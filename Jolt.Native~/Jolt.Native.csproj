@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <UseWindowsToolset>$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))</UseWindowsToolset>
+        <UseMacOSToolset>$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))</UseMacOSToolset>
+        <UseLinuxToolset>$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))</UseLinuxToolset>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Vezel.Zig.Toolsets.win-x64" Version="0.11.0.1" Condition="'$(UseWindowsToolset)' == 'true'">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Vezel.Zig.Toolsets.osx-x64" Version="0.11.0.1" Condition="'$(UseMacOSToolset)' == 'true'">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Vezel.Zig.Toolsets.linux-x64" Version="0.11.0.1" Condition="'$(UseLinuxToolset)' == 'true'">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <NativeOptimize>Debug</NativeOptimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <NativeOptimize>ReleaseFast</NativeOptimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="out\$(Configuration)\**\*.dll" />
+        <Content Include="out\$(Configuration)\**\*.dylib" />
+        <Content Include="out\$(Configuration)\**\*.so" />
+    </ItemGroup>
+
+    <Target Name="Compile Jolt" AfterTargets="Build" Condition="'$(ZigExePath)' != ''">
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
+    </Target>
+
+    <Target Name="Generate Jolt Bindings" BeforeTargets="Build">
+        <Exec Command="clangsharppinvokegenerator -f lib\joltc\joltc.h -n Jolt -m Bindings -l joltc -o ..\Jolt\Bindings\Bindings.g.cs @clangsharp.rsp"/>
+    </Target>
+
+    <ItemGroup>
+        <UnityExports Include="out\$(Configuration)\**\*.dll"/>
+        <UnityExports Include="out\$(Configuration)\**\*.dylib"/>
+        <UnityExports Include="out\$(Configuration)\**\*.so"/>
+    </ItemGroup>
+
+    <Target Name="Export Jolt" AfterTargets="Generate Jolt Bindings">
+        <Copy SourceFiles="@(UnityExports)" DestinationFolder="..\Jolt.Native\$(Configuration)\%(RecursiveDir)" />
+    </Target>
+
+</Project>

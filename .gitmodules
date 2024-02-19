@@ -1,0 +1,3 @@
+[submodule "Jolt.Native~/lib/jolt"]
+	path = Jolt.Native~/lib/jolt
+	url = git@github.com:jrouwe/JoltPhysics.git

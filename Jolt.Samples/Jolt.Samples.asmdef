@@ -1,0 +1,17 @@
+{
+    "name": "Jolt.Samples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a27d84b966358f640a9a96cddf1d0136",
+        "GUID:d8b63aba1907145bea998dd612889d6b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

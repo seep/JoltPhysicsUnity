@@ -1,0 +1,11 @@
+# Jolt.Native build cache directories
+bin/
+obj/
+out/
+
+# Jolt.Native zig cache directories
+zig-out/
+zig-cache/
+
+# JetBrains cache directory
+.idea/
