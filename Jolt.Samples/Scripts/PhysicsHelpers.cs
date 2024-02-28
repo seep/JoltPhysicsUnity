@@ -147,10 +147,7 @@ namespace Jolt.Samples
 
                 if (!TryGetShapeSettings(child.gameObject, out ShapeSettings s)) continue;
 
-                var pos = (float3) child.localPosition;
-                var rot = (quaternion) child.localRotation;
-
-                settings.AddShape(in pos, in rot, s);
+                settings.AddShape(child.localPosition, child.localRotation, s);
             }
 
             return (ShapeSettings) settings;

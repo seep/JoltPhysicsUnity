@@ -10,9 +10,9 @@ namespace Jolt
     {
         private static NativeHandlePool handles = new (1024);
 
-        private static Dictionary<IntPtr, IContactListener> managedContactListeners = new ();
+        private static Dictionary<IntPtr, IContactListener> managedContactListeners = new (); // TODO use unmanaged container for Burst compatability
 
-        private static Dictionary<IntPtr, IBodyActivationListener> managedBodyActivationListeners = new ();
+        private static Dictionary<IntPtr, IBodyActivationListener> managedBodyActivationListeners = new (); // TODO use unmanaged container for Burst compatability
 
         #region Handle Management
 
@@ -256,7 +256,7 @@ namespace Jolt
 
         #region JPH_PhysicsSystem
 
-        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(in PhysicsSystemSettings settings, out NativeOwnedHandle<JPH_ObjectLayerPairFilter> h1, out NativeOwnedHandle<JPH_BroadPhaseLayerInterface> h2, out NativeOwnedHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
+        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings, out NativeOwnedHandle<JPH_ObjectLayerPairFilter> h1, out NativeOwnedHandle<JPH_BroadPhaseLayerInterface> h2, out NativeOwnedHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
         {
             JPH_PhysicsSystemSettings nativeSettings = default;
 
@@ -366,12 +366,9 @@ namespace Jolt
             return Bindings.JPH_PhysicsSystem_GetMaxBodies(GetPointer(system));
         }
 
-        public static void JPH_PhysicsSystem_SetGravity(NativeHandle<JPH_PhysicsSystem> system, in float3 gravity)
+        public static void JPH_PhysicsSystem_SetGravity(NativeHandle<JPH_PhysicsSystem> system, float3 gravity)
         {
-            fixed (float3* gravityPtr = &gravity)
-            {
-                Bindings.JPH_PhysicsSystem_SetGravity(GetPointer(system), gravityPtr);
-            }
+            Bindings.JPH_PhysicsSystem_SetGravity(GetPointer(system), &gravity);
         }
 
         public static float3 JPH_PhysicsSystem_GetGravity(NativeHandle<JPH_PhysicsSystem> system)
@@ -433,12 +430,9 @@ namespace Jolt
 
         #region JPH_BoxShapeSettings
 
-        public static NativeHandle<JPH_BoxShapeSettings> JPH_BoxShapeSettings_Create(in float3 halfExtent, float convexRadius)
+        public static NativeHandle<JPH_BoxShapeSettings> JPH_BoxShapeSettings_Create(float3 halfExtent, float convexRadius)
         {
-            fixed (float3* halfExtentPtr = &halfExtent)
-            {
-                return CreateHandle(Bindings.JPH_BoxShapeSettings_Create(halfExtentPtr, convexRadius));
-            }
+            return CreateHandle(Bindings.JPH_BoxShapeSettings_Create(&halfExtent, convexRadius));
         }
 
         public static NativeHandle<JPH_BoxShape> JPH_BoxShapeSettings_CreateShape(NativeHandle<JPH_BoxShapeSettings> settings)
@@ -450,18 +444,17 @@ namespace Jolt
 
         #region JPH_BoxShape
 
-        public static NativeHandle<JPH_BoxShape> JPH_BoxShape_Create(in float3 halfExtent, float convexRadius)
+        public static NativeHandle<JPH_BoxShape> JPH_BoxShape_Create(float3 halfExtent, float convexRadius)
         {
-            fixed (float3* halfExtentPtr = &halfExtent)
-            {
-                return CreateHandle(Bindings.JPH_BoxShape_Create(halfExtentPtr, convexRadius));
-            }
+            return CreateHandle(Bindings.JPH_BoxShape_Create(&halfExtent, convexRadius));
         }
 
         public static float3 JPH_BoxShape_GetHalfExtent(NativeHandle<JPH_BoxShape> shape)
         {
             float3 result = default;
+
             Bindings.JPH_BoxShape_GetHalfExtent(GetPointer(shape), &result);
+
             return result;
         }
 
@@ -517,14 +510,9 @@ namespace Jolt
 
         #region JPH_TriangleShapeSettings
 
-        public static NativeHandle<JPH_TriangleShapeSettings> JPH_TriangleShapeSettings_Create(in float3 va, in float3 vb, in float3 vc, float convexRadius)
+        public static NativeHandle<JPH_TriangleShapeSettings> JPH_TriangleShapeSettings_Create(float3 va, float3 vb, float3 vc, float convexRadius)
         {
-            fixed (float3* vaPtr = &va)
-            fixed (float3* vbPtr = &vb)
-            fixed (float3* vcPtr = &vc)
-            {
-                return CreateHandle(Bindings.JPH_TriangleShapeSettings_Create(vaPtr, vbPtr, vcPtr, convexRadius));
-            }
+            return CreateHandle(Bindings.JPH_TriangleShapeSettings_Create(&va, &vb, &vc, convexRadius));
         }
 
         #endregion
@@ -687,22 +675,14 @@ namespace Jolt
 
         #region JPH_CompoundShapeSetting
 
-        public static void JPH_CompoundShapeSettings_AddShape<T, U>(NativeHandle<T> settings, in float3 position, in quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShapeSettings
+        public static void JPH_CompoundShapeSettings_AddShape<T, U>(NativeHandle<T> settings, float3 position, quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShapeSettings
         {
-            fixed (float3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                Bindings.JPH_CompoundShapeSettings_AddShape((JPH_CompoundShapeSettings*) GetPointer(settings), positionPtr, rotationPtr, (JPH_ShapeSettings*) GetPointer(shape), userData);
-            }
+            Bindings.JPH_CompoundShapeSettings_AddShape((JPH_CompoundShapeSettings*) GetPointer(settings), &position, &rotation, (JPH_ShapeSettings*) GetPointer(shape), userData);
         }
 
-        public static void JPH_CompoundShapeSettings_AddShape2<T, U>(NativeHandle<T> settings, in float3 position, in quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShape
+        public static void JPH_CompoundShapeSettings_AddShape2<T, U>(NativeHandle<T> settings, float3 position, quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShape
         {
-            fixed (float3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                Bindings.JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings*) GetPointer(settings), positionPtr, rotationPtr, (JPH_Shape*) GetPointer(shape), userData);
-            }
+            Bindings.JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings*) GetPointer(settings), &position, &rotation, (JPH_Shape*) GetPointer(shape), userData);
         }
 
         public static NativeHandle<JPH_StaticCompoundShapeSettings> JPH_StaticCompoundShapeSettings_Create()
@@ -725,22 +705,14 @@ namespace Jolt
 
         #region JPH_RotatedTranslatedShapeSettings
 
-        public static NativeHandle<JPH_RotatedTranslatedShapeSettings> JPH_RotatedTranslatedShapeSettings_Create(in float3 position, in quaternion rotation, NativeHandle<JPH_ShapeSettings> settings)
+        public static NativeHandle<JPH_RotatedTranslatedShapeSettings> JPH_RotatedTranslatedShapeSettings_Create(float3 position, quaternion rotation, NativeHandle<JPH_ShapeSettings> settings)
         {
-            fixed (float3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                return CreateHandle(Bindings.JPH_RotatedTranslatedShapeSettings_Create(positionPtr, rotationPtr, GetPointer(settings)));
-            }
+            return CreateHandle(Bindings.JPH_RotatedTranslatedShapeSettings_Create(&position, &rotation, GetPointer(settings)));
         }
 
-        public static NativeHandle<JPH_RotatedTranslatedShapeSettings> JPH_RotatedTranslatedShapeSettings_Create2(in float3 position, in quaternion rotation, NativeHandle<JPH_Shape> shape)
+        public static NativeHandle<JPH_RotatedTranslatedShapeSettings> JPH_RotatedTranslatedShapeSettings_Create2(float3 position, quaternion rotation, NativeHandle<JPH_Shape> shape)
         {
-            fixed (float3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                return CreateHandle(Bindings.JPH_RotatedTranslatedShapeSettings_Create2(positionPtr, rotationPtr, GetPointer(shape)));
-            }
+            return CreateHandle(Bindings.JPH_RotatedTranslatedShapeSettings_Create2(&position, &rotation, GetPointer(shape)));
         }
 
         public static NativeHandle<JPH_RotatedTranslatedShape> JPH_RotatedTranslatedShapeSettings_CreateShape(NativeHandle<JPH_RotatedTranslatedShapeSettings> settings)
@@ -752,13 +724,9 @@ namespace Jolt
 
         #region JPH_RotatedTranslatedShape
 
-        public static NativeHandle<JPH_RotatedTranslatedShape> JPH_RotatedTranslatedShape_Create(in float3 position, in quaternion rotation, NativeHandle<JPH_Shape> shape)
+        public static NativeHandle<JPH_RotatedTranslatedShape> JPH_RotatedTranslatedShape_Create(float3 position, quaternion rotation, NativeHandle<JPH_Shape> shape)
         {
-            fixed (float3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                return CreateHandle(Bindings.JPH_RotatedTranslatedShape_Create(positionPtr, rotationPtr, GetPointer(shape)));
-            }
+            return CreateHandle(Bindings.JPH_RotatedTranslatedShape_Create(&position, &rotation, GetPointer(shape)));
         }
 
         #endregion
@@ -773,22 +741,28 @@ namespace Jolt
 
         public static AABox JPH_Shape_GetLocalBounds<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            AABox result = default;
+            AABox result;
+
             Bindings.JPH_Shape_GetLocalBounds((JPH_Shape*) GetPointer(shape), &result);
+
             return result;
         }
 
         public static MassProperties JPH_Shape_GetMassProperties<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            MassProperties result = default;
+            MassProperties result;
+
             Bindings.JPH_Shape_GetMassProperties((JPH_Shape*) GetPointer(shape), &result);
+
             return result;
         }
 
         public static float3 JPH_Shape_GetCenterOfMass<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
             float3 result = default;
+
             Bindings.JPH_Shape_GetCenterOfMass((JPH_Shape*) GetPointer(shape), &result);
+
             return result;
         }
 
@@ -806,22 +780,14 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_BodyCreationSettings_Create());
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create2<T>(NativeHandle<T> settings, in double3 position, in quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShapeSettings
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create2<T>(NativeHandle<T> settings, double3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShapeSettings
         {
-            fixed (double3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                return CreateHandle(Bindings.JPH_BodyCreationSettings_Create2((JPH_ShapeSettings*) GetPointer(settings), positionPtr, rotationPtr, motion, layer));
-            }
+            return CreateHandle(Bindings.JPH_BodyCreationSettings_Create2((JPH_ShapeSettings*) GetPointer(settings), &position, &rotation, motion, layer));
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create3<T>(NativeHandle<T> shape, in double3 position, in quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShape
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create3<T>(NativeHandle<T> shape, double3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShape
         {
-            fixed (double3* positionPtr = &position)
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                return CreateHandle(Bindings.JPH_BodyCreationSettings_Create3((JPH_Shape*) GetPointer(shape), positionPtr, rotationPtr, motion, layer));
-            }
+            return CreateHandle(Bindings.JPH_BodyCreationSettings_Create3((JPH_Shape*) GetPointer(shape), &position, &rotation, motion, layer));
         }
 
         public static void JPH_BodyCreationSettings_Destroy(NativeHandle<JPH_BodyCreationSettings> handle)
@@ -834,31 +800,29 @@ namespace Jolt
         public static float3 JPH_BodyCreationSettings_GetLinearVelocity(NativeHandle<JPH_BodyCreationSettings> settings)
         {
             float3 result;
+
             Bindings.JPH_BodyCreationSettings_GetLinearVelocity(GetPointer(settings), &result);
+
             return result;
         }
 
-        public static void JPH_BodyCreationSettings_SetLinearVelocity(NativeHandle<JPH_BodyCreationSettings> settings, in float3 velocity)
+        public static void JPH_BodyCreationSettings_SetLinearVelocity(NativeHandle<JPH_BodyCreationSettings> settings, float3 velocity)
         {
-            fixed (float3* velocityPtr = &velocity)
-            {
-                Bindings.JPH_BodyCreationSettings_SetLinearVelocity(GetPointer(settings), velocityPtr);
-            }
+            Bindings.JPH_BodyCreationSettings_SetLinearVelocity(GetPointer(settings), &velocity);
         }
 
         public static float3 JPH_BodyCreationSettings_GetAngularVelocity(NativeHandle<JPH_BodyCreationSettings> settings)
         {
             float3 result;
+
             Bindings.JPH_BodyCreationSettings_GetAngularVelocity(GetPointer(settings), &result);
+
             return result;
         }
 
-        public static void JPH_BodyCreationSettings_SetAngularVelocity(NativeHandle<JPH_BodyCreationSettings> settings, in float3 velocity)
+        public static void JPH_BodyCreationSettings_SetAngularVelocity(NativeHandle<JPH_BodyCreationSettings> settings, float3 velocity)
         {
-            fixed (float3* velocityPtr = &velocity)
-            {
-                Bindings.JPH_BodyCreationSettings_SetAngularVelocity(GetPointer(settings), velocityPtr);
-            }
+            Bindings.JPH_BodyCreationSettings_SetAngularVelocity(GetPointer(settings), &velocity);
         }
 
         public static MotionType JPH_BodyCreationSettings_GetMotionType(NativeHandle<JPH_BodyCreationSettings> settings)
@@ -1035,25 +999,26 @@ namespace Jolt
             return Bindings.JPH_BodyInterface_IsAdded(GetOwnedPointer(@interface), bodyID);
         }
 
-        public static void JPH_BodyInterface_SetLinearVelocity(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, in float3 velocity)
+        public static void JPH_BodyInterface_SetLinearVelocity(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, float3 velocity)
         {
-            fixed (float3* velocityPtr = &velocity)
-            {
-                Bindings.JPH_BodyInterface_SetLinearVelocity(GetOwnedPointer(@interface), bodyID, velocityPtr);
-            }
+            Bindings.JPH_BodyInterface_SetLinearVelocity(GetOwnedPointer(@interface), bodyID, &velocity);
         }
 
         public static float3 JPH_BodyInterface_GetLinearVelocity(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            float3 result = default;
+            float3 result;
+
             Bindings.JPH_BodyInterface_GetLinearVelocity(GetOwnedPointer(@interface), bodyID, &result);
+
             return result;
         }
 
         public static double3 JPH_BodyInterface_GetCenterOfMassPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            double3 result = default;
+            double3 result;
+
             Bindings.JPH_BodyInterface_GetCenterOfMassPosition(GetOwnedPointer(@interface), bodyID, &result);
+
             return result;
         }
 
@@ -1087,33 +1052,31 @@ namespace Jolt
             Bindings.JPH_BodyInterface_SetFriction(GetOwnedPointer(@interface), bodyID, friction);
         }
 
-        public static void JPH_BodyInterface_SetPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, in double3 position, Activation activation)
+        public static void JPH_BodyInterface_SetPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, double3 position, Activation activation)
         {
-            fixed (double3* positionPtr = &position)
-            {
-                Bindings.JPH_BodyInterface_SetPosition(GetOwnedPointer(@interface), bodyID, positionPtr, activation);
-            }
+            Bindings.JPH_BodyInterface_SetPosition(GetOwnedPointer(@interface), bodyID, &position, activation);
         }
 
         public static double3 JPH_BodyInterface_GetPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             double3 result;
+
             Bindings.JPH_BodyInterface_GetPosition(GetOwnedPointer(@interface), bodyID, &result);
+
             return result;
         }
 
-        public static void JPH_BodyInterface_SetRotation(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, in quaternion rotation, Activation activation)
+        public static void JPH_BodyInterface_SetRotation(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, quaternion rotation, Activation activation)
         {
-            fixed (quaternion* rotationPtr = &rotation)
-            {
-                Bindings.JPH_BodyInterface_SetRotation(GetOwnedPointer(@interface), bodyID, rotationPtr, activation);
-            }
+            Bindings.JPH_BodyInterface_SetRotation(GetOwnedPointer(@interface), bodyID, &rotation, activation);
         }
 
         public static quaternion JPH_BodyInterface_GetRotation(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             quaternion result;
+
             Bindings.JPH_BodyInterface_GetRotation(GetOwnedPointer(@interface), bodyID, &result);
+
             return result;
         }
 
@@ -1121,7 +1084,7 @@ namespace Jolt
 
         public static rmatrix4x4 JPH_BodyInterface_GetWorldTransform(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            rmatrix4x4 result = default;
+            rmatrix4x4 result;
 
             Bindings.JPH_BodyInterface_GetWorldTransform(GetOwnedPointer(@interface), bodyID, &result);
 
@@ -1177,22 +1140,265 @@ namespace Jolt
         public static AABox JPH_Body_GetWorldSpaceBounds(NativeHandle<JPH_Body> body)
         {
             AABox result;
+
             Bindings.JPH_Body_GetWorldSpaceBounds(GetPointer(body), &result);
+
             return result;
         }
 
-        public static void JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subshapeID, out double3 position, out float3 normal)
+        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subShapeID, double3 position)
         {
-            fixed (double3* positionPtr = &position)
-            fixed (float3* normalPtr = &normal)
-            {
-                Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(GetPointer(body), subshapeID, positionPtr, normalPtr);
-            }
+            float3 result;
+
+            Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(GetPointer(body), subShapeID, &position, &result);
+
+            return result;
         }
 
         public static bool JPH_Body_IsActive(NativeHandle<JPH_Body> body)
         {
             return Bindings.JPH_Body_IsActive(GetPointer(body));
+        }
+
+        public static bool JPH_Body_IsStatic(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_IsStatic(GetPointer(body));
+        }
+
+        public static bool JPH_Body_IsKinematic(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_IsKinematic(GetPointer(body));
+        }
+
+        public static bool JPH_Body_IsDynamic(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_IsDynamic(GetPointer(body));
+        }
+
+        public static bool JPH_Body_IsSensor(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_IsSensor(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetIsSensor(NativeHandle<JPH_Body> body, bool value)
+        {
+            Bindings.JPH_Body_SetIsSensor(GetPointer(body), value);
+        }
+
+        public static void JPH_Body_SetCollideKinematicVsNonDynamic(NativeHandle<JPH_Body> body, bool value)
+        {
+            Bindings.JPH_Body_SetCollideKinematicVsNonDynamic(GetPointer(body), value);
+        }
+
+        public static bool JPH_Body_GetCollideKinematicVsNonDynamic(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetCollideKinematicVsNonDynamic(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetUseManifoldReduction(NativeHandle<JPH_Body> body, bool value)
+        {
+            Bindings.JPH_Body_SetUseManifoldReduction(GetPointer(body), value);
+        }
+
+        public static bool JPH_Body_GetUseManifoldReduction(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetUseManifoldReduction(GetPointer(body));
+        }
+
+        public static bool JPH_Body_GetUseManifoldReductionWithBody(NativeHandle<JPH_Body> body, NativeHandle<JPH_Body> other)
+        {
+            return Bindings.JPH_Body_GetUseManifoldReductionWithBody(GetPointer(body), GetPointer(body));
+        }
+
+        public static void JPH_Body_SetApplyGyroscopicForce(NativeHandle<JPH_Body> body, bool value)
+        {
+            Bindings.JPH_Body_SetApplyGyroscopicForce(GetPointer(body), value);
+        }
+
+        public static bool JPH_Body_GetApplyGyroscopicForce(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetApplyGyroscopicForce(GetPointer(body));
+        }
+
+        public static NativeOwnedHandle<JPH_MotionProperties> JPH_Body_GetMotionProperties(NativeHandle<JPH_Body> body)
+        {
+            return CreateOwnedHandle(body, Bindings.JPH_Body_GetMotionProperties(GetPointer(body)));
+        }
+
+        public static MotionType JPH_Body_GetMotionType(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetMotionType(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetMotionType(NativeHandle<JPH_Body> body, MotionType motion)
+        {
+            Bindings.JPH_Body_SetMotionType(GetPointer(body), motion);
+        }
+
+        public static bool JPH_Body_GetAllowSleeping(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetAllowSleeping(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetAllowSleeping(NativeHandle<JPH_Body> body, bool allowSleeping)
+        {
+            Bindings.JPH_Body_SetAllowSleeping(GetPointer(body), allowSleeping);
+        }
+
+        public static void JPH_Body_ResetSleepTimer(NativeHandle<JPH_Body> body)
+        {
+            Bindings.JPH_Body_ResetSleepTimer(GetPointer(body));
+        }
+
+        public static float JPH_Body_GetFriction(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetFriction(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetFriction(NativeHandle<JPH_Body> body, float friction)
+        {
+            Bindings.JPH_Body_SetFriction(GetPointer(body), friction);
+        }
+
+        public static float JPH_Body_GetRestitution(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetRestitution(GetPointer(body));
+        }
+
+        public static void JPH_Body_SetRestitution(NativeHandle<JPH_Body> body, float restitution)
+        {
+            Bindings.JPH_Body_SetRestitution(GetPointer(body), restitution);
+        }
+
+        public static float3 JPH_Body_GetLinearVelocity(NativeHandle<JPH_Body> body)
+        {
+            float3 result;
+
+            Bindings.JPH_Body_GetLinearVelocity(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static void JPH_Body_SetLinearVelocity(NativeHandle<JPH_Body> body, float3 velocity)
+        {
+            Bindings.JPH_Body_SetLinearVelocity(GetPointer(body), &velocity);
+        }
+
+        public static float3 JPH_Body_GetAngularVelocity(NativeHandle<JPH_Body> body)
+        {
+            float3 result;
+
+            Bindings.JPH_Body_GetAngularVelocity(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static void JPH_Body_SetAngularVelocity(NativeHandle<JPH_Body> body, float3 velocity)
+        {
+            Bindings.JPH_Body_SetAngularVelocity(GetPointer(body), &velocity);
+        }
+
+        public static void JPH_Body_AddForce(NativeHandle<JPH_Body> body, float3 force)
+        {
+            Bindings.JPH_Body_AddForce(GetPointer(body), &force);
+        }
+
+        public static void JPH_Body_AddForceAtPosition(NativeHandle<JPH_Body> body, float3 force, double3 position)
+        {
+            Bindings.JPH_Body_AddForceAtPosition(GetPointer(body), &force, &position);
+        }
+
+        public static void JPH_Body_AddTorque(NativeHandle<JPH_Body> body, float3 force)
+        {
+            Bindings.JPH_Body_AddTorque(GetPointer(body), &force);
+        }
+
+        public static float3 JPH_Body_GetAccumulatedForce(NativeHandle<JPH_Body> body)
+        {
+            float3 result;
+
+            Bindings.JPH_Body_GetAccumulatedForce(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static float3 JPH_Body_GetAccumulatedTorque(NativeHandle<JPH_Body> body)
+        {
+            float3 result;
+
+            Bindings.JPH_Body_GetAccumulatedTorque(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static void JPH_Body_AddImpulse(NativeHandle<JPH_Body> body, float3 impulse)
+        {
+            Bindings.JPH_Body_AddImpulse(GetPointer(body), &impulse);
+        }
+
+        public static void JPH_Body_AddImpulseAtPosition(NativeHandle<JPH_Body> body, float3 impulse, double3 position)
+        {
+            Bindings.JPH_Body_AddImpulseAtPosition(GetPointer(body), &impulse, &position);
+        }
+
+        public static void JPH_Body_AddAngularImpulse(NativeHandle<JPH_Body> body, float3 angularImpulse)
+        {
+            Bindings.JPH_Body_AddAngularImpulse(GetPointer(body), &angularImpulse);
+        }
+
+        public static double3 JPH_Body_GetPosition(NativeHandle<JPH_Body> body)
+        {
+            double3 result;
+
+            Bindings.JPH_Body_GetPosition(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static quaternion JPH_Body_GetRotation(NativeHandle<JPH_Body> body)
+        {
+            quaternion result;
+
+            Bindings.JPH_Body_GetRotation(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static double3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
+        {
+            double3 result;
+
+            Bindings.JPH_Body_GetCenterOfMassPosition(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static rmatrix4x4 JPH_Body_GetWorldTransform(NativeHandle<JPH_Body> body)
+        {
+            rmatrix4x4 result;
+
+            Bindings.JPH_Body_GetWorldTransform(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static rmatrix4x4 JPH_Body_GetCenterOfMassTransform(NativeHandle<JPH_Body> body)
+        {
+            rmatrix4x4 result;
+
+            Bindings.JPH_Body_GetCenterOfMassTransform(GetPointer(body), &result);
+
+            return result;
+        }
+
+        public static void JPH_Body_SetUserData(NativeHandle<JPH_Body> body, ulong userData)
+        {
+            Bindings.JPH_Body_SetUserData(GetPointer(body), userData);
+        }
+
+        public static ulong JPH_Body_GetUserData(NativeHandle<JPH_Body> body)
+        {
+            return Bindings.JPH_Body_GetUserData(GetPointer(body));
         }
 
         #endregion

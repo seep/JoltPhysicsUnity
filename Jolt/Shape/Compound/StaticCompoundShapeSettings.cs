@@ -24,14 +24,14 @@ namespace Jolt
 
         #region JPH_CompoundShapeSettings
 
-        public void AddShape(in float3 position, in quaternion rotation, ShapeSettings shape, uint userData = 0)
+        public void AddShape(float3 position, quaternion rotation, ShapeSettings shape, uint userData = 0)
         {
-            JPH_CompoundShapeSettings_AddShape(Handle, in position, in rotation, shape.Handle, userData);
+            JPH_CompoundShapeSettings_AddShape(Handle, position, rotation, shape.Handle, userData);
         }
 
-        public void AddShape(in float3 position, in quaternion rotation, Shape shape, uint userData)
+        public void AddShape(float3 position, quaternion rotation, Shape shape, uint userData)
         {
-            JPH_CompoundShapeSettings_AddShape2(Handle, in position, in rotation, shape.Handle, userData);
+            JPH_CompoundShapeSettings_AddShape2(Handle, position, rotation, shape.Handle, userData);
         }
 
         #endregion
