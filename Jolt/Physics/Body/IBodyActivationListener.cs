@@ -1,6 +1,4 @@
-﻿using static Jolt.JoltAPI;
-
-namespace Jolt
+﻿namespace Jolt
 {
     public interface IBodyActivationListener
     {
