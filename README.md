@@ -7,6 +7,11 @@ package for unmanaged collections.
 The C# API is almost entirely implemented on unmanaged structs, making it suitable for use from
 Unity Jobs and Burst compiled code.
 
+### Installation
+
+The package is not currently published on any registries. You can [add it as a git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
+or [embed it directly in your project](https://docs.unity3d.com/Manual/upm-embed.html).
+
 ### Acknowledgements
 
 This package relies on the `joltc` bindings written by [amerkoleci](https://github.com/amerkoleci)
