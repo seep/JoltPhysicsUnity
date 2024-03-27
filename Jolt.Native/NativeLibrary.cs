@@ -70,7 +70,7 @@ namespace Jolt.Native
 
             foreach (var path in paths)
             {
-                if (TryLoadLibrary($"{path}/{libname}", out libptr))
+                if (TryLoadLibrary(Path.Combine(path, libname), out libptr))
                 {
                     Debug.Log($"Loaded Jolt library at {path}/{libname}");
                     break;
@@ -120,7 +120,7 @@ namespace Jolt.Native
 
         private static string[] EditorLibraryPaths()
         {
-            const string package = "unjolt";
+            const string package = "com.seep.jolt";
 
             #if JOLT_RELEASE
             const string config = "Release";
