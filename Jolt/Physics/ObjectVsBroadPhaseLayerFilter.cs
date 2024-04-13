@@ -4,9 +4,9 @@ namespace Jolt
 {
     public struct ObjectVsBroadPhaseLayerFilter : IEquatable<ObjectVsBroadPhaseLayerFilter>
     {
-        internal NativeOwnedHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
+        internal NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
 
-        internal ObjectVsBroadPhaseLayerFilter(NativeOwnedHandle<JPH_ObjectVsBroadPhaseLayerFilter> handle)
+        internal ObjectVsBroadPhaseLayerFilter(NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> handle)
         {
             Handle = handle;
         }

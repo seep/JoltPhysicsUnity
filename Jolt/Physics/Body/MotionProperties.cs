@@ -4,9 +4,9 @@ namespace Jolt
 {
     public struct MotionProperties : IEquatable<MotionProperties>
     {
-        internal NativeOwnedHandle<JPH_MotionProperties> Handle;
+        internal NativeHandle<JPH_MotionProperties> Handle;
 
-        internal MotionProperties(NativeOwnedHandle<JPH_MotionProperties> handle)
+        internal MotionProperties(NativeHandle<JPH_MotionProperties> handle)
         {
             Handle = handle;
         }

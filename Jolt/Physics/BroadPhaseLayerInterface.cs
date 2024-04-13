@@ -2,9 +2,9 @@
 {
     public struct BroadPhaseLayerInterface
     {
-        internal NativeOwnedHandle<JPH_BroadPhaseLayerInterface> Handle;
+        internal NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
 
-        internal BroadPhaseLayerInterface(NativeOwnedHandle<JPH_BroadPhaseLayerInterface> handle)
+        internal BroadPhaseLayerInterface(NativeHandle<JPH_BroadPhaseLayerInterface> handle)
         {
             Handle = handle;
         }

@@ -1,76 +1,85 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Jolt
 {
-    /// <summary>
-    /// A handle for a native resource.
-    /// </summary>
-    internal struct NativeHandle : IEquatable<NativeHandle>
+    internal unsafe struct NativeHandle<T> : IDisposable, IEquatable<NativeHandle<T>> where T : unmanaged
     {
-        internal uint Index;
-        internal uint Version;
+        #if !JOLT_DISABLE_SAFETY_CHECkS
+        private NativeSafetyHandle safety;
+        #endif
 
-        public static NativeHandle Null = new ();
+        private T* ptr;
 
-        public static bool operator ==(NativeHandle lhs, NativeHandle rhs)
+        public NativeHandle(T* ptr)
         {
-            return lhs.Equals(rhs);
+            #if !JOLT_DISABLE_SAFETY_CHECkS
+            safety = NativeSafetyHandle.Create();
+            #endif
+
+            this.ptr = ptr;
         }
 
-        public static bool operator !=(NativeHandle lhs, NativeHandle rhs)
+        /// <summary>
+        /// Create a NativeHandle to a new pointer with the same safety handle as this handle. If this handle is disposed of, the owned handle will throw if it is dereferenced.
+        /// </summary>
+        public NativeHandle<U> CreateOwnedHandle<U>(U* ptr) where U : unmanaged
         {
-            return !lhs.Equals(rhs);
+            #if !JOLT_DISABLE_SAFETY_CHECkS
+            return new NativeHandle<U> { ptr = ptr, safety = safety };
+            #else
+            return new NativeHandle<U> { ptr = ptr };
+            #endif
         }
 
-        public bool Equals(NativeHandle other)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly NativeHandle<U> Reinterpret<U>() where U : unmanaged
         {
-            return Index == other.Index && Version == other.Version;
+            #if !JOLT_DISABLE_SAFETY_CHECkS
+            return new NativeHandle<U> { ptr = (U*) ptr, safety = safety };
+            #else
+            return new NativeHandle<U> { ptr = (U*) ptr };
+            #endif
         }
 
-        public override bool Equals(object obj)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly T* Unwrap()
         {
-            return obj is NativeHandle other && Equals(other);
+            #if !JOLT_DISABLE_SAFETY_CHECkS
+            NativeSafetyHandle.AssertExists(in safety);
+            #endif
+
+            return ptr;
         }
 
-        public override int GetHashCode()
+        #region IDisposable
+
+        public void Dispose()
         {
-            return HashCode.Combine(Index, Version);
-        }
-    }
+            #if !JOLT_DISABLE_SAFETY_CHECkS
+            NativeSafetyHandle.Release(safety);
+            #endif
 
-    /// <summary>
-    /// Typed version of NativeHandle. The generic typing is only for development; typed and untyped handles are considered equal as long as their index and version are equal.
-    /// </summary>
-    internal struct NativeHandle<T> : IEquatable<NativeHandle<T>>
-    {
-        internal uint Index;
-        internal uint Version;
-
-        public static NativeHandle<T> Null = new ();
-
-        public NativeHandle Untyped()
-        {
-            return new NativeHandle { Index = Index, Version = Version };
+            ptr = null;
         }
 
-        public readonly NativeHandle<U> Reinterpret<U>()
-        {
-            return new NativeHandle<U> { Index = Index, Version = Version };
-        }
+        #endregion
 
-        public bool Equals(NativeHandle other)
-        {
-            return Index == other.Index && Version == other.Version;
-        }
+        #region IEquatable
 
         public bool Equals(NativeHandle<T> other)
         {
-            return Index == other.Index && Version == other.Version;
+            return ptr == other.ptr;
         }
 
         public override bool Equals(object obj)
         {
             return obj is NativeHandle<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine((nint) ptr);
         }
 
         public static bool operator ==(NativeHandle<T> lhs, NativeHandle<T> rhs)
@@ -83,9 +92,6 @@ namespace Jolt
             return !lhs.Equals(rhs);
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Index, Version);
-        }
+        #endregion
     }
 }

@@ -6,9 +6,9 @@ namespace Jolt
 {
     public struct BodyInterface
     {
-        internal NativeOwnedHandle<JPH_BodyInterface> Handle;
+        internal NativeHandle<JPH_BodyInterface> Handle;
 
-        internal BodyInterface(NativeOwnedHandle<JPH_BodyInterface> handle)
+        internal BodyInterface(NativeHandle<JPH_BodyInterface> handle)
         {
             Handle = handle;
         }

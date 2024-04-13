@@ -5,9 +5,9 @@ namespace Jolt
 {
     public struct ObjectLayerPairFilter : IEquatable<ObjectLayerPairFilter>
     {
-        internal NativeOwnedHandle<JPH_ObjectLayerPairFilter> Handle;
+        internal NativeHandle<JPH_ObjectLayerPairFilter> Handle;
 
-        internal ObjectLayerPairFilter(NativeOwnedHandle<JPH_ObjectLayerPairFilter> handle)
+        internal ObjectLayerPairFilter(NativeHandle<JPH_ObjectLayerPairFilter> handle)
         {
             Handle = handle;
         }

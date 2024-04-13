@@ -8,8 +8,6 @@ namespace Jolt
 {
     internal static unsafe class JoltAPI
     {
-        private static NativeHandlePool handles = new (1024);
-
         private static Dictionary<IntPtr, IContactListener> managedContactListeners = new (); // TODO use unmanaged container for Burst compatability
 
         private static Dictionary<IntPtr, IBodyActivationListener> managedBodyActivationListeners = new (); // TODO use unmanaged container for Burst compatability
@@ -19,31 +17,19 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static NativeHandle<T> CreateHandle<T>(T* ptr) where T : unmanaged
         {
-            return handles.CreateHandle(ptr);
+            return new NativeHandle<T>(ptr);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static NativeOwnedHandle<U> CreateOwnedHandle<T, U>(NativeHandle<T> owner, U* ptr) where T : unmanaged where U : unmanaged
+        private static NativeHandle<U> CreateOwnedHandle<T, U>(NativeHandle<T> owner, U* ptr) where T : unmanaged where U : unmanaged
         {
-            return handles.CreateOwnedHandle(owner, ptr);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void DisposeHandle<T>(NativeHandle<T> handle) where T : unmanaged
-        {
-            handles.DisposeHandle(handle);
+            return owner.CreateOwnedHandle(ptr);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T* GetPointer<T>(NativeHandle<T> handle) where T : unmanaged
         {
-            return handles.GetPointer(handle);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T* GetOwnedPointer<T>(NativeOwnedHandle<T> handle) where T : unmanaged
-        {
-            return handles.GetOwnedPointer(handle);
+            return handle.Unwrap();
         }
 
         #endregion
@@ -256,7 +242,7 @@ namespace Jolt
 
         #region JPH_PhysicsSystem
 
-        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings, out NativeOwnedHandle<JPH_ObjectLayerPairFilter> h1, out NativeOwnedHandle<JPH_BroadPhaseLayerInterface> h2, out NativeOwnedHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
+        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings, out NativeHandle<JPH_ObjectLayerPairFilter> h1, out NativeHandle<JPH_BroadPhaseLayerInterface> h2, out NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
         {
             JPH_PhysicsSystemSettings nativeSettings = default;
 
@@ -290,7 +276,8 @@ namespace Jolt
         public static void JPH_PhysicsSystem_Destroy(NativeHandle<JPH_PhysicsSystem> handle)
         {
             Bindings.JPH_PhysicsSystem_Destroy(GetPointer(handle));
-            DisposeHandle(handle);
+
+            handle.Dispose();
         }
 
         public static void JPH_PhysicsSystem_OptimizeBroadPhase(NativeHandle<JPH_PhysicsSystem> handle)
@@ -303,32 +290,32 @@ namespace Jolt
             return Bindings.JPH_PhysicsSystem_Step(GetPointer(system), deltaTime, collisionSteps);
         }
 
-        public static NativeOwnedHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterface(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterface(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetBodyInterface(GetPointer(system)));
         }
 
-        public static NativeOwnedHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetBodyInterfaceNoLock(GetPointer(system)));
         }
 
-        public static NativeOwnedHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterface(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterface(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetBodyLockInterface(GetPointer(system)));
         }
 
-        public static NativeOwnedHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(GetPointer(system)));
         }
 
-        public static NativeOwnedHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetNarrowPhaseQuery(GetPointer(system)));
         }
 
-        public static NativeOwnedHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(GetPointer(system)));
         }
@@ -409,7 +396,8 @@ namespace Jolt
         public static void JPH_ShapeSettings_Destroy<T>(NativeHandle<T> settings) where T : unmanaged, INativeShapeSettings
         {
             Bindings.JPH_ShapeSettings_Destroy((JPH_ShapeSettings*) GetPointer(settings));
-            DisposeHandle(settings);
+
+            settings.Dispose();
         }
 
         #endregion
@@ -729,10 +717,11 @@ namespace Jolt
 
         #region JPH_Shape
 
-        public static void JPH_Shape_Destroy<T>(NativeHandle<T> handle) where T : unmanaged, INativeShape
+        public static void JPH_Shape_Destroy<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            Bindings.JPH_Shape_Destroy((JPH_Shape*) GetPointer(handle));
-            DisposeHandle(handle);
+            Bindings.JPH_Shape_Destroy((JPH_Shape*) GetPointer(shape));
+
+            shape.Dispose();
         }
 
         public static AABox JPH_Shape_GetLocalBounds<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
@@ -786,11 +775,11 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_BodyCreationSettings_Create3((JPH_Shape*) GetPointer(shape), &position, &rotation, motion, layer));
         }
 
-        public static void JPH_BodyCreationSettings_Destroy(NativeHandle<JPH_BodyCreationSettings> handle)
+        public static void JPH_BodyCreationSettings_Destroy(NativeHandle<JPH_BodyCreationSettings> settings)
         {
-            Bindings.JPH_BodyCreationSettings_Destroy(GetPointer(handle));
+            Bindings.JPH_BodyCreationSettings_Destroy(GetPointer(settings));
 
-            DisposeHandle(handle);
+            settings.Dispose();
         }
 
         public static float3 JPH_BodyCreationSettings_GetLinearVelocity(NativeHandle<JPH_BodyCreationSettings> settings)
@@ -914,175 +903,175 @@ namespace Jolt
 
         #region JPH_BodyInterface
 
-        public static void JPH_BodyInterface_DestroyBody(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static void JPH_BodyInterface_DestroyBody(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            Bindings.JPH_BodyInterface_DestroyBody(GetOwnedPointer(@interface), bodyID);
+            Bindings.JPH_BodyInterface_DestroyBody(GetPointer(@interface), bodyID);
 
             // TODO mark any active body handles for this bodyID as disposed
         }
 
-        public static BodyID JPH_BodyInterface_CreateAndAddBody(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings, Activation activation)
+        public static BodyID JPH_BodyInterface_CreateAndAddBody(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings, Activation activation)
         {
-            return Bindings.JPH_BodyInterface_CreateAndAddBody(GetOwnedPointer(@interface), GetPointer(settings), activation);
+            return Bindings.JPH_BodyInterface_CreateAndAddBody(GetPointer(@interface), GetPointer(settings), activation);
         }
 
-        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBody(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings)
+        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBody(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_BodyInterface_CreateBody(GetOwnedPointer(@interface), GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_BodyInterface_CreateBody(GetPointer(@interface), GetPointer(settings)));
         }
 
-        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateSoftBody(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_SoftBodyCreationSettings> settings)
+        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateSoftBody(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_SoftBodyCreationSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_BodyInterface_CreateSoftBody(GetOwnedPointer(@interface), GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_BodyInterface_CreateSoftBody(GetPointer(@interface), GetPointer(settings)));
         }
 
-        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBodyWithID(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, NativeHandle<JPH_BodyCreationSettings> settings)
+        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBodyWithID(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, NativeHandle<JPH_BodyCreationSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_BodyInterface_CreateBodyWithID(GetOwnedPointer(@interface), bodyID, GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_BodyInterface_CreateBodyWithID(GetPointer(@interface), bodyID, GetPointer(settings)));
         }
 
-        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBodyWithoutID(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings)
+        public static NativeHandle<JPH_Body> JPH_BodyInterface_CreateBodyWithoutID(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_BodyCreationSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_BodyInterface_CreateBodyWithoutID(GetOwnedPointer(@interface), GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_BodyInterface_CreateBodyWithoutID(GetPointer(@interface), GetPointer(settings)));
         }
 
-        public static void JPH_BodyInterface_DestroyBodyWithoutID(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body)
+        public static void JPH_BodyInterface_DestroyBodyWithoutID(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body)
         {
-            Bindings.JPH_BodyInterface_DestroyBodyWithoutID(GetOwnedPointer(@interface), GetPointer(body));
+            Bindings.JPH_BodyInterface_DestroyBodyWithoutID(GetPointer(@interface), GetPointer(body));
         }
 
-        public static bool JPH_BodyInterface_AssignBodyID(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body)
+        public static bool JPH_BodyInterface_AssignBodyID(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body)
         {
-            return Bindings.JPH_BodyInterface_AssignBodyID(GetOwnedPointer(@interface), GetPointer(body));
+            return Bindings.JPH_BodyInterface_AssignBodyID(GetPointer(@interface), GetPointer(body));
         }
 
-        public static bool JPH_BodyInterface_AssignBodyID2(NativeOwnedHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body, BodyID bodyID)
+        public static bool JPH_BodyInterface_AssignBodyID2(NativeHandle<JPH_BodyInterface> @interface, NativeHandle<JPH_Body> body, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_AssignBodyID2(GetOwnedPointer(@interface), GetPointer(body), bodyID);
+            return Bindings.JPH_BodyInterface_AssignBodyID2(GetPointer(@interface), GetPointer(body), bodyID);
         }
 
-        public static NativeHandle<JPH_Body> JPH_BodyInterface_UnassignBodyID(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static NativeHandle<JPH_Body> JPH_BodyInterface_UnassignBodyID(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             // TODO is CreateHandle correct? Does that create a duplicate pointer to the body?
 
-            // return CreateHandle(Bindings.JPH_BodyInterface_UnassignBodyID(GetOwnedPointer(@interface), bodyID));
+            // return CreateHandle(Bindings.JPH_BodyInterface_UnassignBodyID(GetPointer(@interface), bodyID));
 
             throw new NotImplementedException();
         }
 
-        public static void JPH_BodyInterface_AddBody(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, Activation activation)
+        public static void JPH_BodyInterface_AddBody(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, Activation activation)
         {
-            Bindings.JPH_BodyInterface_AddBody(GetOwnedPointer(@interface), bodyID, activation);
+            Bindings.JPH_BodyInterface_AddBody(GetPointer(@interface), bodyID, activation);
         }
 
-        public static void JPH_BodyInterface_RemoveBody(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static void JPH_BodyInterface_RemoveBody(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            Bindings.JPH_BodyInterface_RemoveBody(GetOwnedPointer(@interface), bodyID);
+            Bindings.JPH_BodyInterface_RemoveBody(GetPointer(@interface), bodyID);
         }
 
-        public static bool JPH_BodyInterface_IsActive(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static bool JPH_BodyInterface_IsActive(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_IsActive(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_IsActive(GetPointer(@interface), bodyID);
         }
 
-        public static bool JPH_BodyInterface_IsAdded(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static bool JPH_BodyInterface_IsAdded(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_IsAdded(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_IsAdded(GetPointer(@interface), bodyID);
         }
 
-        public static bool JPH_BodyInterface_GetBodyType(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static bool JPH_BodyInterface_GetBodyType(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_IsAdded(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_IsAdded(GetPointer(@interface), bodyID);
         }
 
-        public static void JPH_BodyInterface_SetLinearVelocity(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, float3 velocity)
+        public static void JPH_BodyInterface_SetLinearVelocity(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, float3 velocity)
         {
-            Bindings.JPH_BodyInterface_SetLinearVelocity(GetOwnedPointer(@interface), bodyID, &velocity);
+            Bindings.JPH_BodyInterface_SetLinearVelocity(GetPointer(@interface), bodyID, &velocity);
         }
 
-        public static float3 JPH_BodyInterface_GetLinearVelocity(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static float3 JPH_BodyInterface_GetLinearVelocity(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             float3 result;
 
-            Bindings.JPH_BodyInterface_GetLinearVelocity(GetOwnedPointer(@interface), bodyID, &result);
+            Bindings.JPH_BodyInterface_GetLinearVelocity(GetPointer(@interface), bodyID, &result);
 
             return result;
         }
 
-        public static double3 JPH_BodyInterface_GetCenterOfMassPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static double3 JPH_BodyInterface_GetCenterOfMassPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             double3 result;
 
-            Bindings.JPH_BodyInterface_GetCenterOfMassPosition(GetOwnedPointer(@interface), bodyID, &result);
+            Bindings.JPH_BodyInterface_GetCenterOfMassPosition(GetPointer(@interface), bodyID, &result);
 
             return result;
         }
 
-        public static MotionType JPH_BodyInterface_GetMotionType(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static MotionType JPH_BodyInterface_GetMotionType(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_GetMotionType(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_GetMotionType(GetPointer(@interface), bodyID);
         }
 
-        public static void JPH_BodyInterface_SetMotionType(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, MotionType motion, Activation activation)
+        public static void JPH_BodyInterface_SetMotionType(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, MotionType motion, Activation activation)
         {
-            Bindings.JPH_BodyInterface_SetMotionType(GetOwnedPointer(@interface), bodyID, motion, activation);
+            Bindings.JPH_BodyInterface_SetMotionType(GetPointer(@interface), bodyID, motion, activation);
         }
 
-        public static float JPH_BodyInterface_GetRestitution(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static float JPH_BodyInterface_GetRestitution(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_GetRestitution(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_GetRestitution(GetPointer(@interface), bodyID);
         }
 
-        public static void JPH_BodyInterface_SetRestitution(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, float restitution)
+        public static void JPH_BodyInterface_SetRestitution(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, float restitution)
         {
-            Bindings.JPH_BodyInterface_SetRestitution(GetOwnedPointer(@interface), bodyID, restitution);
+            Bindings.JPH_BodyInterface_SetRestitution(GetPointer(@interface), bodyID, restitution);
         }
 
-        public static float JPH_BodyInterface_GetFriction(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static float JPH_BodyInterface_GetFriction(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            return Bindings.JPH_BodyInterface_GetFriction(GetOwnedPointer(@interface), bodyID);
+            return Bindings.JPH_BodyInterface_GetFriction(GetPointer(@interface), bodyID);
         }
 
-        public static void JPH_BodyInterface_SetFriction(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, float friction)
+        public static void JPH_BodyInterface_SetFriction(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, float friction)
         {
-            Bindings.JPH_BodyInterface_SetFriction(GetOwnedPointer(@interface), bodyID, friction);
+            Bindings.JPH_BodyInterface_SetFriction(GetPointer(@interface), bodyID, friction);
         }
 
-        public static void JPH_BodyInterface_SetPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, double3 position, Activation activation)
+        public static void JPH_BodyInterface_SetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, double3 position, Activation activation)
         {
-            Bindings.JPH_BodyInterface_SetPosition(GetOwnedPointer(@interface), bodyID, &position, activation);
+            Bindings.JPH_BodyInterface_SetPosition(GetPointer(@interface), bodyID, &position, activation);
         }
 
-        public static double3 JPH_BodyInterface_GetPosition(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static double3 JPH_BodyInterface_GetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             double3 result;
 
-            Bindings.JPH_BodyInterface_GetPosition(GetOwnedPointer(@interface), bodyID, &result);
+            Bindings.JPH_BodyInterface_GetPosition(GetPointer(@interface), bodyID, &result);
 
             return result;
         }
 
-        public static void JPH_BodyInterface_SetRotation(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID, quaternion rotation, Activation activation)
+        public static void JPH_BodyInterface_SetRotation(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, quaternion rotation, Activation activation)
         {
-            Bindings.JPH_BodyInterface_SetRotation(GetOwnedPointer(@interface), bodyID, &rotation, activation);
+            Bindings.JPH_BodyInterface_SetRotation(GetPointer(@interface), bodyID, &rotation, activation);
         }
 
-        public static quaternion JPH_BodyInterface_GetRotation(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static quaternion JPH_BodyInterface_GetRotation(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             quaternion result;
 
-            Bindings.JPH_BodyInterface_GetRotation(GetOwnedPointer(@interface), bodyID, &result);
+            Bindings.JPH_BodyInterface_GetRotation(GetPointer(@interface), bodyID, &result);
 
             return result;
         }
 
         // TODO
 
-        public static rmatrix4x4 JPH_BodyInterface_GetWorldTransform(NativeOwnedHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static rmatrix4x4 JPH_BodyInterface_GetWorldTransform(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             rmatrix4x4 result;
 
-            Bindings.JPH_BodyInterface_GetWorldTransform(GetOwnedPointer(@interface), bodyID, &result);
+            Bindings.JPH_BodyInterface_GetWorldTransform(GetPointer(@interface), bodyID, &result);
 
             return result;
         }
@@ -1216,7 +1205,7 @@ namespace Jolt
             return Bindings.JPH_Body_GetApplyGyroscopicForce(GetPointer(body));
         }
 
-        public static NativeOwnedHandle<JPH_MotionProperties> JPH_Body_GetMotionProperties(NativeHandle<JPH_Body> body)
+        public static NativeHandle<JPH_MotionProperties> JPH_Body_GetMotionProperties(NativeHandle<JPH_Body> body)
         {
             return CreateOwnedHandle(body, Bindings.JPH_Body_GetMotionProperties(GetPointer(body)));
         }
