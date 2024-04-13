@@ -643,23 +643,19 @@ namespace Jolt
             }
         }
 
-        public static void JPH_MeshShapeSettings_DetermineMinAndMaxSample(NativeHandle<JPH_HeightFieldShapeSettings> settings, out float min, out float max, out float quantization)
+        public static void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(NativeHandle<JPH_HeightFieldShapeSettings> settings, out float min, out float max, out float quantization)
         {
-            // TODO rename JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample ?
-
             fixed (float* minPtr = &min)
             fixed (float* maxPtr = &max)
             fixed (float* quantizationPtr = &quantization)
             {
-                Bindings.JPH_MeshShapeSettings_DetermineMinAndMaxSample(GetPointer(settings), minPtr, maxPtr, quantizationPtr);
+                Bindings.JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(GetPointer(settings), minPtr, maxPtr, quantizationPtr);
             }
         }
 
-        public static uint JPH_MeshShapeSettings_CalculateBitsPerSampleForError(NativeHandle<JPH_HeightFieldShapeSettings> settings, float maxError)
+        public static uint JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(NativeHandle<JPH_HeightFieldShapeSettings> settings, float maxError)
         {
-            // TODO rename JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError ?
-
-            return Bindings.JPH_MeshShapeSettings_CalculateBitsPerSampleForError(GetPointer(settings), maxError);
+            return Bindings.JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(GetPointer(settings), maxError);
         }
 
         #endregion
