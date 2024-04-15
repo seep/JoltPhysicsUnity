@@ -14,6 +14,10 @@ namespace Jolt
 
         public ObjectVsBroadPhaseLayerFilter ObjectVsBroadPhaseLayerFilter;
 
+        internal NativeHandle<JPH_ContactListener> ContactListenerHandle;
+
+        internal NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
+
         public PhysicsSystem(PhysicsSystemSettings settings)
         {
             Handle = JPH_PhysicsSystem_Create(settings, out var h1, out var h2, out var h3);
@@ -23,6 +27,10 @@ namespace Jolt
             BroadPhaseLayerInterface = new BroadPhaseLayerInterface(h2);
 
             ObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilter(h3);
+
+            ContactListenerHandle = JPH_ContactListener_Create();
+
+            BodyActivationListenerHandle = JPH_BodyActivationListener_Create();
         }
 
         public void OptimizeBroadPhase()
@@ -33,6 +41,20 @@ namespace Jolt
         public BodyInterface GetBodyInterface()
         {
             return new BodyInterface(JPH_PhysicsSystem_GetBodyInterface(Handle));
+        }
+
+        public void SetContactListener(IContactListener listener)
+        {
+            ContactListener.Attach(this, listener);
+
+            JPH_PhysicsSystem_SetContactListener(Handle, ContactListenerHandle);
+        }
+
+        public void SetBodyActivationListener(IBodyActivationListener listener)
+        {
+            BodyActivationListener.Attach(this, listener);
+
+            JPH_PhysicsSystem_SetBodyActivationListener(Handle, BodyActivationListenerHandle);
         }
 
         /// <summary>
@@ -71,7 +93,15 @@ namespace Jolt
 
         public void Dispose()
         {
+            ContactListener.Detach(this);
+
+            BodyActivationListener.Detach(this);
+
             JPH_PhysicsSystem_Destroy(Handle);
+
+            JPH_ContactListener_Destroy(ContactListenerHandle);
+
+            JPH_BodyActivationListener_Destroy(BodyActivationListenerHandle);
         }
 
         public bool Equals(PhysicsSystem other)

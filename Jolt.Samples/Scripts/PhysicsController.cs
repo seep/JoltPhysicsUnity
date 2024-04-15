@@ -28,6 +28,11 @@ namespace Jolt.Samples
             system = new PhysicsSystem(settings);
             bodies = system.GetBodyInterface();
 
+            foreach (var addon in GetComponents<IPhysicsSystemAddon>())
+            {
+                addon.Initialize(system); // initialize any adjacent addons
+            }
+
             foreach (var authoring in FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
             {
                 var bodyID = PhysicsHelpers.CreateBodyFromGameObject(bodies, authoring.gameObject);

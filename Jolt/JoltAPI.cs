@@ -8,10 +8,6 @@ namespace Jolt
 {
     internal static unsafe class JoltAPI
     {
-        private static Dictionary<IntPtr, IContactListener> managedContactListeners = new (); // TODO use unmanaged container for Burst compatability
-
-        private static Dictionary<IntPtr, IBodyActivationListener> managedBodyActivationListeners = new (); // TODO use unmanaged container for Burst compatability
-
         #region Handle Management
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,26 +29,6 @@ namespace Jolt
         }
 
         #endregion
-
-        static JoltAPI()
-        {
-            // Set global static contact and body activation listeners. These are invoked by joltc
-            // with the listener, which we use as a key to find the associated managed callbacks.
-
-            Bindings.JPH_ContactListener_SetProcs(new JPH_ContactListener_Procs
-            {
-                OnContactValidate  = Marshal.GetFunctionPointerForDelegate(OnContactValidateDelegate),
-                OnContactAdded     = Marshal.GetFunctionPointerForDelegate(OnContactAddedDelegate),
-                OnContactPersisted = Marshal.GetFunctionPointerForDelegate(OnContactPersistedDelegate),
-                OnContactRemoved   = Marshal.GetFunctionPointerForDelegate(OnContactRemovedDelegate),
-            });
-
-            Bindings.JPH_BodyActivationListener_SetProcs(new JPH_BodyActivationListener_Procs
-            {
-                OnBodyActivated   = Marshal.GetFunctionPointerForDelegate(OnBodyActivatedDelegate),
-                OnBodyDeactivated = Marshal.GetFunctionPointerForDelegate(OnBodyDeactivatedDelegate),
-            });
-        }
 
         #region JPH
 
@@ -158,88 +134,6 @@ namespace Jolt
 
         #endregion
 
-        #region JPH_ContactListener
-
-        private static void OnContactValidateCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result)
-        {
-            if (managedContactListeners.TryGetValue((IntPtr) listener, out var value))
-            {
-                value.OnContactValidate(); // TODO add args
-            }
-        }
-
-        private static void OnContactAddedCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB)
-        {
-            if (managedContactListeners.TryGetValue((IntPtr) listener, out var value))
-            {
-                value.OnContactAdded(); // TODO add args
-            }
-        }
-
-        private static void OnContactPersistedCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB)
-        {
-            if (managedContactListeners.TryGetValue((IntPtr) listener, out var value))
-            {
-                value.OnContactPersisted(); // TODO add args
-            }
-        }
-
-        private static void OnContactRemovedCallback(JPH_ContactListener* listener, JPH_SubShapeIDPair* pair)
-        {
-            if (managedContactListeners.TryGetValue((IntPtr) listener, out var value))
-            {
-                value.OnContactRemoved(); // TODO add args
-            }
-        }
-
-        // Define static delegates so we can marshal function pointers.
-
-        private delegate void OnContactValidate(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result);
-
-        private static readonly OnContactValidate OnContactValidateDelegate = OnContactValidateCallback;
-
-        private delegate void OnContactAdded(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB);
-
-        private static readonly OnContactAdded OnContactAddedDelegate = OnContactAddedCallback;
-
-        private delegate void OnContactPersisted(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB);
-
-        private static readonly OnContactPersisted OnContactPersistedDelegate = OnContactPersistedCallback;
-
-        private delegate void OnContactRemoved(JPH_ContactListener* listener, JPH_SubShapeIDPair* pair);
-
-        private static readonly OnContactRemoved OnContactRemovedDelegate = OnContactRemovedCallback;
-
-        #endregion
-
-        #region JPH_BodyActivationListener
-
-        private static void OnBodyActivatedCallback(JPH_BodyActivationListener* listener, BodyID bodyID, ulong bodyUserData)
-        {
-            if (managedBodyActivationListeners.TryGetValue((IntPtr) listener, out var value))
-            {
-                value.OnBodyActivated(bodyID, bodyUserData);
-            }
-        }
-
-        private static void OnBodyDeactivatedCallback(JPH_BodyActivationListener* listener, BodyID bodyID, ulong bodyUserData)
-        {
-            if (managedBodyActivationListeners.TryGetValue((IntPtr)listener, out var value))
-            {
-                value.OnBodyDeactivated(bodyID, bodyUserData);
-            }
-        }
-
-        private delegate void OnBodyActivated(JPH_BodyActivationListener* listener, BodyID bodyID, ulong bodyUserData);
-
-        private static readonly OnBodyActivated OnBodyActivatedDelegate = OnBodyActivatedCallback;
-
-        private delegate void OnBodyDeactivated(JPH_BodyActivationListener* listener, BodyID bodyID, ulong bodyUserData);
-
-        private static readonly OnBodyDeactivated OnBodyDeactivatedDelegate = OnBodyDeactivatedCallback;
-
-        #endregion
-
         #region JPH_PhysicsSystem
 
         public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings, out NativeHandle<JPH_ObjectLayerPairFilter> h1, out NativeHandle<JPH_BroadPhaseLayerInterface> h2, out NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
@@ -320,22 +214,14 @@ namespace Jolt
             return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(GetPointer(system)));
         }
 
-        public static void JPH_PhysicsSystem_SetContactListener(NativeHandle<JPH_PhysicsSystem> system, IContactListener listener)
+        public static void JPH_PhysicsSystem_SetContactListener(NativeHandle<JPH_PhysicsSystem> system, NativeHandle<JPH_ContactListener> listener)
         {
-            var nativeContactListener = Bindings.JPH_ContactListener_Create();
-
-            Bindings.JPH_PhysicsSystem_SetContactListener(GetPointer(system), nativeContactListener);
-
-            managedContactListeners.Add((IntPtr) nativeContactListener, listener);
+            Bindings.JPH_PhysicsSystem_SetContactListener(GetPointer(system), GetPointer(listener));
         }
 
-        public static void JPH_PhysicsSystem_SetBodyActivationListener(NativeHandle<JPH_PhysicsSystem> system, IBodyActivationListener listener)
+        public static void JPH_PhysicsSystem_SetBodyActivationListener(NativeHandle<JPH_PhysicsSystem> system, NativeHandle<JPH_BodyActivationListener> listener)
         {
-            var nativeBodyActivationListener = Bindings.JPH_BodyActivationListener_Create();
-
-            Bindings.JPH_PhysicsSystem_SetBodyActivationListener(GetPointer(system), nativeBodyActivationListener);
-
-            managedBodyActivationListeners.Add((IntPtr) nativeBodyActivationListener, listener);
+            Bindings.JPH_PhysicsSystem_SetBodyActivationListener(GetPointer(system), GetPointer(listener));
         }
 
         public static uint JPH_PhysicsSystem_GetNumBodies(NativeHandle<JPH_PhysicsSystem> system)
@@ -1384,6 +1270,58 @@ namespace Jolt
         public static ulong JPH_Body_GetUserData(NativeHandle<JPH_Body> body)
         {
             return Bindings.JPH_Body_GetUserData(GetPointer(body));
+        }
+
+        #endregion
+
+        #region JPH_BroadPhaseLayerFilter
+
+        // TODO
+
+        #endregion
+
+        #region JPH_ObjectLayerFilter
+
+        // TODO
+
+        #endregion
+
+        #region JPH_BodyFilter
+
+        // TODO
+
+        #endregion
+
+        #region JPH_ContactListener
+
+        // JPH_ContactListener_SetProcs is used directly internally
+
+        public static NativeHandle<JPH_ContactListener> JPH_ContactListener_Create()
+        {
+            return CreateHandle(Bindings.JPH_ContactListener_Create());
+        }
+
+        public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
+        {
+            Bindings.JPH_ContactListener_Destroy(GetPointer(listener));
+            listener.Dispose();
+        }
+
+        #endregion
+
+        #region JPH_BodyActivationListener
+
+        // JPH_BodyActivationListener_SetProcs is used directly internally
+
+        public static NativeHandle<JPH_BodyActivationListener> JPH_BodyActivationListener_Create()
+        {
+            return CreateHandle(Bindings.JPH_BodyActivationListener_Create());
+        }
+
+        public static void JPH_BodyActivationListener_Destroy(NativeHandle<JPH_BodyActivationListener> listener)
+        {
+            Bindings.JPH_BodyActivationListener_Destroy(GetPointer(listener));
+            listener.Dispose();
         }
 
         #endregion
