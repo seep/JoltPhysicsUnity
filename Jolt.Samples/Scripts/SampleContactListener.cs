@@ -9,9 +9,11 @@ namespace Jolt.Samples
             system.SetContactListener(this);
         }
 
-        public void OnContactValidate()
+        public ValidateResult OnContactValidate()
         {
             Debug.Log("OnContactValidate");
+
+            return ValidateResult.AcceptAllContactsForThisBodyPair;
         }
 
         void IContactListener.OnContactAdded()
