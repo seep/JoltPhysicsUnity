@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace Jolt
 {
-    internal static unsafe class ContactListener
+    internal static unsafe class StaticContactListener
     {
-        private delegate void OnContactValidate(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result);
+        private delegate ValidateResult OnContactValidate(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result);
 
         private delegate void OnContactAdded(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB);
 
@@ -17,7 +18,7 @@ namespace Jolt
 
         private static Dictionary<nint, IContactListener> lookup = new (); // TODO use unmanaged container for Burst compatability
 
-        static ContactListener()
+        static StaticContactListener()
         {
             Bindings.JPH_ContactListener_SetProcs(new JPH_ContactListener_Procs
             {
@@ -49,12 +50,19 @@ namespace Jolt
             lookup.Remove((nint) system.ContactListenerHandle.Unwrap());
         }
 
-        private static void OnContactValidateCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result)
+        private static ValidateResult OnContactValidateCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result)
         {
             if (lookup.TryGetValue((nint) listener, out var value))
             {
-                value.OnContactValidate(); // TODO add args
+                return value.OnContactValidate(); // TODO add args
             }
+
+            #if UNITY_EDITOR
+            Debug.LogError("Missing contact listener in OnContactValidate; using default ValidateResult. Outside the editor this error will crash the application!");
+            return default; // prevent jolt from crashing the editor
+            #endif
+
+            throw new Exception("Missing contact listener in OnContactValidate.");
         }
 
         private static void OnContactAddedCallback(JPH_ContactListener* listener, JPH_Body* bodyA, JPH_Body* bodyB)

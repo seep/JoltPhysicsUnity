@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    public static unsafe class BodyActivationListener
+    public static unsafe class StaticBodyActivationListener
     {
         private delegate void OnBodyActivated(JPH_BodyActivationListener* listener, BodyID bodyID, ulong bodyUserData);
 
@@ -12,7 +12,7 @@ namespace Jolt
 
         private static Dictionary<nint, IBodyActivationListener> lookup = new (); // TODO use unmanaged container for Burst compatability
 
-        static BodyActivationListener()
+        static StaticBodyActivationListener()
         {
             Bindings.JPH_BodyActivationListener_SetProcs(new JPH_BodyActivationListener_Procs
             {

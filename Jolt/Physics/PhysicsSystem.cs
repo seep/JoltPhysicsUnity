@@ -45,14 +45,14 @@ namespace Jolt
 
         public void SetContactListener(IContactListener listener)
         {
-            ContactListener.Attach(this, listener);
+            StaticContactListener.Attach(this, listener);
 
             JPH_PhysicsSystem_SetContactListener(Handle, ContactListenerHandle);
         }
 
         public void SetBodyActivationListener(IBodyActivationListener listener)
         {
-            BodyActivationListener.Attach(this, listener);
+            StaticBodyActivationListener.Attach(this, listener);
 
             JPH_PhysicsSystem_SetBodyActivationListener(Handle, BodyActivationListenerHandle);
         }
@@ -93,9 +93,9 @@ namespace Jolt
 
         public void Dispose()
         {
-            ContactListener.Detach(this);
+            StaticContactListener.Detach(this);
 
-            BodyActivationListener.Detach(this);
+            StaticBodyActivationListener.Detach(this);
 
             JPH_PhysicsSystem_Destroy(Handle);
 
