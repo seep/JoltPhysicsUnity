@@ -43,24 +43,24 @@
         <Content Include="out\$(Configuration)\**\*.so" />
     </ItemGroup>
 
-    <Target Name="Compile Jolt" AfterTargets="Build" Condition="'$(ZigExePath)' != ''">
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
-    </Target>
-
-    <Target Name="Generate Jolt Bindings" BeforeTargets="Build">
-        <Exec Command="clangsharppinvokegenerator -f lib\joltc\joltc.h -n Jolt -m Bindings -l joltc -o ..\Jolt\Bindings\Bindings.g.cs @clangsharp.rsp"/>
-    </Target>
-
     <ItemGroup>
         <UnityExports Include="out\$(Configuration)\**\*.dll"/>
         <UnityExports Include="out\$(Configuration)\**\*.dylib"/>
         <UnityExports Include="out\$(Configuration)\**\*.so"/>
     </ItemGroup>
 
-    <Target Name="Export Jolt" AfterTargets="Generate Jolt Bindings">
+    <Target Name="Compile Jolt" AfterTargets="Build" Condition="'$(ZigExePath)' != ''">
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
+    </Target>
+
+    <Target Name="Export Jolt" AfterTargets="Compile Jolt">
         <Copy SourceFiles="@(UnityExports)" DestinationFolder="..\Jolt.Native\$(Configuration)\%(RecursiveDir)" />
+    </Target>
+
+    <Target Name="Generate Jolt Bindings" AfterTargets="Build">
+        <Exec Command="clangsharppinvokegenerator -f lib\joltc\joltc.h -n Jolt -m Bindings -l joltc -o ..\Jolt\Bindings\Bindings.g.cs @clangsharp.rsp"/>
     </Target>
 
 </Project>
