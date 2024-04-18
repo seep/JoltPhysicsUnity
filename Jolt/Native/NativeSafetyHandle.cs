@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
+using UnityEngine;
+
+[assembly: InternalsVisibleTo("Jolt.Editor")]
 
 namespace Jolt
 {
+    #if !JOLT_DISABLE_SAFETY_CHECkS
+
     /// <summary>
     /// A safety handle for detecting use-after-free access of native objects.
     /// </summary>
@@ -13,15 +18,32 @@ namespace Jolt
         // AtomicSafetyHandle is tightly coupled to the ENABLE_UNITY_COLLECTIONS_CHECKS scripting
         // define, and ideally the Jolt safety checks can be enabled independently.
 
+        // TODO investigate more sophisticated use-after-free safety checks
+
         public uint Index;
 
         private static uint nextHandleIndex;
 
         private static NativeHashSet<uint> disposed;
 
-        static NativeSafetyHandle()
+        [RuntimeInitializeOnLoadMethod]
+        internal static void Initialize()
         {
+            if (disposed.IsCreated) disposed.Dispose();
+
             disposed = new NativeHashSet<uint>(1024, Allocator.Persistent);
+        }
+
+        /// <summary>
+        /// Dispose the internal safety handle state.
+        /// </summary>
+        internal static void Deinitialize()
+        {
+            if (!disposed.IsCreated) return;
+
+            // TODO check for unreleased safety handles?
+
+            disposed.Dispose();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,6 +55,11 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Release(in NativeSafetyHandle handle)
         {
+            if (disposed.Contains(handle.Index))
+            {
+                Debug.LogWarning("A NativeSafetyHandle is being released for a handle index that was already released.");
+            }
+
             disposed.Add(handle.Index);
         }
 
@@ -47,4 +74,6 @@ namespace Jolt
             }
         }
     }
+
+    #endif
 }

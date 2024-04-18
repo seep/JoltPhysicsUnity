@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using Jolt.Native;
 
+using static Jolt.JoltAPI;
+
 namespace Jolt
 {
     internal class JoltAutoInitialization : MonoBehaviour
@@ -16,7 +18,7 @@ namespace Jolt
 
             NativeLibrary.LoadLibrary();
 
-            if (!JoltAPI.JPH_Init(DefaultTempAllocatorSize))
+            if (!JPH_Init(DefaultTempAllocatorSize))
             {
                 Debug.LogError("JPH_Init failed");
             }
@@ -28,7 +30,7 @@ namespace Jolt
 
         private static void Shutdown()
         {
-            JoltAPI.JPH_Shutdown();
+            JPH_Shutdown();
 
             initialized = false;
         }
