@@ -16,12 +16,12 @@ namespace Jolt
             return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create() };
         }
 
-        public static BodyCreationSettings FromShapeSettings(ShapeSettings settings, in double3 position, in quaternion rotation, MotionType motion, ushort layer)
+        public static BodyCreationSettings FromShapeSettings(ShapeSettings settings, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
             return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create2(settings.Handle, position, rotation, motion, layer) };
         }
 
-        public static BodyCreationSettings FromShape(Shape shape, in double3 position, in quaternion rotation, MotionType motion, ushort layer)
+        public static BodyCreationSettings FromShape(Shape shape, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
             return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motion, layer) };
         }

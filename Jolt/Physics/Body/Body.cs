@@ -30,7 +30,7 @@ namespace Jolt
             return JPH_Body_GetWorldSpaceBounds(Handle);
         }
 
-        public float3 GetWorldSpaceSurfaceNormal(uint subShapeID, double3 position)
+        public float3 GetWorldSpaceSurfaceNormal(uint subShapeID, rvec3 position)
         {
             return JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, position);
         }
@@ -175,7 +175,7 @@ namespace Jolt
             JPH_Body_AddForce(Handle, force);
         }
 
-        public void AddForceAtPosition(float3 force, double3 position)
+        public void AddForceAtPosition(float3 force, rvec3 position)
         {
             JPH_Body_AddForceAtPosition(Handle, force, position);
         }
@@ -200,7 +200,7 @@ namespace Jolt
             JPH_Body_AddImpulse(Handle, impulse);
         }
 
-        public void AddImpulseAtPosition(float3 impulse, double3 position)
+        public void AddImpulseAtPosition(float3 impulse, rvec3 position)
         {
             JPH_Body_AddImpulseAtPosition(Handle, impulse, position);
         }
@@ -210,7 +210,7 @@ namespace Jolt
             JPH_Body_AddAngularImpulse(Handle, impulse);
         }
 
-        public double3 GetPosition()
+        public rvec3 GetPosition()
         {
             return JPH_Body_GetPosition(Handle);
         }
@@ -220,7 +220,7 @@ namespace Jolt
             return JPH_Body_GetRotation(Handle);
         }
 
-        public double3 GetCenterOfMassPosition()
+        public rvec3 GetCenterOfMassPosition()
         {
             return JPH_Body_GetCenterOfMassPosition(Handle);
         }

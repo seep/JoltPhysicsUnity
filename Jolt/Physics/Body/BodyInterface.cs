@@ -43,7 +43,7 @@ namespace Jolt
             return JPH_BodyInterface_GetWorldTransform(Handle, bodyID);
         }
 
-        public double3 GetCenterOfMassPosition(BodyID bodyID)
+        public rvec3 GetCenterOfMassPosition(BodyID bodyID)
         {
             return JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID);
         }
