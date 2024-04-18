@@ -16,7 +16,11 @@ namespace Jolt.Samples
         {
             // assume no scaling and skip decomposition
 
-            var wtransform = bodies.GetWorldTransform(bodyID).IntoFloat4x4();
+            #if JOLT_DOUBLE_PRECISION
+            throw new NotImplementedException();
+            #endif
+
+            var wtransform = (float4x4) bodies.GetWorldTransform(bodyID);
 
             transform.position = wtransform.c3.xyz;
             transform.rotation = new quaternion(wtransform);
@@ -33,7 +37,7 @@ namespace Jolt.Samples
                 throw new NotImplementedException();
             }
 
-            var pos = new double3(body.transform.position);
+            var pos = (float3) body.transform.position;
             var rot = (quaternion) body.transform.rotation;
 
             var layer = body.MotionType == MotionType.Static
@@ -45,7 +49,7 @@ namespace Jolt.Samples
                 : Activation.Activate;
 
             var settings = BodyCreationSettings.FromShapeSettings(
-                shape, in pos, in rot, body.MotionType, layer
+                shape, pos, rot, body.MotionType, layer
             );
 
             return bodies.CreateAndAddBody(settings, activation);

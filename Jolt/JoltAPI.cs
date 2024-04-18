@@ -651,12 +651,12 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_BodyCreationSettings_Create());
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create2<T>(NativeHandle<T> settings, double3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShapeSettings
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create2<T>(NativeHandle<T> settings, rvec3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShapeSettings
         {
             return CreateHandle(Bindings.JPH_BodyCreationSettings_Create2((JPH_ShapeSettings*) GetPointer(settings), &position, &rotation, motion, layer));
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create3<T>(NativeHandle<T> shape, double3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShape
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create3<T>(NativeHandle<T> shape, rvec3 position, quaternion rotation, MotionType motion, ushort layer) where T : unmanaged, INativeShape
         {
             return CreateHandle(Bindings.JPH_BodyCreationSettings_Create3((JPH_Shape*) GetPointer(shape), &position, &rotation, motion, layer));
         }
@@ -884,9 +884,9 @@ namespace Jolt
             return result;
         }
 
-        public static double3 JPH_BodyInterface_GetCenterOfMassPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static rvec3 JPH_BodyInterface_GetCenterOfMassPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            double3 result;
+            rvec3 result;
 
             Bindings.JPH_BodyInterface_GetCenterOfMassPosition(GetPointer(@interface), bodyID, &result);
 
@@ -923,14 +923,14 @@ namespace Jolt
             Bindings.JPH_BodyInterface_SetFriction(GetPointer(@interface), bodyID, friction);
         }
 
-        public static void JPH_BodyInterface_SetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, double3 position, Activation activation)
+        public static void JPH_BodyInterface_SetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, rvec3 position, Activation activation)
         {
             Bindings.JPH_BodyInterface_SetPosition(GetPointer(@interface), bodyID, &position, activation);
         }
 
-        public static double3 JPH_BodyInterface_GetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static rvec3 JPH_BodyInterface_GetPosition(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
-            double3 result;
+            rvec3 result;
 
             Bindings.JPH_BodyInterface_GetPosition(GetPointer(@interface), bodyID, &result);
 
@@ -1017,7 +1017,7 @@ namespace Jolt
             return result;
         }
 
-        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subShapeID, double3 position)
+        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subShapeID, rvec3 position)
         {
             float3 result;
 
@@ -1174,7 +1174,7 @@ namespace Jolt
             Bindings.JPH_Body_AddForce(GetPointer(body), &force);
         }
 
-        public static void JPH_Body_AddForceAtPosition(NativeHandle<JPH_Body> body, float3 force, double3 position)
+        public static void JPH_Body_AddForceAtPosition(NativeHandle<JPH_Body> body, float3 force, rvec3 position)
         {
             Bindings.JPH_Body_AddForceAtPosition(GetPointer(body), &force, &position);
         }
@@ -1207,7 +1207,7 @@ namespace Jolt
             Bindings.JPH_Body_AddImpulse(GetPointer(body), &impulse);
         }
 
-        public static void JPH_Body_AddImpulseAtPosition(NativeHandle<JPH_Body> body, float3 impulse, double3 position)
+        public static void JPH_Body_AddImpulseAtPosition(NativeHandle<JPH_Body> body, float3 impulse, rvec3 position)
         {
             Bindings.JPH_Body_AddImpulseAtPosition(GetPointer(body), &impulse, &position);
         }
@@ -1217,9 +1217,9 @@ namespace Jolt
             Bindings.JPH_Body_AddAngularImpulse(GetPointer(body), &angularImpulse);
         }
 
-        public static double3 JPH_Body_GetPosition(NativeHandle<JPH_Body> body)
+        public static rvec3 JPH_Body_GetPosition(NativeHandle<JPH_Body> body)
         {
-            double3 result;
+            rvec3 result;
 
             Bindings.JPH_Body_GetPosition(GetPointer(body), &result);
 
@@ -1235,9 +1235,9 @@ namespace Jolt
             return result;
         }
 
-        public static double3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
+        public static rvec3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
         {
-            double3 result;
+            rvec3 result;
 
             Bindings.JPH_Body_GetCenterOfMassPosition(GetPointer(body), &result);
 
