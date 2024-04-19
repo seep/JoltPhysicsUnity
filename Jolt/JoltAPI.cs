@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Unity.Mathematics;
 
 namespace Jolt
@@ -1323,6 +1321,30 @@ namespace Jolt
             Bindings.JPH_BodyActivationListener_Destroy(GetPointer(listener));
             listener.Dispose();
         }
+
+        #endregion
+
+        #region JPH_CharacterBaseSettings
+
+        // TODO
+
+        #endregion
+
+        #region JPH_CharacterBase
+
+        // TODO
+
+        #endregion
+
+        #region JPH_CharacterVirtualSettings
+
+        // TODO
+
+        #endregion
+
+        #region JPH_CharacterVirtual
+
+        // TODO
 
         #endregion
     }
