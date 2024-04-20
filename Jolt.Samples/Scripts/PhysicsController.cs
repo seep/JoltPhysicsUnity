@@ -5,8 +5,28 @@ namespace Jolt.Samples
 {
     public class PhysicsController : MonoBehaviour
     {
+        /// <summary>
+        /// The max amount of rigid bodies that can be added to the physics system. Adding more will raise a native exception.
+        /// </summary>
+        /// <remarks>
+        /// This is intentionally low for the samples. For a real project, use something in the order of 65536.
+        /// </remarks>
         private const uint MaxBodies = 1024;
+
+        /// <summary>
+        /// The max amount of body pairs that can be queued at any time. If this is too small, the queue will fill up and the broad phase jobs will start to do narrow phase work. This is slightly less efficient.
+        /// </summary>
+        /// <remarks>
+        /// This is intentionally low for the samples. For a real project, use something in the order of 65536.
+        /// </remarks>
         private const uint MaxBodyPairs = 1024;
+
+        /// <summary>
+        /// The maximum size of the contact constraint buffer. If more contacts are detected, these contacts will be ignored and bodies will start interpenetrating / fall through the world.
+        /// </summary>
+        /// <remarks>
+        /// This is intentionally low for the samples. For a real project, use something in the order of 10240.
+        /// </remarks>
         private const uint MaxContactConstraints = 1024;
 
         private const int CollisionSteps = 1;
