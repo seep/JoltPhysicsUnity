@@ -23,9 +23,16 @@ namespace Jolt
                 Debug.LogError("JPH_Init failed");
             }
 
+            JPH_SetAssertFailureHandler(OnAssertFailure);
+
             initialized = true;
 
             Application.quitting += Shutdown;
+        }
+
+        private static void OnAssertFailure(string expr, string message, string file, uint line)
+        {
+            Debug.Log($"Jolt Assertion Failed:\n{expr}\n{message}\n{file}\n{line}");
         }
 
         private static void Shutdown()

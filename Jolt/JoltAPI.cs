@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Unity.Mathematics;
 
 namespace Jolt
@@ -40,10 +41,12 @@ namespace Jolt
             Bindings.JPH_Shutdown();
         }
 
-        public static void JPH_SetAssertFailureHandler()
+        public static void JPH_SetAssertFailureHandler(AssertFailureHandler handler)
         {
-            throw new NotImplementedException();
+            Bindings.JPH_SetAssertFailureHandler(Marshal.GetFunctionPointerForDelegate(handler));
         }
+
+        internal delegate void AssertFailureHandler(string expr, string message, string file, uint line);
 
         #endregion
 
