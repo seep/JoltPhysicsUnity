@@ -75,22 +75,22 @@ namespace Jolt
 
         public static NativeHandle<JPH_ObjectLayerPairFilter> JPH_ObjectLayerPairFilterMask_Create()
         {
-            throw new NotImplementedException();
+            return CreateHandle(Bindings.JPH_ObjectLayerPairFilterMask_Create());
         }
 
-        public static void JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask)
+        public static ushort JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask)
         {
-            Bindings.JPH_ObjectLayerPairFilterMask_GetObjectLayer(group, mask); // TODO no handle?
+            return Bindings.JPH_ObjectLayerPairFilterMask_GetObjectLayer(group, mask); // TODO no handle?
         }
 
-        public static void JPH_ObjectLayerPairFilterMask_GetGroup(ushort layer)
+        public static uint JPH_ObjectLayerPairFilterMask_GetGroup(ushort layer)
         {
-            Bindings.JPH_ObjectLayerPairFilterMask_GetGroup(layer); // TODO no handle?
+            return Bindings.JPH_ObjectLayerPairFilterMask_GetGroup(layer); // TODO no handle?
         }
 
-        public static void JPH_ObjectLayerPairFilterMask_GetMask(ushort layer)
+        public static uint JPH_ObjectLayerPairFilterMask_GetMask(ushort layer)
         {
-            Bindings.JPH_ObjectLayerPairFilterMask_GetMask(layer); // TODO no handle?
+            return Bindings.JPH_ObjectLayerPairFilterMask_GetMask(layer);
         }
 
         #endregion
@@ -110,6 +110,11 @@ namespace Jolt
         public static void JPH_ObjectLayerPairFilterTable_EnableCollision(NativeHandle<JPH_ObjectLayerPairFilter> filter, ushort layerA, ushort layerB)
         {
             Bindings.JPH_ObjectLayerPairFilterTable_EnableCollision(GetPointer(filter), layerA, layerB);
+        }
+
+        public static bool JPH_ObjectLayerPairFilterTable_ShouldCollide(NativeHandle<JPH_ObjectLayerPairFilter> filter, ushort layerA, ushort layerB)
+        {
+            return Bindings.JPH_ObjectLayerPairFilterTable_ShouldCollide(GetPointer(filter), layerA, layerB);
         }
 
         #endregion

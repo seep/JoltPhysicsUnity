@@ -1,5 +1,4 @@
 ﻿using System;
-using static Jolt.JoltAPI;
 
 namespace Jolt
 {
@@ -13,6 +12,16 @@ namespace Jolt
         }
 
         #region IEquatable
+
+        public static bool operator ==(ObjectLayerPairFilter lhs, ObjectLayerPairFilter rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ObjectLayerPairFilter lhs, ObjectLayerPairFilter rhs)
+        {
+            return !lhs.Equals(rhs);
+        }
 
         public bool Equals(ObjectLayerPairFilter other)
         {
