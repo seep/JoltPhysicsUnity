@@ -33,6 +33,7 @@ JPH_AllowedDOFs=AllowedDOFs
 JPH_Bool32=NativeBool
 JPH_BodyID=BodyID
 JPH_BodyType=BodyType
+JPH_BroadPhaseLayer=BroadPhaseLayer
 JPH_ConstraintSpace=ConstraintSpace
 JPH_GroundState=GroundState
 JPH_IndexedTriangle=IndexedTriangle
@@ -42,6 +43,7 @@ JPH_Matrix4x4=float4x4
 JPH_MotionType=MotionType
 JPH_MotionQuality=MotionQuality
 JPH_MotorState=MotorState
+JPH_ObjectLayer=ObjectLayer
 JPH_PhysicsUpdateError=PhysicsUpdateError
 JPH_Quat=quaternion
 JPH_RMatrix4x4=rmatrix4x4
@@ -64,5 +66,3 @@ quaternion=Unity.Mathematics
 --nativeTypeNamesToStrip
 uint32_t
 JPH_Bool32
-JPH_BroadPhaseLayer
-JPH_ObjectLayer
