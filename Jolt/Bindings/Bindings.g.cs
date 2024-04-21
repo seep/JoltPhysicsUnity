@@ -5,43 +5,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal enum JPH_ShapeType
-    {
-        JPH_ShapeType_Convex = 0,
-        JPH_ShapeType_Compound = 1,
-        JPH_ShapeType_Decorated = 2,
-        JPH_ShapeType_Mesh = 3,
-        JPH_ShapeType_HeightField = 4,
-        JPH_ShapeType_SoftBody = 5,
-        JPH_ShapeType_User1 = 6,
-        JPH_ShapeType_User2 = 7,
-        JPH_ShapeType_User3 = 8,
-        JPH_ShapeType_User4 = 9,
-        _JPH_ShapeType_Count,
-        _JPH_ShapeType_Force32 = 0x7fffffff,
-    }
-
-    internal enum JPH_ShapeSubType
-    {
-        JPH_ShapeSubType_Sphere = 0,
-        JPH_ShapeSubType_Box = 1,
-        JPH_ShapeSubType_Triangle = 2,
-        JPH_ShapeSubType_Capsule = 3,
-        JPH_ShapeSubType_TaperedCapsule = 4,
-        JPH_ShapeSubType_Cylinder = 5,
-        JPH_ShapeSubType_ConvexHull = 6,
-        JPH_ShapeSubType_StaticCompound = 7,
-        JPH_ShapeSubType_MutableCompound = 8,
-        JPH_ShapeSubType_RotatedTranslated = 9,
-        JPH_ShapeSubType_Scaled = 10,
-        JPH_ShapeSubType_OffsetCenterOfMass = 11,
-        JPH_ShapeSubType_Mesh = 12,
-        JPH_ShapeSubType_HeightField = 13,
-        JPH_ShapeSubType_SoftBody = 14,
-        _JPH_ShapeSubType_Count,
-        _JPH_ShapeSubType_Force32 = 0x7fffffff,
-    }
-
     internal enum JPH_ConstraintType
     {
         JPH_ConstraintType_Constraint = 0,
@@ -819,10 +782,12 @@ namespace Jolt
         public static extern void JPH_Shape_Destroy(JPH_Shape* shape);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_ShapeType JPH_Shape_GetType([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape);
+        [return: NativeTypeName("JPH_ShapeType")]
+        public static extern ShapeType JPH_Shape_GetType([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_ShapeSubType JPH_Shape_GetSubType([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape);
+        [return: NativeTypeName("JPH_ShapeSubType")]
+        public static extern ShapeSubType JPH_Shape_GetSubType([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("uint64_t")]
