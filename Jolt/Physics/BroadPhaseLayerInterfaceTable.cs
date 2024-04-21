@@ -13,7 +13,7 @@ namespace Jolt
         }
 
         /// <summary>
-        /// Implicit reinterpret cast as a generic BroadPhaseLayerInterface.
+        /// Implicit reinterpret cast as the base class BroadPhaseLayerInterface.
         /// </summary>
         public static implicit operator BroadPhaseLayerInterface(BroadPhaseLayerInterfaceTable table)
         {
@@ -27,10 +27,8 @@ namespace Jolt
             return new BroadPhaseLayerInterfaceTable(JPH_BroadPhaseLayerInterfaceTable_Create(numObjectLayers, numBroadPhaseLayers));
         }
 
-        public void MapObjectToBroadPhaseLayer(ObjectLayer objectLayer, byte broadPhaseLayer)
+        public void MapObjectToBroadPhaseLayer(ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer)
         {
-            // TODO create BroadPhaseLayer with implicit byte cast like ObjectLayer?
-
             JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(Handle, objectLayer, broadPhaseLayer);
         }
 

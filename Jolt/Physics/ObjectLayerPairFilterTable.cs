@@ -28,17 +28,17 @@ namespace Jolt
 
         #region JPH_ObjectLayerPairFilterTable
 
-        public void EnableCollision(ushort layerA, ushort layerB)
+        public void EnableCollision(ObjectLayer layerA, ObjectLayer layerB)
         {
             JPH_ObjectLayerPairFilterTable_EnableCollision(Handle, layerA, layerB);
         }
 
-        public void DisableCollision(ushort layerA, ushort layerB)
+        public void DisableCollision(ObjectLayer layerA, ObjectLayer layerB)
         {
             JPH_ObjectLayerPairFilterTable_DisableCollision(Handle, layerA, layerB);
         }
 
-        public bool ShouldCollide(ushort layerA, ushort layerB)
+        public bool ShouldCollide(ObjectLayer layerA, ObjectLayer layerB)
         {
             return JPH_ObjectLayerPairFilterTable_ShouldCollide(Handle, layerA, layerB);
         }

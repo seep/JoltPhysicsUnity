@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Jolt
 {
+    [StructLayout(LayoutKind.Sequential)]
     public readonly struct ObjectLayer : IEquatable<ObjectLayer>
     {
+        // A distinct type wrapper around ushort (or optionally uint, but unsupported). See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/ObjectLayer.h
+
         /// <summary>
         /// Number of bits in an object layer.
         /// </summary>
@@ -24,11 +28,9 @@ namespace Jolt
             Value = value;
         }
 
-        public static implicit operator ushort(ObjectLayer layer)
-        {
-            return layer.Value;
-        }
-
+        /// <summary>
+        /// Implicit cast from ushort. The inverse is not available to avoid confusion.
+        /// </summary>
         public static implicit operator ObjectLayer(ushort layer)
         {
             return new ObjectLayer(layer);

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Jolt
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct BroadPhaseLayer : IEquatable<BroadPhaseLayer>
     {
+        // A distinct type wrapper around a byte. See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h
+
         public readonly byte Value;
 
         public BroadPhaseLayer(byte value)
@@ -11,11 +15,9 @@ namespace Jolt
             Value = value;
         }
 
-        public static implicit operator byte(BroadPhaseLayer layer)
-        {
-            return layer.Value;
-        }
-
+        /// <summary>
+        /// Implicit cast from byte. The inverse is not available to avoid confusion.
+        /// </summary>
         public static implicit operator BroadPhaseLayer(byte layer)
         {
             return new BroadPhaseLayer(layer);

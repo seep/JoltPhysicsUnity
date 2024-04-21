@@ -13,7 +13,7 @@ namespace Jolt
         }
 
         /// <summary>
-        /// Implicit reinterpret cast as a generic BroadPhaseLayerInterface.
+        /// Implicit reinterpret cast as the base class BroadPhaseLayerInterface.
         /// </summary>
         public static implicit operator BroadPhaseLayerInterface(BroadPhaseLayerInterfaceMask mask)
         {
@@ -27,7 +27,7 @@ namespace Jolt
             return new BroadPhaseLayerInterfaceMask(JPH_BroadPhaseLayerInterfaceMask_Create(numBroadPhaseLayers));
         }
 
-        public void ConfigureLayer(byte broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
+        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
         {
             JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
         }

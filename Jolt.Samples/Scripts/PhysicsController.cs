@@ -29,6 +29,20 @@ namespace Jolt.Samples
         /// </remarks>
         private const uint MaxContactConstraints = 1024;
 
+        private static class ObjectLayers
+        {
+            public static readonly ObjectLayer Static = 0;
+            public static readonly ObjectLayer Moving = 1;
+            public const uint NumLayers = 2;
+        }
+
+        private static class BroadPhaseLayers
+        {
+            public static readonly BroadPhaseLayer Static = 0;
+            public static readonly BroadPhaseLayer Moving = 1;
+            public const uint NumLayers = 2;
+        }
+
         private const int CollisionSteps = 1;
 
         private PhysicsSystem system;
@@ -38,17 +52,17 @@ namespace Jolt.Samples
 
         private void Start()
         {
-            var objectLayerPairFilter = ObjectLayerPairFilterTable.Create(2);
+            var objectLayerPairFilter = ObjectLayerPairFilterTable.Create(ObjectLayers.NumLayers);
 
-            objectLayerPairFilter.EnableCollision(0, 1);
-            objectLayerPairFilter.EnableCollision(1, 1);
+            objectLayerPairFilter.EnableCollision(ObjectLayers.Static, ObjectLayers.Moving);
+            objectLayerPairFilter.EnableCollision(ObjectLayers.Moving, ObjectLayers.Moving);
 
-            var broadPhaseLayerInterface = BroadPhaseLayerInterfaceTable.Create(2, 2);
+            var broadPhaseLayerInterface = BroadPhaseLayerInterfaceTable.Create(ObjectLayers.NumLayers, BroadPhaseLayers.NumLayers);
 
-            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(0, 0);
-            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(1, 1);
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(ObjectLayers.Static, BroadPhaseLayers.Static);
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(ObjectLayers.Moving, BroadPhaseLayers.Moving);
 
-            var objectVsBroadPhaseLayerFilter = ObjectVsBroadPhaseLayerFilterTable.Create(broadPhaseLayerInterface, 2, objectLayerPairFilter, 2);
+            var objectVsBroadPhaseLayerFilter = ObjectVsBroadPhaseLayerFilterTable.Create(broadPhaseLayerInterface, BroadPhaseLayers.NumLayers, objectLayerPairFilter, ObjectLayers.NumLayers);
 
             var settings = new PhysicsSystemSettings
             {

@@ -57,7 +57,7 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_BroadPhaseLayerInterfaceMask_Create(numBroadPhaseLayers));
         }
 
-        public static void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, byte broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
+        public static void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
         {
             Bindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(GetPointer(@interface), broadPhaseLayer, groupsToInclude, groupsToExclude);
         }
@@ -71,7 +71,7 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_BroadPhaseLayerInterfaceTable_Create(numObjectLayers, numBroadPhaseLayers));
         }
 
-        public static void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, ushort objectLayer, byte broadPhaseLayer)
+        public static void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer)
         {
             Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(GetPointer(@interface), objectLayer, broadPhaseLayer);
         }
@@ -85,17 +85,17 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_ObjectLayerPairFilterMask_Create());
         }
 
-        public static ushort JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask)
+        public static ObjectLayer JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask)
         {
-            return Bindings.JPH_ObjectLayerPairFilterMask_GetObjectLayer(group, mask); // TODO no handle?
+            return Bindings.JPH_ObjectLayerPairFilterMask_GetObjectLayer(group, mask);
         }
 
-        public static uint JPH_ObjectLayerPairFilterMask_GetGroup(ushort layer)
+        public static uint JPH_ObjectLayerPairFilterMask_GetGroup(ObjectLayer layer)
         {
-            return Bindings.JPH_ObjectLayerPairFilterMask_GetGroup(layer); // TODO no handle?
+            return Bindings.JPH_ObjectLayerPairFilterMask_GetGroup(layer);
         }
 
-        public static uint JPH_ObjectLayerPairFilterMask_GetMask(ushort layer)
+        public static uint JPH_ObjectLayerPairFilterMask_GetMask(ObjectLayer layer)
         {
             return Bindings.JPH_ObjectLayerPairFilterMask_GetMask(layer);
         }
@@ -109,17 +109,17 @@ namespace Jolt
             return CreateHandle(Bindings.JPH_ObjectLayerPairFilterTable_Create(numObjectLayers));
         }
 
-        public static void JPH_ObjectLayerPairFilterTable_DisableCollision(NativeHandle<JPH_ObjectLayerPairFilter> filter, ushort layerA, ushort layerB)
+        public static void JPH_ObjectLayerPairFilterTable_DisableCollision(NativeHandle<JPH_ObjectLayerPairFilter> filter, ObjectLayer layerA, ObjectLayer layerB)
         {
             Bindings.JPH_ObjectLayerPairFilterTable_DisableCollision(GetPointer(filter), layerA, layerB);
         }
 
-        public static void JPH_ObjectLayerPairFilterTable_EnableCollision(NativeHandle<JPH_ObjectLayerPairFilter> filter, ushort layerA, ushort layerB)
+        public static void JPH_ObjectLayerPairFilterTable_EnableCollision(NativeHandle<JPH_ObjectLayerPairFilter> filter, ObjectLayer layerA, ObjectLayer layerB)
         {
             Bindings.JPH_ObjectLayerPairFilterTable_EnableCollision(GetPointer(filter), layerA, layerB);
         }
 
-        public static bool JPH_ObjectLayerPairFilterTable_ShouldCollide(NativeHandle<JPH_ObjectLayerPairFilter> filter, ushort layerA, ushort layerB)
+        public static bool JPH_ObjectLayerPairFilterTable_ShouldCollide(NativeHandle<JPH_ObjectLayerPairFilter> filter, ObjectLayer layerA, ObjectLayer layerB)
         {
             return Bindings.JPH_ObjectLayerPairFilterTable_ShouldCollide(GetPointer(filter), layerA, layerB);
         }
