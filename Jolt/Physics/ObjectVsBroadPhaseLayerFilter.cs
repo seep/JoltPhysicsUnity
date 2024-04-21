@@ -13,6 +13,16 @@ namespace Jolt
 
         #region IEquatable
 
+        public static bool operator ==(ObjectVsBroadPhaseLayerFilter lhs, ObjectVsBroadPhaseLayerFilter rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ObjectVsBroadPhaseLayerFilter lhs, ObjectVsBroadPhaseLayerFilter rhs)
+        {
+            return !lhs.Equals(rhs);
+        }
+
         public bool Equals(ObjectVsBroadPhaseLayerFilter other)
         {
             return Handle.Equals(other.Handle);

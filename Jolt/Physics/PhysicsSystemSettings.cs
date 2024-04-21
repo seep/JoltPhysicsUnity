@@ -8,5 +8,11 @@ namespace Jolt
         public uint MaxBodies;
         public uint MaxBodyPairs;
         public uint MaxContactConstraints;
+
+        public ObjectLayerPairFilter ObjectLayerPairFilter;
+
+        public BroadPhaseLayerInterface BroadPhaseLayerInterface;
+
+        public ObjectVsBroadPhaseLayerFilter ObjectVsBroadPhaseLayerFilter;
     }
 }

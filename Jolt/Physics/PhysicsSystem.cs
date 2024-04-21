@@ -8,25 +8,25 @@ namespace Jolt
     {
         internal NativeHandle<JPH_PhysicsSystem> Handle;
 
+        internal NativeHandle<JPH_ContactListener> ContactListenerHandle;
+
+        internal NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
+
         public ObjectLayerPairFilter ObjectLayerPairFilter;
 
         public BroadPhaseLayerInterface BroadPhaseLayerInterface;
 
         public ObjectVsBroadPhaseLayerFilter ObjectVsBroadPhaseLayerFilter;
 
-        internal NativeHandle<JPH_ContactListener> ContactListenerHandle;
-
-        internal NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
-
         public PhysicsSystem(PhysicsSystemSettings settings)
         {
-            Handle = JPH_PhysicsSystem_Create(settings, out var h1, out var h2, out var h3);
+            Handle = JPH_PhysicsSystem_Create(settings);
 
-            ObjectLayerPairFilter = new ObjectLayerPairFilter(h1);
+            ObjectLayerPairFilter = settings.ObjectLayerPairFilter;
 
-            BroadPhaseLayerInterface = new BroadPhaseLayerInterface(h2);
+            BroadPhaseLayerInterface = settings.BroadPhaseLayerInterface;
 
-            ObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilter(h3);
+            ObjectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter;
 
             ContactListenerHandle = JPH_ContactListener_Create();
 

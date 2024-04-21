@@ -29,11 +29,11 @@ namespace Jolt
         }
 
         /// <summary>
-        /// Reinterpret the native handle as an ObjectLayerPairFilter.
+        /// Implicit reinterpret cast as a base ObjectLayerPairFilter.
         /// </summary>
-        public ObjectLayerPairFilter AsObjectLayerPairFilter()
+        public static implicit operator ObjectLayerPairFilter(ObjectLayerPairFilterMask mask)
         {
-            return new ObjectLayerPairFilter(Handle);
+            return new ObjectLayerPairFilter(mask.Handle);
         }
 
         #region JPH_ObjectLayerPairFilter

@@ -38,11 +38,26 @@ namespace Jolt.Samples
 
         private void Start()
         {
+            var objectLayerPairFilter = ObjectLayerPairFilterTable.Create(2);
+
+            objectLayerPairFilter.EnableCollision(0, 1);
+            objectLayerPairFilter.EnableCollision(1, 1);
+
+            var broadPhaseLayerInterface = BroadPhaseLayerInterfaceTable.Create(2, 2);
+
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(0, 0);
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(1, 1);
+
+            var objectVsBroadPhaseLayerFilter = ObjectVsBroadPhaseLayerFilterTable.Create(broadPhaseLayerInterface, 2, objectLayerPairFilter, 2);
+
             var settings = new PhysicsSystemSettings
             {
                 MaxBodies = MaxBodies,
                 MaxBodyPairs = MaxBodyPairs,
-                MaxContactConstraints = MaxContactConstraints
+                MaxContactConstraints = MaxContactConstraints,
+                ObjectLayerPairFilter = objectLayerPairFilter,
+                BroadPhaseLayerInterface = broadPhaseLayerInterface,
+                ObjectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter,
             };
 
             system = new PhysicsSystem(settings);

@@ -50,26 +50,30 @@ namespace Jolt
 
         #endregion
 
-        #region JPH_BroadPhaseLayerInterface
+        #region JPH_BroadPhaseLayerInterfaceMask
 
         public static NativeHandle<JPH_BroadPhaseLayerInterface> JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers)
         {
-            throw new NotImplementedException();
+            return CreateHandle(Bindings.JPH_BroadPhaseLayerInterfaceMask_Create(numBroadPhaseLayers));
         }
 
         public static void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, byte broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
         {
-            throw new NotImplementedException();
+            Bindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(GetPointer(@interface), broadPhaseLayer, groupsToInclude, groupsToExclude);
         }
+
+        #endregion
+
+        #region JPH_BroadPhaseLayerInterfaceTable
 
         public static NativeHandle<JPH_BroadPhaseLayerInterface> JPH_BroadPhaseLayerInterfaceTable_Create(uint numObjectLayers, uint numBroadPhaseLayers)
         {
-            throw new NotImplementedException();
+            return CreateHandle(Bindings.JPH_BroadPhaseLayerInterfaceTable_Create(numObjectLayers, numBroadPhaseLayers));
         }
 
         public static void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, ushort objectLayer, byte broadPhaseLayer)
         {
-            throw new NotImplementedException();
+            Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(GetPointer(@interface), objectLayer, broadPhaseLayer);
         }
 
         #endregion
@@ -124,53 +128,37 @@ namespace Jolt
 
         #region JPH_ObjectVsBroadPhaseLayerFilterMask
 
-        public static NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> JPH_ObjectVsBroadPhaseLayerFilterMask_Create(NativeHandle<JPH_BroadPhaseLayerInterface> broadPhaseLayerInterface)
+        public static NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> JPH_ObjectVsBroadPhaseLayerFilterMask_Create(NativeHandle<JPH_BroadPhaseLayerInterface> @interface)
         {
-            throw new NotImplementedException();
+            return CreateHandle(Bindings.JPH_ObjectVsBroadPhaseLayerFilterMask_Create(GetPointer(@interface)));
         }
 
         #endregion
 
         #region JPH_ObjectVsBroadPhaseLayerFilterTable
 
-        public static NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> JPH_ObjectVsBroadPhaseLayerFilterTable_Create(NativeHandle<JPH_BroadPhaseLayerInterface> broadPhaseLayerInterface, uint numBroadPhaseLayers, NativeHandle<JPH_ObjectLayerPairFilter> objectLayerPairFilter, uint numObjectLayers)
+        public static NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> JPH_ObjectVsBroadPhaseLayerFilterTable_Create(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, uint numBroadPhaseLayers, NativeHandle<JPH_ObjectLayerPairFilter> filter, uint numObjectLayers)
         {
-            throw new NotImplementedException();
+            return CreateHandle(Bindings.JPH_ObjectVsBroadPhaseLayerFilterTable_Create(GetPointer(@interface), numBroadPhaseLayers, GetPointer(filter), numObjectLayers));
         }
 
         #endregion
 
         #region JPH_PhysicsSystem
 
-        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings, out NativeHandle<JPH_ObjectLayerPairFilter> h1, out NativeHandle<JPH_BroadPhaseLayerInterface> h2, out NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> h3)
+        public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings)
         {
-            JPH_PhysicsSystemSettings nativeSettings = default;
+            var nativeSettings = new JPH_PhysicsSystemSettings
+            {
+                maxBodies = settings.MaxBodies,
+                maxBodyPairs = settings.MaxBodyPairs,
+                maxContactConstraints = settings.MaxContactConstraints,
+                objectLayerPairFilter = GetPointer(settings.ObjectLayerPairFilter.Handle),
+                broadPhaseLayerInterface = GetPointer(settings.BroadPhaseLayerInterface.Handle),
+                objectVsBroadPhaseLayerFilter = GetPointer(settings.ObjectVsBroadPhaseLayerFilter.Handle)
+            };
 
-            nativeSettings.maxBodies = settings.MaxBodies;
-            nativeSettings.maxBodyPairs = settings.MaxBodyPairs;
-            nativeSettings.maxContactConstraints = settings.MaxContactConstraints;
-
-            // TODO take these as args
-
-            nativeSettings.objectLayerPairFilter = Bindings.JPH_ObjectLayerPairFilterTable_Create(2);
-
-            Bindings.JPH_ObjectLayerPairFilterTable_EnableCollision(nativeSettings.objectLayerPairFilter, 0, 1);
-            Bindings.JPH_ObjectLayerPairFilterTable_EnableCollision(nativeSettings.objectLayerPairFilter, 1, 1);
-
-            nativeSettings.broadPhaseLayerInterface = Bindings.JPH_BroadPhaseLayerInterfaceMask_Create(2);
-
-            Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nativeSettings.broadPhaseLayerInterface, 0, 0);
-            Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nativeSettings.broadPhaseLayerInterface, 1, 1);
-
-            nativeSettings.objectVsBroadPhaseLayerFilter = Bindings.JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nativeSettings.broadPhaseLayerInterface, 2, nativeSettings.objectLayerPairFilter, 2);
-
-            var system = CreateHandle(Bindings.JPH_PhysicsSystem_Create(&nativeSettings));
-
-            h1 = CreateOwnedHandle(system, nativeSettings.objectLayerPairFilter);
-            h2 = CreateOwnedHandle(system, nativeSettings.broadPhaseLayerInterface);
-            h3 = CreateOwnedHandle(system, nativeSettings.objectVsBroadPhaseLayerFilter);
-
-            return system;
+            return CreateHandle(Bindings.JPH_PhysicsSystem_Create(&nativeSettings));
         }
 
         public static void JPH_PhysicsSystem_Destroy(NativeHandle<JPH_PhysicsSystem> handle)

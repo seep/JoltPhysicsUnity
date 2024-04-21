@@ -17,12 +17,13 @@ namespace Jolt
             return new ObjectLayerPairFilterTable(JPH_ObjectLayerPairFilterTable_Create(numObjectLayers));
         }
 
+
         /// <summary>
-        /// Reinterpret the native handle as an ObjectLayerPairFilter.
+        /// Implicit reinterpret cast as a base ObjectLayerPairFilter.
         /// </summary>
-        public ObjectLayerPairFilter AsObjectLayerPairFilter()
+        public static implicit operator ObjectLayerPairFilter(ObjectLayerPairFilterTable table)
         {
-            return new ObjectLayerPairFilter(Handle);
+            return new ObjectLayerPairFilter(table.Handle);
         }
 
         #region JPH_ObjectLayerPairFilterTable
