@@ -791,6 +791,18 @@ namespace Jolt
 
         #endregion
 
+        #region JPH_FixedConstraintSettings
+
+        // TODO
+
+        #endregion
+
+        #region JPH_FixedConstraint
+
+        // TODO
+
+        #endregion
+
         #region JPH_BodyInterface
 
         public static void JPH_BodyInterface_DestroyBody(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
