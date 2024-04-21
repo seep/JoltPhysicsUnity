@@ -267,6 +267,16 @@ namespace Jolt
             throw new NotImplementedException();
         }
 
+        public static void JPH_PhysicsSystem_GetBodies(NativeHandle<JPH_PhysicsSystem> system)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void JPH_PhysicsSystem_GetConstraints(NativeHandle<JPH_PhysicsSystem> system)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         // JPH_Quaternion_FromTo covered by Unity.Mathematics
