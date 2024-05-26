@@ -2,10 +2,11 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace Jolt
 {
-    internal static unsafe class JoltAPI
+    internal static unsafe partial class JoltAPI
     {
         #region Handle Management
 
@@ -1353,40 +1354,6 @@ namespace Jolt
         #region JPH_BodyFilter
 
         // TODO
-
-        #endregion
-
-        #region JPH_ContactListener
-
-        // JPH_ContactListener_SetProcs is used directly internally
-
-        public static NativeHandle<JPH_ContactListener> JPH_ContactListener_Create()
-        {
-            return CreateHandle(Bindings.JPH_ContactListener_Create());
-        }
-
-        public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
-        {
-            Bindings.JPH_ContactListener_Destroy(GetPointer(listener));
-            listener.Dispose();
-        }
-
-        #endregion
-
-        #region JPH_BodyActivationListener
-
-        // JPH_BodyActivationListener_SetProcs is used directly internally
-
-        public static NativeHandle<JPH_BodyActivationListener> JPH_BodyActivationListener_Create()
-        {
-            return CreateHandle(Bindings.JPH_BodyActivationListener_Create());
-        }
-
-        public static void JPH_BodyActivationListener_Destroy(NativeHandle<JPH_BodyActivationListener> listener)
-        {
-            Bindings.JPH_BodyActivationListener_Destroy(GetPointer(listener));
-            listener.Dispose();
-        }
 
         #endregion
 

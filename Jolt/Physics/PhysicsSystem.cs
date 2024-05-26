@@ -6,11 +6,11 @@ namespace Jolt
 {
     public struct PhysicsSystem : IDisposable, IEquatable<PhysicsSystem>
     {
-        internal NativeHandle<JPH_PhysicsSystem> Handle;
+        internal readonly NativeHandle<JPH_PhysicsSystem> Handle;
 
-        internal NativeHandle<JPH_ContactListener> ContactListenerHandle;
+        internal readonly NativeHandle<JPH_ContactListener> ContactListenerHandle;
 
-        internal NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
+        internal readonly NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
 
         /// <summary>
         /// The ObjectLayerPairFilter of the system.
@@ -39,7 +39,11 @@ namespace Jolt
 
             ContactListenerHandle = JPH_ContactListener_Create();
 
+            JPH_PhysicsSystem_SetContactListener(Handle, ContactListenerHandle);
+
             BodyActivationListenerHandle = JPH_BodyActivationListener_Create();
+
+            JPH_PhysicsSystem_SetBodyActivationListener(Handle, BodyActivationListenerHandle);
         }
 
         public void OptimizeBroadPhase()
@@ -65,16 +69,12 @@ namespace Jolt
 
         public void SetContactListener(IContactListener listener)
         {
-            StaticContactListener.Attach(this, listener);
-
-            JPH_PhysicsSystem_SetContactListener(Handle, ContactListenerHandle);
+            JPH_ContactListener_SetProcs(ContactListenerHandle, listener);
         }
 
         public void SetBodyActivationListener(IBodyActivationListener listener)
         {
-            StaticBodyActivationListener.Attach(this, listener);
-
-            JPH_PhysicsSystem_SetBodyActivationListener(Handle, BodyActivationListenerHandle);
+            JPH_BodyActivationListener_SetProcs(BodyActivationListenerHandle, listener);
         }
 
         /// <summary>
@@ -85,8 +85,7 @@ namespace Jolt
         /// </remarks>
         public bool Step(float deltaTime, int collisionSteps, out PhysicsUpdateError error)
         {
-            error = JPH_PhysicsSystem_Step(Handle, deltaTime, collisionSteps);
-            return error == PhysicsUpdateError.None;
+            return (error = JPH_PhysicsSystem_Step(Handle, deltaTime, collisionSteps)) == PhysicsUpdateError.None;
         }
 
         /// <summary>
@@ -125,10 +124,6 @@ namespace Jolt
 
         public void Dispose()
         {
-            StaticContactListener.Detach(this);
-
-            StaticBodyActivationListener.Detach(this);
-
             JPH_PhysicsSystem_Destroy(Handle);
 
             JPH_ContactListener_Destroy(ContactListenerHandle);
