@@ -279,7 +279,7 @@ namespace Jolt
 
         #endregion
 
-        // JPH_Quaternion_FromTo covered by Unity.Mathematics_
+        // JPH_Quaternion_FromTo covered by Unity.Mathematics
 
         #region JPH_ShapeSettings
 
