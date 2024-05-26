@@ -188,24 +188,24 @@ namespace Jolt
             return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetBodyInterfaceNoLock(GetPointer(system)));
         }
 
-        public static NativeHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterface(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyLockInterface> JPH_PhysicsSystem_GetBodyLockInterface(NativeHandle<JPH_PhysicsSystem> system)
         {
-            return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetBodyLockInterface(GetPointer(system)));
+            return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetBodyLockInterface(GetPointer(system)));
         }
 
-        public static NativeHandle<JPH_BodyLockInterface> JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_BodyLockInterface> JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
-            return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(GetPointer(system)));
+            return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(GetPointer(system)));
         }
 
-        public static NativeHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_NarrowPhaseQuery> JPH_PhysicsSystem_GetNarrowPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)
         {
-            return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetNarrowPhaseQuery(GetPointer(system)));
+            return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetNarrowPhaseQuery(GetPointer(system)));
         }
 
-        public static NativeHandle<JPH_NarrowPhaseQuery> JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(NativeHandle<JPH_PhysicsSystem> system)
+        public static NativeHandle<JPH_NarrowPhaseQuery> JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
-            return CreateOwnedHandle(system, Bindings.JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(GetPointer(system)));
+            return CreateOwnedHandle(system, Bindings.JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(GetPointer(system)));
         }
 
         public static void JPH_PhysicsSystem_SetContactListener(NativeHandle<JPH_PhysicsSystem> system, NativeHandle<JPH_ContactListener> listener)
