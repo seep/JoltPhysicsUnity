@@ -3,9 +3,10 @@
 
 #include "joltc.h"
 
-#ifdef _MSC_VER
-__pragma(warning(push, 0))
-#endif
+#include <Jolt/Core/Core.h>
+
+JPH_SUPPRESS_WARNING_PUSH
+JPH_SUPPRESS_WARNINGS
 
 #include "Jolt/Jolt.h"
 #include "Jolt/RegisterTypes.h"
@@ -21,6 +22,7 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterTable.h"
 #include "Jolt/Physics/Collision/ObjectLayerPairFilterTable.h"
 #include "Jolt/Physics/Collision/CastResult.h"
+#include "Jolt/Physics/Collision/CollidePointResult.h"
 #include "Jolt/Physics/Collision/CollideShape.h"
 #include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
@@ -35,11 +37,14 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Collision/Shape/HeightFieldShape.h"
 #include "Jolt/Physics/Collision/Shape/StaticCompoundShape.h"
 #include "Jolt/Physics/Collision/Shape/MutableCompoundShape.h"
+#include "Jolt/Physics/Collision/Shape/DecoratedShape.h"
 #include "Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h"
+#include "Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.h"
 #include "Jolt/Physics/Body/BodyCreationSettings.h"
 #include "Jolt/Physics/Body/BodyActivationListener.h"
 #include "Jolt/Physics/SoftBody/SoftBodyCreationSettings.h"
 #include "Jolt/Physics/Collision/RayCast.h"
+#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseQuery.h"
 #include "Jolt/Physics/Collision/NarrowPhaseQuery.h"
 #include "Jolt/Physics/Constraints/SpringSettings.h"
 #include "Jolt/Physics/Constraints/FixedConstraint.h"
@@ -47,19 +52,11 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
 #include "Jolt/Physics/Constraints/HingeConstraint.h"
 #include "Jolt/Physics/Constraints/SliderConstraint.h"
+#include "Jolt/Physics/Constraints/ConeConstraint.h"
 #include "Jolt/Physics/Constraints/SwingTwistConstraint.h"
 #include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 #include "Jolt/Physics/Character/CharacterBase.h"
 #include "Jolt/Physics/Character/CharacterVirtual.h"
-
-#ifdef _MSC_VER
-__pragma(warning(pop))
-#endif
-
-#ifdef _MSC_VER
-#	pragma warning(push)
-#	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-#endif
 
 #include <iostream>
 #include <cstdarg>
@@ -101,14 +98,19 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 #endif // JPH_ENABLE_ASSERTS
 
 // From Jolt conversion methods
-static void FromJolt(const JPH::Vec3& vec, JPH_Vec3* result)
+static inline JPH_Bool32 FromJolt(bool value)
+{
+    return value ? 1 : 0;
+}
+
+static inline void FromJolt(const JPH::Vec3& vec, JPH_Vec3* result)
 {
     result->x = vec.GetX();
     result->y = vec.GetY();
     result->z = vec.GetZ();
 }
 
-static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
+static inline void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
 {
     result->x = quat.GetX();
     result->y = quat.GetY();
@@ -116,7 +118,7 @@ static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
-static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
+static inline void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
@@ -145,14 +147,14 @@ static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 }
 
 #if defined(JPH_DOUBLE_PRECISION)
-static void FromJolt(const JPH::RVec3& vec, JPH_RVec3* result)
+static inline void FromJolt(const JPH::RVec3& vec, JPH_RVec3* result)
 {
     result->x = vec.GetX();
     result->y = vec.GetY();
     result->z = vec.GetZ();
 }
 
-static void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
+static inline void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
@@ -181,18 +183,45 @@ static void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
 }
 #endif /* defined(JPH_DOUBLE_PRECISION) */
 
+static inline void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
+{
+	result->mass = jolt.mMass;
+	FromJolt(jolt.mInertia, &result->inertia);
+}
+
+static inline void FromJolt(const JPH::SpringSettings& jolt, JPH_SpringSettings* result)
+{
+	result->mode = static_cast<JPH_SpringMode>(jolt.mMode);
+    result->frequencyOrStiffness = jolt.mFrequency;
+    result->damping = jolt.mDamping;
+}
+
+static inline void FromJolt(const JPH::MotorSettings& jolt, JPH_MotorSettings* result)
+{
+    FromJolt(jolt.mSpringSettings, &result->springSettings);
+    result->minForceLimit = jolt.mMinForceLimit;
+    result->maxForceLimit = jolt.mMaxForceLimit;
+    result->minTorqueLimit = jolt.mMaxTorqueLimit;
+    result->maxTorqueLimit = jolt.mMaxTorqueLimit;
+}
+
 // To Jolt conversion methods
-static JPH::Vec3 ToJolt(const JPH_Vec3* vec)
+static inline bool ToJolt(JPH_Bool32 value)
+{
+    return value == 1;
+}
+
+static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
 }
 
-static JPH::Quat ToJolt(const JPH_Quat* quat)
+static inline JPH::Quat ToJolt(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
-static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
+static inline JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
 {
     JPH::Mat44 result{};
     result.SetColumn4(0, JPH::Vec4(matrix.m11, matrix.m12, matrix.m13, matrix.m14));
@@ -202,18 +231,18 @@ static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
     return result;
 }
 
-static JPH::Float3 ToJoltFloat3(const JPH_Vec3& vec)
+static inline JPH::Float3 ToJoltFloat3(const JPH_Vec3& vec)
 {
     return JPH::Float3(vec.x, vec.y, vec.z);
 }
 
 #if defined(JPH_DOUBLE_PRECISION)
-static JPH::RVec3 ToJolt(const JPH_RVec3* vec)
+static inline JPH::RVec3 ToJolt(const JPH_RVec3* vec)
 {
     return JPH::RVec3(vec->x, vec->y, vec->z);
 }
 
-static JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
+static inline JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
 {
     JPH::RMat44 result{};
     result.SetColumn4(0, JPH::Vec4(matrix.m11, matrix.m12, matrix.m13, matrix.m14));
@@ -224,13 +253,7 @@ static JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
 }
 #endif /* defined(JPH_DOUBLE_PRECISION) */
 
-static void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
-{
-	result->mass = jolt.mMass;
-	FromJolt(jolt.mInertia, &result->inertia);
-}
-
-static JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
+static inline JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
 {
 	JPH::MassProperties result{};
 	result.mMass = properties->mass;
@@ -238,9 +261,40 @@ static JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
 	return result;
 }
 
+static inline JPH::SpringSettings ToJolt(const JPH_SpringSettings* settings)
+{
+    JPH::SpringSettings result{};
+	result.mMode = static_cast<JPH::ESpringMode>(settings->mode);
+    result.mFrequency = settings->frequencyOrStiffness;
+    result.mDamping = settings->damping;
+    return result;
+}
+
+static inline JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
+{
+    JPH::MotorSettings result{};
+    result.mSpringSettings = ToJolt(&settings->springSettings);
+    result.mMinForceLimit = settings->minForceLimit;
+    result.mMaxForceLimit = settings->maxForceLimit;
+    result.mMinTorqueLimit = settings->minTorqueLimit;
+    result.mMaxTorqueLimit = settings->maxTorqueLimit;
+    return result;
+}
+
+void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* properties, JPH_Matrix4x4* rotation, JPH_Vec3* diagonal)
+{
+	JPH::Mat44 joltRotation;
+	JPH::Vec3 joltDiagonal;
+	JPH::MassProperties joltProperties = ToJolt(properties);
+	joltProperties.DecomposePrincipalMomentsOfInertia(joltRotation, joltDiagonal);
+	FromJolt(joltRotation, rotation);
+	FromJolt(joltDiagonal, diagonal);
+}
+
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
-    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
+	JPH::MassProperties joltProperties = ToJolt(properties);
+    joltProperties.ScaleToMass(mass);
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
@@ -448,6 +502,69 @@ void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system)
     }
 }
 
+void JPH_PhysicsSystem_SetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* settings)
+{
+	JPH::PhysicsSettings joltSettings;
+	joltSettings.mMaxInFlightBodyPairs = settings->maxInFlightBodyPairs;
+	joltSettings.mStepListenersBatchSize = settings->stepListenersBatchSize;
+	joltSettings.mStepListenerBatchesPerJob = settings->stepListenerBatchesPerJob;
+	joltSettings.mBaumgarte = settings->baumgarte;
+	joltSettings.mSpeculativeContactDistance = settings->speculativeContactDistance;
+	joltSettings.mPenetrationSlop = settings->penetrationSlop;
+	joltSettings.mLinearCastThreshold = settings->linearCastThreshold;
+	joltSettings.mLinearCastMaxPenetration = settings->linearCastMaxPenetration;
+	joltSettings.mManifoldToleranceSq = settings->manifoldToleranceSq;
+	joltSettings.mMaxPenetrationDistance = settings->maxPenetrationDistance;
+	joltSettings.mBodyPairCacheMaxDeltaPositionSq = settings->bodyPairCacheMaxDeltaPositionSq;
+	joltSettings.mBodyPairCacheCosMaxDeltaRotationDiv2 = settings->bodyPairCacheCosMaxDeltaRotationDiv2;
+	joltSettings.mContactNormalCosMaxDeltaRotation = settings->contactNormalCosMaxDeltaRotation;
+	joltSettings.mContactPointPreserveLambdaMaxDistSq = settings->contactPointPreserveLambdaMaxDistSq;
+	joltSettings.mNumVelocitySteps = settings->numVelocitySteps;
+	joltSettings.mNumPositionSteps = settings->numPositionSteps;
+	joltSettings.mMinVelocityForRestitution = settings->minVelocityForRestitution;
+	joltSettings.mTimeBeforeSleep = settings->timeBeforeSleep;
+	joltSettings.mPointVelocitySleepThreshold = settings->pointVelocitySleepThreshold;
+	joltSettings.mDeterministicSimulation = static_cast<bool>(settings->deterministicSimulation);
+	joltSettings.mConstraintWarmStart = static_cast<bool>(settings->constraintWarmStart);
+	joltSettings.mUseBodyPairContactCache = static_cast<bool>(settings->useBodyPairContactCache);
+	joltSettings.mUseManifoldReduction = static_cast<bool>(settings->useManifoldReduction);
+	joltSettings.mUseLargeIslandSplitter = static_cast<bool>(settings->useLargeIslandSplitter);
+	joltSettings.mAllowSleeping = static_cast<bool>(settings->allowSleeping);
+	joltSettings.mCheckActiveEdges = static_cast<bool>(settings->checkActiveEdges);
+	system->physicsSystem->SetPhysicsSettings(joltSettings);
+}
+
+void JPH_PhysicsSystem_GetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* result)
+{
+	auto joltSettings = system->physicsSystem->GetPhysicsSettings();
+	result->maxInFlightBodyPairs = joltSettings.mMaxInFlightBodyPairs;
+	result->stepListenersBatchSize = joltSettings.mStepListenersBatchSize;
+	result->stepListenerBatchesPerJob = joltSettings.mStepListenerBatchesPerJob;
+	result->baumgarte = joltSettings.mBaumgarte;
+	result->speculativeContactDistance = joltSettings.mSpeculativeContactDistance;
+	result->penetrationSlop = joltSettings.mPenetrationSlop;
+	result->linearCastThreshold = joltSettings.mLinearCastThreshold;
+	result->linearCastMaxPenetration = joltSettings.mLinearCastMaxPenetration;
+	result->manifoldToleranceSq = joltSettings.mManifoldToleranceSq;
+	result->maxPenetrationDistance = joltSettings.mMaxPenetrationDistance;
+	result->bodyPairCacheMaxDeltaPositionSq = joltSettings.mBodyPairCacheMaxDeltaPositionSq;
+	result->bodyPairCacheCosMaxDeltaRotationDiv2 = joltSettings.mBodyPairCacheCosMaxDeltaRotationDiv2;
+	result->contactNormalCosMaxDeltaRotation = joltSettings.mContactNormalCosMaxDeltaRotation;
+	result->contactPointPreserveLambdaMaxDistSq = joltSettings.mContactPointPreserveLambdaMaxDistSq;
+	result->numVelocitySteps = joltSettings.mNumVelocitySteps;
+	result->numPositionSteps = joltSettings.mNumPositionSteps;
+	result->minVelocityForRestitution = joltSettings.mMinVelocityForRestitution;
+	result->timeBeforeSleep = joltSettings.mTimeBeforeSleep;
+	result->pointVelocitySleepThreshold = joltSettings.mPointVelocitySleepThreshold;
+	result->deterministicSimulation = joltSettings.mDeterministicSimulation;
+	result->constraintWarmStart = joltSettings.mConstraintWarmStart;
+	result->useBodyPairContactCache = joltSettings.mUseBodyPairContactCache;
+	result->useManifoldReduction = joltSettings.mUseManifoldReduction;
+	result->useLargeIslandSplitter = joltSettings.mUseLargeIslandSplitter;
+	result->allowSleeping = joltSettings.mAllowSleeping;
+	result->checkActiveEdges = joltSettings.mCheckActiveEdges;
+}
+
 void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
@@ -476,13 +593,13 @@ JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* s
     return reinterpret_cast<JPH_BodyInterface*>(&system->physicsSystem->GetBodyInterfaceNoLock());
 }
 
-const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system)
+const JPH_BodyLockInterface* JPH_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
     return reinterpret_cast<const JPH_BodyLockInterface*>(&system->physicsSystem->GetBodyLockInterface());
 }
-const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system)
+const JPH_BodyLockInterface* JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
@@ -490,7 +607,11 @@ const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const 
 }
 
 /* JPH_BroadPhaseLayerFilter */
-static JPH_BroadPhaseLayerFilter_Procs g_BroadPhaseLayerFilter_Procs;
+static const JPH::BroadPhaseLayerFilter& ToJolt(JPH_BroadPhaseLayerFilter* bpFilter)
+{
+    static const JPH::BroadPhaseLayerFilter g_defaultBroadPhaseLayerFilter = {};
+    return bpFilter ? *reinterpret_cast<JPH::BroadPhaseLayerFilter*>(bpFilter) : g_defaultBroadPhaseLayerFilter;
+}
 
 class ManagedBroadPhaseLayerFilter final : public JPH::BroadPhaseLayerFilter
 {
@@ -504,16 +625,23 @@ public:
 
     bool ShouldCollide(BroadPhaseLayer inLayer) const override
     {
-        return g_BroadPhaseLayerFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_BroadPhaseLayerFilter*>(this),
-            static_cast<JPH_BroadPhaseLayer>(inLayer)
-        ) == 1;
+        if (procs.ShouldCollide)
+		{
+            return procs.ShouldCollide(userData, static_cast<JPH_BroadPhaseLayer>(inLayer)) == 1;
+        }
+
+        return true;
     }
+
+    JPH_BroadPhaseLayerFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs)
+void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayerFilter_Procs procs, void* userData)
 {
-    g_BroadPhaseLayerFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedBroadPhaseLayerFilter*>(filter);
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void)
@@ -531,7 +659,11 @@ void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter)
 }
 
 /* JPH_ObjectLayerFilter */
-static JPH_ObjectLayerFilter_Procs g_ObjectLayerFilter_Procs;
+static const JPH::ObjectLayerFilter& ToJolt(JPH_ObjectLayerFilter* opFilter)
+{
+    static const JPH::ObjectLayerFilter g_defaultObjectLayerFilter = {};
+    return opFilter ? *reinterpret_cast<JPH::ObjectLayerFilter*>(opFilter) : g_defaultObjectLayerFilter;
+}
 
 class ManagedObjectLayerFilter final : public JPH::ObjectLayerFilter
 {
@@ -545,16 +677,23 @@ public:
 
     bool ShouldCollide(ObjectLayer inLayer) const override
     {
-        return g_ObjectLayerFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_ObjectLayerFilter*>(this),
-            static_cast<JPH_ObjectLayer>(inLayer)
-        ) == 1;
+        if (procs.ShouldCollide)
+        {
+            return procs.ShouldCollide(userData, static_cast<JPH_ObjectLayer>(inLayer)) == 1;
+        }
+
+        return true;
     }
+
+    JPH_ObjectLayerFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs)
+void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter* filter, JPH_ObjectLayerFilter_Procs procs, void* userData)
 {
-    g_ObjectLayerFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedObjectLayerFilter*>(filter);
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void)
@@ -572,7 +711,11 @@ void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter)
 }
 
 /* JPH_BodyFilter */
-static JPH_BodyFilter_Procs g_BodyFilter_Procs;
+static const JPH::BodyFilter& ToJolt(JPH_BodyFilter* bodyFilter)
+{
+    static const JPH::BodyFilter g_defaultBodyFilter = {};
+    return bodyFilter ? *reinterpret_cast<JPH::BodyFilter*>(bodyFilter) : g_defaultBodyFilter;
+}
 
 class ManagedBodyFilter final : public JPH::BodyFilter
 {
@@ -586,22 +729,33 @@ public:
 
     bool ShouldCollide(const BodyID &bodyID) const override
     {
-        return !!g_BodyFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_BodyFilter*>(this),
-            (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+        if (procs.ShouldCollide)
+        {
+            return !!procs.ShouldCollide(userData, (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+        }
+
+        return true;
     }
 
     bool ShouldCollideLocked(const Body& body) const override
     {
-        return !!g_BodyFilter_Procs.ShouldCollideLocked(
-            reinterpret_cast<const JPH_BodyFilter*>(this),
-            reinterpret_cast<const JPH_Body *>(&body));
+        if (procs.ShouldCollideLocked)
+        {
+            return !!procs.ShouldCollideLocked(userData, reinterpret_cast<const JPH_Body *>(&body));
+        }
+
+        return true;
     }
+
+    JPH_BodyFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs)
+void JPH_BodyFilter_SetProcs(JPH_BodyFilter* filter, JPH_BodyFilter_Procs procs, void* userData)
 {
-    g_BodyFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedBodyFilter*>(filter);
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_BodyFilter* JPH_BodyFilter_Create(void)
@@ -843,6 +997,32 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
     return reinterpret_cast<JPH_ConvexHullShape*>(shape);
 }
 
+uint32_t JPH_ConvexHullShape_GetNumPoints(const JPH_ConvexHullShape* shape)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumPoints();
+}
+
+void JPH_ConvexHullShape_GetPoint(const JPH_ConvexHullShape* shape, uint32_t index, JPH_Vec3* result)
+{
+	auto point = reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetPoint(index);
+	FromJolt(point, result);
+}
+
+uint32_t JPH_ConvexHullShape_GetNumFaces(const JPH_ConvexHullShape* shape)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumFaces();
+}
+
+uint32_t JPH_ConvexHullShape_GetNumVerticesInFace(const JPH_ConvexHullShape* shape, uint32_t faceIndex)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumVerticesInFace(faceIndex);
+}
+
+uint32_t JPH_ConvexHullShape_GetFaceVertices(const JPH_ConvexHullShape* shape, uint32_t faceIndex, uint32_t maxVertices, uint32_t* vertices)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetFaceVertices(faceIndex, maxVertices, vertices);
+}
+
 /* MeshShapeSettings */
 JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount)
 {
@@ -1061,22 +1241,28 @@ void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape
     reinterpret_cast<JPH::MutableCompoundShape*>(shape)->AdjustCenterOfMass();
 }
 
-/* RotatedTranslatedShape */
-JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings)
-{
-    auto jolt_settings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
+/* DecoratedShape */
+const JPH_Shape* JPH_DecoratedShape_GetInnerShape(const JPH_DecoratedShape* shape) {
+	auto joltShape = reinterpret_cast<const JPH::DecoratedShape*>(shape);
+	return reinterpret_cast<const JPH_Shape*>(joltShape->GetInnerShape());
+}
 
-    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), jolt_settings);
+/* RotatedTranslatedShape */
+JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shapeSettings)
+{
+    auto joltSettings = reinterpret_cast<const JPH::ShapeSettings*>(shapeSettings);
+
+    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), joltSettings);
     settings->AddRef();
 
     return reinterpret_cast<JPH_RotatedTranslatedShapeSettings*>(settings);
 }
 
-JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create2(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape)
+JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create2(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape)
 {
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
 
-    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), jolt_shape);
+    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), joltShape);
     settings->AddRef();
 
     return reinterpret_cast<JPH_RotatedTranslatedShapeSettings*>(settings);
@@ -1093,9 +1279,9 @@ JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShapeSettings_CreateShape(const
     return reinterpret_cast<JPH_RotatedTranslatedShape*>(shape);
 }
 
-JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape)
+JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape)
 {
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+    auto jolt_shape = reinterpret_cast<const JPH::Shape*>(shape);
 
     auto rotatedTranslatedShape = new JPH::RotatedTranslatedShape(ToJolt(position), ToJolt(rotation), jolt_shape);
     rotatedTranslatedShape->AddRef();
@@ -1117,6 +1303,53 @@ void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslatedShape* sh
 	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
 	JPH::Quat joltQuat = joltShape->GetRotation();
 	FromJolt(joltQuat, rotation);
+}
+
+/* JPH_OffsetCenterOfMassShape */
+JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create(const JPH_Vec3* offset, const JPH_ShapeSettings* shapeSettings)
+{
+	auto joltSettings = reinterpret_cast<const JPH::ShapeSettings*>(shapeSettings);
+
+    auto settings = new JPH::OffsetCenterOfMassShapeSettings(ToJolt(offset), joltSettings);
+    settings->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShapeSettings*>(settings);
+}
+
+JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create2(const JPH_Vec3* offset, const JPH_Shape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+
+    auto rotatedTranslatedShape = new JPH::OffsetCenterOfMassShapeSettings(ToJolt(offset), joltShape);
+    rotatedTranslatedShape->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShapeSettings*>(rotatedTranslatedShape);
+}
+
+JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShapeSettings_CreateShape(const JPH_OffsetCenterOfMassShapeSettings* settings)
+{
+	const JPH::OffsetCenterOfMassShapeSettings* joltSettings = reinterpret_cast<const JPH::OffsetCenterOfMassShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShape*>(shape);
+}
+
+JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShape_Create(JPH_Vec3* offset, JPH_Shape* shape)
+{
+    auto joltShape = reinterpret_cast<JPH::Shape*>(shape);
+
+    auto offsetCenterOfMassShape = new JPH::OffsetCenterOfMassShape(joltShape, ToJolt(offset));
+    offsetCenterOfMassShape->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShape*>(offsetCenterOfMassShape);
+}
+
+void JPH_OffsetCenterOfMassShape_GetOffset(const JPH_OffsetCenterOfMassShape* shape, JPH_Vec3* result)
+{
+    FromJolt(reinterpret_cast<const JPH::OffsetCenterOfMassShape*>(shape)->GetOffset(), result);
 }
 
 /* Shape */
@@ -1318,15 +1551,14 @@ JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create(void)
     return reinterpret_cast<JPH_SoftBodyCreationSettings*>(bodyCreationSettings);
 }
 
-//void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings)
-//{
-//    if (settings)
-//    {
-//		// TODO: MSVC issue -> `scalar deleting destructor'(unsigned int) __ptr64': function not inlined
-//		auto bodyCreationSettings = reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
-//		delete bodyCreationSettings;
-//    }
-//}
+void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings)
+{
+    if (settings)
+    {
+		auto bodyCreationSettings = reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
+		delete bodyCreationSettings;
+    }
+}
 
 /* JPH_ConstraintSettings */
 void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
@@ -1338,10 +1570,106 @@ void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
     }
 }
 
+JPH_Bool32 JPH_ConstraintSettings_GetEnabled(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return static_cast<JPH_Bool32>(joltSettings->mEnabled);
+}
+
+void JPH_FixedConstraintSettings_SetEnabled(JPH_ConstraintSettings* settings, JPH_Bool32 value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mEnabled = static_cast<bool>(value);
+}
+
+uint32_t JPH_ConstraintSettings_GetConstraintPriority(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return joltSettings->mConstraintPriority;
+}
+
+void JPH_FixedConstraintSettings_SetConstraintPriority(JPH_ConstraintSettings* settings, uint32_t value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mConstraintPriority = value;
+}
+
+uint32_t JPH_ConstraintSettings_GetNumVelocityStepsOverride(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return joltSettings->mNumVelocityStepsOverride;
+}
+
+void JPH_ConstraintSettings_SetNumVelocityStepsOverride(JPH_ConstraintSettings* settings, uint32_t value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mNumVelocityStepsOverride = value;
+}
+
+uint32_t JPH_ConstraintSettings_GetNumPositionStepsOverride(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return joltSettings->mNumPositionStepsOverride;
+}
+
+void JPH_ConstraintSettings_SetNumPositionStepsOverride(JPH_ConstraintSettings* settings, uint32_t value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mNumPositionStepsOverride = value;
+}
+
+float JPH_ConstraintSettings_GetDrawConstraintSize(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return joltSettings->mDrawConstraintSize;
+}
+
+void JPH_ConstraintSettings_SetDrawConstraintSize(JPH_ConstraintSettings* settings, float value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mDrawConstraintSize = value;
+}
+
+uint64_t JPH_ConstraintSettings_GetUserData(JPH_ConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    return joltSettings->mUserData;
+}
+
+void JPH_ConstraintSettings_SetUserData(JPH_ConstraintSettings* settings, uint64_t value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::ConstraintSettings* joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    joltSettings->mUserData = value;
+}
+
 /* JPH_Constraint */
 JPH_ConstraintSettings* JPH_Constraint_GetConstraintSettings(JPH_Constraint* constraint)
 {
-    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraint);
     auto settings = joltConstraint->GetConstraintSettings().GetPtr();
     return reinterpret_cast<JPH_ConstraintSettings*>(settings);
 }
@@ -1354,6 +1682,16 @@ JPH_ConstraintType JPH_Constraint_GetType(const JPH_Constraint* constraint)
 JPH_ConstraintSubType JPH_Constraint_GetSubType(const JPH_Constraint* constraint)
 {
 	return static_cast<JPH_ConstraintSubType>(reinterpret_cast<const JPH::Constraint*>(constraint)->GetSubType());
+}
+
+uint32_t JPH_Constraint_GetConstraintPriority(const JPH_Constraint* constraint)
+{
+    return reinterpret_cast<const JPH::Constraint*>(constraint)->GetConstraintPriority();
+}
+
+void JPH_Constraint_SetConstraintPriority(JPH_Constraint* constraint, uint32_t priority)
+{
+    return reinterpret_cast<JPH::Constraint*>(constraint)->SetConstraintPriority(priority);
 }
 
 JPH_Bool32 JPH_Constraint_GetEnabled(JPH_Constraint* constraint)
@@ -1378,6 +1716,11 @@ void JPH_Constraint_SetUserData(JPH_Constraint* constraint, uint64_t userData)
     reinterpret_cast<JPH::Constraint*>(constraint)->SetUserData(userData);
 }
 
+void JPH_Constraint_NotifyShapeChanged(JPH_Constraint* constraint, JPH_BodyID bodyID, JPH_Vec3* deltaCOM)
+{
+    reinterpret_cast<JPH::Constraint*>(constraint)->NotifyShapeChanged(JPH::BodyID(bodyID), ToJolt(deltaCOM));
+}
+
 void JPH_Constraint_Destroy(JPH_Constraint* constraint)
 {
     if (constraint)
@@ -1387,31 +1730,12 @@ void JPH_Constraint_Destroy(JPH_Constraint* constraint)
     }
 }
 
-JPH_SpringSettings* JPH_SpringSettings_Create(float frequency, float damping)
-{
-    auto settings = new JPH::SpringSettings(ESpringMode::FrequencyAndDamping, frequency, damping);
-    return reinterpret_cast<JPH_SpringSettings*>(settings);
-}
-
-void JPH_SpringSettings_Destroy(JPH_SpringSettings* settings)
-{
-    if (settings)
-    {
-        delete reinterpret_cast<JPH::SpringSettings*>(settings);
-    }
-}
-
-float JPH_SpringSettings_GetFrequency(JPH_SpringSettings* settings)
-{
-    return reinterpret_cast<JPH::SpringSettings*>(settings)->mFrequency;
-}
-
 /* JPH_TwoBodyConstraintSettings */
 
 /* JPH_FixedConstraintSettings */
 JPH_FixedConstraintSettings* JPH_FixedConstraintSettings_Create(void)
 {
-    auto settings = new JPH::FixedConstraintSettings();
+    JPH::FixedConstraintSettings* settings = new JPH::FixedConstraintSettings();
     settings->AddRef();
 
     return reinterpret_cast<JPH_FixedConstraintSettings*>(settings);
@@ -1420,106 +1744,128 @@ JPH_FixedConstraintSettings* JPH_FixedConstraintSettings_Create(void)
 JPH_ConstraintSpace JPH_FixedConstraintSettings_GetSpace(JPH_FixedConstraintSettings* settings)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
 
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     return static_cast<JPH_ConstraintSpace>(joltSettings->mSpace);
 }
 
 void JPH_FixedConstraintSettings_SetSpace(JPH_FixedConstraintSettings* settings, JPH_ConstraintSpace space)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
 
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mSpace = static_cast<JPH::EConstraintSpace>(space);
+}
+
+JPH_Bool32 JPH_FixedConstraintSettings_GetAutoDetectPoint(JPH_FixedConstraintSettings* settings)
+{
+	JPH_ASSERT(settings);
+
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    return static_cast<JPH_Bool32>(joltSettings->mAutoDetectPoint);
+}
+
+void JPH_FixedConstraintSettings_SetAutoDetectPoint(JPH_FixedConstraintSettings* settings, JPH_Bool32 value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    joltSettings->mAutoDetectPoint = static_cast<bool>(value);
 }
 
 void JPH_FixedConstraintSettings_GetPoint1(JPH_FixedConstraintSettings* settings, JPH_RVec3* result)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
 
-    auto joltVector = joltSettings->mPoint1;
-    FromJolt(joltVector, result);
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    FromJolt(joltSettings->mPoint1, result);
 }
 
 void JPH_FixedConstraintSettings_SetPoint1(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
 
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mPoint1 = ToJolt(value);
-}
-
-void JPH_FixedConstraintSettings_GetPoint2(JPH_FixedConstraintSettings* settings, JPH_RVec3* result)
-{
-    JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
-
-    auto joltVector = joltSettings->mPoint2;
-    FromJolt(joltVector, result);
-}
-
-void JPH_FixedConstraintSettings_SetPoint2(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value)
-{
-    JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
-
-    joltSettings->mPoint2 = ToJolt(value);
 }
 
 void JPH_FixedConstraintSettings_GetAxisX1(JPH_FixedConstraintSettings* settings, JPH_Vec3* result)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     FromJolt(joltSettings->mAxisX1, result);
 }
 
 void JPH_FixedConstraintSettings_SetAxisX1(JPH_FixedConstraintSettings* settings, const JPH_Vec3* value)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mAxisX1 = ToJolt(value);
 }
 
 void JPH_FixedConstraintSettings_GetAxisY1(JPH_FixedConstraintSettings* settings, JPH_Vec3* result)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     FromJolt(joltSettings->mAxisY1, result);
 }
 
 void JPH_FixedConstraintSettings_SetAxisY1(JPH_FixedConstraintSettings* settings, const JPH_Vec3* value)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mAxisX1 = ToJolt(value);
+}
+
+void JPH_FixedConstraintSettings_GetPoint2(JPH_FixedConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    FromJolt(joltSettings->mPoint2, result);
+}
+
+void JPH_FixedConstraintSettings_SetPoint2(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    joltSettings->mPoint2 = ToJolt(value);
 }
 
 void JPH_FixedConstraintSettings_GetAxisX2(JPH_FixedConstraintSettings* settings, JPH_Vec3* result)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     FromJolt(joltSettings->mAxisX2, result);
 }
 
 void JPH_FixedConstraintSettings_SetAxisX2(JPH_FixedConstraintSettings* settings, const JPH_Vec3* value)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mAxisX2 = ToJolt(value);
 }
 
 void JPH_FixedConstraintSettings_GetAxisY2(JPH_FixedConstraintSettings* settings, JPH_Vec3* result)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     FromJolt(joltSettings->mAxisY2, result);
 }
 
 void JPH_FixedConstraintSettings_SetAxisY2(JPH_FixedConstraintSettings* settings, const JPH_Vec3* value)
 {
     JPH_ASSERT(settings);
-    auto joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+
+    JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
     joltSettings->mAxisY2 = ToJolt(value);
 }
 
@@ -1528,12 +1874,15 @@ JPH_FixedConstraint* JPH_FixedConstraintSettings_CreateConstraint(JPH_FixedConst
     JPH_ASSERT(settings);
     JPH_ASSERT(body1);
     JPH_ASSERT(body2);
-    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
-    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
-    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::FixedConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+
+	JPH::FixedConstraintSettings* joltSettings = reinterpret_cast<JPH::FixedConstraintSettings*>(settings);
+    JPH::Body* joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    JPH::Body* joltBody2 = reinterpret_cast<JPH::Body*>(body2);
+
+    JPH::FixedConstraint* constraint = static_cast<JPH::FixedConstraint*>(joltSettings->Create(*joltBody1, *joltBody2));
     constraint->AddRef();
 
-    return reinterpret_cast<JPH_FixedConstraint*>(static_cast<JPH::FixedConstraint*>(constraint));
+    return reinterpret_cast<JPH_FixedConstraint*>(constraint);
 }
 
 /* JPH_FixedConstraint */
@@ -1561,6 +1910,23 @@ JPH_DistanceConstraintSettings* JPH_DistanceConstraintSettings_Create(void)
 
     return reinterpret_cast<JPH_DistanceConstraintSettings*>(settings);
 }
+
+JPH_ConstraintSpace JPH_DistanceConstraintSettings_GetSpace(JPH_DistanceConstraintSettings* settings)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::DistanceConstraintSettings*>(settings);
+
+    return static_cast<JPH_ConstraintSpace>(joltSettings->mSpace);
+}
+
+void JPH_DistanceConstraintSettings_SetSpace(JPH_DistanceConstraintSettings* settings, JPH_ConstraintSpace space)
+{
+	JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::DistanceConstraintSettings*>(settings);
+
+    joltSettings->mSpace = static_cast<JPH::EConstraintSpace>(space);
+}
+
 
 void JPH_DistanceConstraintSettings_GetPoint1(JPH_DistanceConstraintSettings* settings, JPH_RVec3* result)
 {
@@ -1730,6 +2096,59 @@ float JPH_HingeConstraint_GetCurrentAngle(JPH_HingeConstraint* constraint)
     return reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetCurrentAngle();
 }
 
+void JPH_HingeConstraint_SetMaxFrictionTorque(JPH_HingeConstraint* constraint, float frictionTorque)
+{
+    reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetMaxFrictionTorque(frictionTorque);
+}
+
+float JPH_HingeConstraint_GetMaxFrictionTorque(JPH_HingeConstraint* constraint)
+{
+    return reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetMaxFrictionTorque();
+}
+
+void JPH_HingeConstraint_SetMotorSettings(JPH_HingeConstraint* constraint, JPH_MotorSettings* settings)
+{
+    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    JPH::MotorSettings& joltSettings = joltConstraint->GetMotorSettings();
+    joltSettings = ToJolt(settings);
+}
+
+void JPH_HingeConstraint_GetMotorSettings(JPH_HingeConstraint* constraint, JPH_MotorSettings* result)
+{
+    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    FromJolt(joltConstraint->GetMotorSettings(), result);
+}
+
+void JPH_HingeConstraint_SetMotorState(JPH_HingeConstraint* constraint, JPH_MotorState state)
+{
+    reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetMotorState(static_cast<JPH::EMotorState>(state));
+}
+
+JPH_MotorState JPH_HingeConstraint_GetMotorState(JPH_HingeConstraint* constraint)
+{
+    return static_cast<JPH_MotorState>(reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetMotorState());
+}
+
+void JPH_HingeConstraint_SetTargetAngularVelocity(JPH_HingeConstraint* constraint, float angularVelocity)
+{
+    return reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetTargetAngularVelocity(angularVelocity);
+}
+
+float JPH_HingeConstraint_GetTargetAngularVelocity(JPH_HingeConstraint* constraint)
+{
+    return reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetTargetAngularVelocity();
+}
+
+void JPH_HingeConstraint_SetTargetAngle(JPH_HingeConstraint* constraint, float angle)
+{
+    return reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetTargetAngle(angle);
+}
+
+float JPH_HingeConstraint_GetTargetAngle(JPH_HingeConstraint* constraint)
+{
+    return reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetTargetAngle();
+}
+
 void JPH_HingeConstraint_SetLimits(JPH_HingeConstraint* constraint, float inLimitsMin, float inLimitsMax)
 {
     return reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetLimits(inLimitsMin, inLimitsMax);
@@ -1750,14 +2169,16 @@ JPH_Bool32 JPH_HingeConstraint_HasLimits(JPH_HingeConstraint* constraint)
     return reinterpret_cast<JPH::HingeConstraint*>(constraint)->HasLimits();
 }
 
-JPH_SpringSettings* JPH_HingeConstraint_GetLimitsSpringSettings(JPH_HingeConstraint* constraint)
+void JPH_HingeConstraint_GetLimitsSpringSettings(JPH_HingeConstraint* constraint, JPH_SpringSettings* result)
 {
-    return reinterpret_cast<JPH_SpringSettings*>(&reinterpret_cast<JPH::HingeConstraint*>(constraint)->GetLimitsSpringSettings());
+    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    FromJolt(joltConstraint->GetLimitsSpringSettings(), result);
 }
 
 void JPH_HingeConstraint_SetLimitsSpringSettings(JPH_HingeConstraint* constraint, JPH_SpringSettings* settings)
 {
-    reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetLimitsSpringSettings(*reinterpret_cast<JPH::SpringSettings*>(settings));
+    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    joltConstraint->SetLimitsSpringSettings(ToJolt(settings));
 }
 
 void JPH_HingeConstraint_GetTotalLambdaPosition(const JPH_HingeConstraint* constraint, JPH_Vec3* result)
@@ -1829,6 +2250,59 @@ float JPH_SliderConstraint_GetCurrentPosition(JPH_SliderConstraint* constraint)
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->GetCurrentPosition();
 }
 
+void JPH_SliderConstraint_SetMaxFrictionForce(JPH_SliderConstraint* constraint, float frictionForce)
+{
+    reinterpret_cast<JPH::SliderConstraint*>(constraint)->SetMaxFrictionForce(frictionForce);
+}
+
+float JPH_SliderConstraint_GetMaxFrictionForce(JPH_SliderConstraint* constraint)
+{
+    return reinterpret_cast<JPH::SliderConstraint*>(constraint)->GetMaxFrictionForce();
+}
+
+void JPH_SliderConstraint_SetMotorSettings(JPH_SliderConstraint* constraint, JPH_MotorSettings* settings)
+{
+    auto joltConstraint = reinterpret_cast<JPH::SliderConstraint*>(constraint);
+    JPH::MotorSettings& joltSettings = joltConstraint->GetMotorSettings();
+    joltSettings = ToJolt(settings);
+}
+
+void JPH_SliderConstraint_GetMotorSettings(JPH_SliderConstraint* constraint, JPH_MotorSettings* result)
+{
+    auto joltConstraint = reinterpret_cast<JPH::SliderConstraint*>(constraint);
+    FromJolt(joltConstraint->GetMotorSettings(), result);
+}
+
+void JPH_SliderConstraint_SetMotorState(JPH_SliderConstraint* constraint, JPH_MotorState state)
+{
+    reinterpret_cast<JPH::SliderConstraint*>(constraint)->SetMotorState(static_cast<JPH::EMotorState>(state));
+}
+
+JPH_MotorState JPH_SliderConstraint_GetMotorState(JPH_SliderConstraint* constraint)
+{
+    return static_cast<JPH_MotorState>(reinterpret_cast<JPH::SliderConstraint*>(constraint)->GetMotorState());
+}
+
+void JPH_SliderConstraint_SetTargetVelocity(JPH_SliderConstraint* constraint, float velocity)
+{
+    return reinterpret_cast<JPH::SliderConstraint*>(constraint)->SetTargetVelocity(velocity);
+}
+
+float JPH_SliderConstraint_GetTargetVelocity(JPH_SliderConstraint* constraint)
+{
+    return reinterpret_cast<JPH::SliderConstraint*>(constraint)->GetTargetVelocity();
+}
+
+void JPH_SliderConstraint_SetTargetPosition(JPH_SliderConstraint* constraint, float position)
+{
+    return reinterpret_cast<JPH::SliderConstraint*>(constraint)->SetTargetPosition(position);
+}
+
+float JPH_SliderConstraint_GetTargetPosition(JPH_SliderConstraint* constraint)
+{
+    return reinterpret_cast<JPH::SliderConstraint*>(constraint)->GetTargetPosition();
+}
+
 void JPH_SliderConstraint_SetLimits(JPH_SliderConstraint* constraint, float inLimitsMin, float inLimitsMax)
 {
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->SetLimits(inLimitsMin, inLimitsMax);
@@ -1847,6 +2321,18 @@ float JPH_SliderConstraint_GetLimitsMax(JPH_SliderConstraint* constraint)
 JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint)
 {
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->HasLimits();
+}
+
+void JPH_SliderConstraint_GetLimitsSpringSettings(JPH_SliderConstraint* constraint, JPH_SpringSettings* result)
+{
+    const auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
+    FromJolt(joltConstraint->GetLimitsSpringSettings(), result);
+}
+
+void JPH_SliderConstraint_SetLimitsSpringSettings(JPH_SliderConstraint* constraint, JPH_SpringSettings* settings)
+{
+    auto joltConstraint = reinterpret_cast<JPH::SliderConstraint*>(constraint);
+    joltConstraint->SetLimitsSpringSettings(ToJolt(settings));
 }
 
 void JPH_SliderConstraint_GetTotalLambdaPosition(const JPH_SliderConstraint* constraint, float* x, float* y)
@@ -1878,6 +2364,123 @@ float JPH_SliderConstraint_GetTotalLambdaMotor(const JPH_SliderConstraint* const
 	JPH_ASSERT(constraint);
 	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
 	return joltConstraint->GetTotalLambdaMotor();
+}
+
+/* JPH_ConeConstraintSettings */
+JPH_ConeConstraintSettings* JPH_ConeConstraintSettings_Create(void)
+{
+	auto settings = new JPH::ConeConstraintSettings();
+    settings->AddRef();
+
+    return reinterpret_cast<JPH_ConeConstraintSettings*>(settings);
+}
+
+void JPH_ConeConstraintSettings_SetPoint1(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mPoint1 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetPoint1(JPH_ConeConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    auto joltVector = joltSettings->mPoint1;
+    FromJolt(joltVector, result);
+}
+
+void JPH_ConeConstraintSettings_SetPoint2(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mPoint2 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetPoint2(JPH_ConeConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    auto joltVector = joltSettings->mPoint2;
+    FromJolt(joltVector, result);
+}
+
+void JPH_ConeConstraintSettings_SetTwistAxis1(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mTwistAxis1 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetTwistAxis1(JPH_ConeConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    FromJolt(joltSettings->mTwistAxis1, result);
+}
+
+void JPH_ConeConstraintSettings_SetTwistAxis2(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mTwistAxis2 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetTwistAxis2(JPH_ConeConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    FromJolt(joltSettings->mTwistAxis2, result);
+}
+
+void JPH_ConeConstraintSettings_SetHalfConeAngle(JPH_ConeConstraintSettings* settings, float halfConeAngle)
+{
+    JPH_ASSERT(settings);
+    reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->mHalfConeAngle = halfConeAngle;
+}
+
+float JPH_ConeConstraintSettings_GetHalfConeAngle(JPH_ConeConstraintSettings* settings)
+{
+    JPH_ASSERT(settings);
+    return reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->mHalfConeAngle;
+}
+
+JPH_ConeConstraint* JPH_ConeConstraintSettings_CreateConstraint(JPH_ConeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+	auto joltBody1 = body1 ? reinterpret_cast<JPH::Body*>(body1) : &JPH::Body::sFixedToWorld;
+    auto joltBody2 = body2 ? reinterpret_cast<JPH::Body*>(body2) : &JPH::Body::sFixedToWorld;
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
+    return reinterpret_cast<JPH_ConeConstraint*>(static_cast<JPH::ConeConstraint*>(constraint));
+}
+
+/* JPH_ConeConstraint */
+void JPH_ConeConstraint_SetHalfConeAngle(JPH_ConeConstraint* constraint, float halfConeAngle)
+{
+	JPH_ASSERT(constraint);
+	reinterpret_cast<JPH::ConeConstraint*>(constraint)->SetHalfConeAngle(halfConeAngle);
+}
+
+float JPH_ConeConstraint_GetCosHalfConeAngle(const JPH_ConeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	return reinterpret_cast<const JPH::ConeConstraint*>(constraint)->GetCosHalfConeAngle();
+}
+
+void JPH_ConeConstraint_GetTotalLambdaPosition(const JPH_ConeConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::ConeConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
+
+float JPH_ConeConstraint_GetTotalLambdaRotation(const JPH_ConeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::ConeConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaRotation();
 }
 
 /* JPH_SwingTwistConstraintSettings */
@@ -2029,14 +2632,16 @@ float JPH_DistanceConstraint_GetMaxDistance(JPH_DistanceConstraint* constraint)
     return reinterpret_cast<JPH::DistanceConstraint*>(constraint)->GetMaxDistance();
 }
 
-JPH_SpringSettings* JPH_DistanceConstraint_GetLimitsSpringSettings(JPH_DistanceConstraint* constraint)
+void JPH_DistanceConstraint_GetLimitsSpringSettings(JPH_DistanceConstraint* constraint, JPH_SpringSettings* result)
 {
-    return reinterpret_cast<JPH_SpringSettings*>(&reinterpret_cast<JPH::DistanceConstraint*>(constraint)->GetLimitsSpringSettings());
+    auto joltConstraint = reinterpret_cast<JPH::DistanceConstraint*>(constraint);
+    FromJolt(joltConstraint->GetLimitsSpringSettings(), result);
 }
 
 void JPH_DistanceConstraint_SetLimitsSpringSettings(JPH_DistanceConstraint* constraint, JPH_SpringSettings* settings)
 {
-    reinterpret_cast<JPH::DistanceConstraint*>(constraint)->SetLimitsSpringSettings(*reinterpret_cast<JPH::SpringSettings*>(settings));
+    auto joltConstraint = reinterpret_cast<JPH::DistanceConstraint*>(constraint);
+    joltConstraint->SetLimitsSpringSettings(ToJolt(settings));
 }
 
 float JPH_DistanceConstraint_GetTotalLambdaPosition(const JPH_DistanceConstraint* constraint)
@@ -2172,6 +2777,11 @@ void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(JPH_TwoBodyConstraint* con
 
 
 /* JPH_MotionProperties */
+JPH_AllowedDOFs JPH_MotionProperties_GetAllowedDOFs(const JPH_MotionProperties* properties)
+{
+    return static_cast<JPH_AllowedDOFs>(reinterpret_cast<const JPH::MotionProperties*>(properties)->GetAllowedDOFs());
+}
+
 void JPH_MotionProperties_SetLinearDamping(JPH_MotionProperties* properties, float damping)
 {
     reinterpret_cast<JPH::MotionProperties*>(properties)->SetLinearDamping(damping);
@@ -2192,11 +2802,6 @@ float JPH_MotionProperties_GetAngularDamping(const JPH_MotionProperties* propert
     return reinterpret_cast<const JPH::MotionProperties*>(properties)->GetAngularDamping();
 }
 
-float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties)
-{
-    return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
-}
-
 void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, const JPH_MassProperties* massProperties)
 {
     reinterpret_cast<JPH::MotionProperties*>(properties)->SetMassProperties(
@@ -2204,13 +2809,45 @@ void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JP
         ToJolt(massProperties));
 }
 
-const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
+float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties)
+{
+    return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
+}
+
+void JPH_MotionProperties_SetInverseMass(JPH_MotionProperties* properties, float inverseMass)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetInverseMass(inverseMass);
+}
+
+void JPH_MotionProperties_GetInverseInertiaDiagonal(JPH_MotionProperties* properties, JPH_Vec3* result)
+{
+    FromJolt(reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseInertiaDiagonal(), result);
+}
+
+void JPH_MotionProperties_GetInertiaRotation(JPH_MotionProperties* properties, JPH_Quat* result)
+{
+    FromJolt(reinterpret_cast<JPH::MotionProperties*>(properties)->GetInertiaRotation(), result);
+}
+
+void JPH_MotionProperties_SetInverseInertia(JPH_MotionProperties* properties, JPH_Vec3* diagonal, JPH_Quat* rot)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetInverseInertia(ToJolt(diagonal), ToJolt(rot));
+}
+
+const JPH_BroadPhaseQuery* JPH_PhysicsSystem_GetBroadPhaseQuery(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    return reinterpret_cast<const JPH_BroadPhaseQuery*>(&system->physicsSystem->GetBroadPhaseQuery());
+}
+
+const JPH_NarrowPhaseQuery* JPH_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
     return reinterpret_cast<const JPH_NarrowPhaseQuery*>(&system->physicsSystem->GetNarrowPhaseQuery());
 }
-const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system)
+const JPH_NarrowPhaseQuery* JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
@@ -2231,6 +2868,13 @@ void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_
 
     auto joltListener = reinterpret_cast<JPH::BodyActivationListener*>(listener);
     system->physicsSystem->SetBodyActivationListener(joltListener);
+}
+
+JPH_Bool32 JPH_PhysicsSystem_WereBodiesInContact(const JPH_PhysicsSystem* system, JPH_BodyID body1, JPH_BodyID body2)
+{
+	JPH_ASSERT(system);
+
+	return system->physicsSystem->WereBodiesInContact(JPH::BodyID(body1), JPH::BodyID(body2));
 }
 
 uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system)
@@ -2365,17 +3009,6 @@ JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCre
     return reinterpret_cast<JPH_Body*>(body);
 }
 
-JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, JPH_SoftBodyCreationSettings* settings)
-{
-    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
-
-    auto body = joltBodyInterface->CreateSoftBody(
-        *reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings)
-    );
-
-    return reinterpret_cast<JPH_Body*>(body);
-}
-
 JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -2446,6 +3079,42 @@ void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID body
 
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     joltBodyInterface->DestroyBody(JPH::BodyID(bodyID));
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBody(*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_SoftBodyCreationSettings* settings)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBodyWithID(JPH::BodyID(bodyID),*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBodyWithoutID(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBodyWithoutID(*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_BodyID JPH_BodyInterface_CreateAndAddSoftBody(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings, JPH_Activation activationMode)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::BodyID bodyID = joltBodyInterface->CreateAndAddSoftBody(*joltSettings, static_cast<JPH::EActivation>(activationMode));
+    return bodyID.GetIndexAndSequenceNumber();
 }
 
 void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Activation activationMode)
@@ -2924,145 +3593,330 @@ void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterfac
 }
 
 //--------------------------------------------------------------------------------------------------
+// JPH_BroadPhaseQuery
+//--------------------------------------------------------------------------------------------------
+class RayCastBodyCollectorCallback : public RayCastBodyCollector
+{
+public:
+    RayCastBodyCollectorCallback(JPH_RayCastBodyCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const BroadPhaseCastResult& result)
+    {
+        JPH_BroadPhaseCastResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
+        hadHit = true;
+    }
+
+    JPH_RayCastBodyCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
+class CollideShapeBodyCollectorCallback : public CollideShapeBodyCollector
+{
+public:
+    CollideShapeBodyCollectorCallback(JPH_CollideShapeBodyCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const BodyID& result)
+    {
+        proc(userData, result.GetIndexAndSequenceNumber());
+        hadHit = true;
+    }
+
+    JPH_CollideShapeBodyCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
+JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* origin, const JPH_Vec3* direction,
+    JPH_RayCastBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && origin && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    JPH::RayCast ray(ToJolt(origin), ToJolt(direction));
+    RayCastBodyCollectorCallback collector(callback, userData);
+    joltQuery->CastRay(ray, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_Bool32 JPH_BroadPhaseQuery_CollideAABox(const JPH_BroadPhaseQuery* query,
+    const JPH_AABox* box, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && box && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    JPH::AABox joltBox(ToJolt(&box->min), ToJolt(&box->max));
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollideAABox(joltBox, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_Bool32 JPH_BroadPhaseQuery_CollideSphere(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* center, float radius, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && center && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollideSphere(ToJolt(center), radius, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_Bool32 JPH_BroadPhaseQuery_CollidePoint(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* point, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && point && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollidePoint(ToJolt(point), collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+//--------------------------------------------------------------------------------------------------
 // JPH_NarrowPhaseQuery
 //--------------------------------------------------------------------------------------------------
+class CastRayCollectorCallback : public CastRayCollector
+{
+public:
+    CastRayCollectorCallback(JPH_CastRayCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const RayCastResult& result)
+    {
+        JPH_RayCastResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
+        hadHit = true;
+    }
+
+    JPH_CastRayCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
+class CollidePointCollectorCallback : public CollidePointCollector
+{
+public:
+    CollidePointCollectorCallback(JPH_CollidePointCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const CollidePointResult& result)
+    {
+        JPH_CollidePointResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
+        hadHit = true;
+    }
+
+    JPH_CollidePointCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
+class CollideShapeCollectorCallback : public CollideShapeCollector
+{
+public:
+    CollideShapeCollectorCallback(JPH_CollideShapeCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const CollideShapeResult& result)
+    {
+        JPH_CollideShapeResult hit;
+        FromJolt(result.mContactPointOn1, &hit.contactPointOn1);
+        FromJolt(result.mContactPointOn2, &hit.contactPointOn2);
+        FromJolt(result.mPenetrationAxis, &hit.penetrationAxis);
+        hit.penetrationDepth = result.mPenetrationDepth;
+        hit.subShapeID1 = result.mSubShapeID1.GetValue();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
+        hadHit = true;
+    }
+
+    JPH_CollideShapeCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
+class CastShapeCollectorCallback : public CastShapeCollector
+{
+public:
+    CastShapeCollectorCallback(JPH_CastShapeCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const ShapeCastResult& result)
+    {
+        JPH_ShapeCastResult hit;
+        FromJolt(result.mContactPointOn1, &hit.contactPointOn1);
+        FromJolt(result.mContactPointOn2, &hit.contactPointOn2);
+        FromJolt(result.mPenetrationAxis, &hit.penetrationAxis);
+        hit.penetrationDepth = result.mPenetrationDepth;
+        hit.subShapeID1 = result.mSubShapeID1.GetValue();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+        hit.isBackFaceHit = result.mIsBackFaceHit;
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
+        hadHit = true;
+    }
+
+    JPH_CastShapeCollector* proc;
+    void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
+};
+
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
     JPH_RayCastResult* hit,
-    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
-    const void* objectLayerFilter, // Can be NULL (no filter)
-    const void* bodyFilter)
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
     JPH_ASSERT(query && origin && direction && hit);
     auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
-    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
-    const JPH::BroadPhaseLayerFilter broad_phase_layer_filter{};
-    const JPH::ObjectLayerFilter object_layer_filter{};
-    const JPH::BodyFilter body_filter{};
 
-    ClosestHitCollisionCollector<CastRayCollector> collector;
+    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
+    RayCastResult result;
+
+    bool hadHit = joltQuery->CastRay(
+        ray,
+        result,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
+
+    if (hadHit)
+    {
+        hit->fraction = result.mFraction;
+        hit->bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit->subShapeID2 = result.mSubShapeID2.GetValue();
+    }
+
+    return static_cast<JPH_Bool32>(hadHit);
+}
+
+JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* query,
+    const JPH_RVec3* origin, const JPH_Vec3* direction,
+    JPH_CastRayCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
+{
+    JPH_ASSERT(query && origin && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
+
+    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
     RayCastSettings ray_settings;
+    CastRayCollectorCallback collector(callback, userData);
+
     joltQuery->CastRay(
         ray,
         ray_settings,
         collector,
-        broadPhaseLayerFilter ? *static_cast<const JPH::BroadPhaseLayerFilter*>(broadPhaseLayerFilter) : broad_phase_layer_filter,
-        objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
-        bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
     );
 
-    if (collector.HadHit())
-    {
-		hit->fraction = collector.mHit.mFraction;
-		hit->bodyID = collector.mHit.mBodyID.GetIndexAndSequenceNumber();
-		hit->subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
-	}
-
-    return collector.HadHit();
+    return collector.hadHit;
 }
 
-JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create(void)
+JPH_Bool32 JPH_NarrowPhaseQuery_CollidePoint(const JPH_NarrowPhaseQuery* query,
+	const JPH_RVec3* point,
+	JPH_CollidePointCollector* callback, void* userData,
+	JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+	JPH_ObjectLayerFilter* objectLayerFilter,
+	JPH_BodyFilter* bodyFilter)
 {
-    auto joltCollector = new AllHitCollisionCollector<CastRayCollector>();
-    return reinterpret_cast<JPH_AllHit_CastRayCollector*>(joltCollector);
-}
-
-void JPH_AllHit_CastRayCollector_Destroy(JPH_AllHit_CastRayCollector* collector)
-{
-    if (collector)
-    {
-        delete reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    }
-}
-
-void JPH_AllHit_CastRayCollector_Reset(JPH_AllHit_CastRayCollector* collector)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    joltCollector->Reset();
-}
-
-JPH_RayCastResult* JPH_AllHit_CastRayCollector_GetHits(JPH_AllHit_CastRayCollector* collector, size_t * size)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    *size = joltCollector->mHits.size();
-    return reinterpret_cast<JPH_RayCastResult*>(joltCollector->mHits.data());
-}
-
-JPH_Bool32 JPH_NarrowPhaseQuery_CastRayAll(const JPH_NarrowPhaseQuery* query,
-    const JPH_RVec3* origin, const JPH_Vec3* direction,
-    JPH_AllHit_CastRayCollector* hit_collector,
-    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
-    const void* objectLayerFilter, // Can be NULL (no filter)
-    const void* bodyFilter) // Can be NULL (no filter)
-{
-    JPH_ASSERT(query && origin && direction && hit_collector);
+    JPH_ASSERT(query && point && callback);
     auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
-    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
-    const JPH::BroadPhaseLayerFilter broad_phase_layer_filter{};
-    const JPH::ObjectLayerFilter object_layer_filter{};
-    const JPH::BodyFilter body_filter{};
-    AllHitCollisionCollector<CastRayCollector>& joltCollector = *reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(hit_collector);
-    RayCastSettings ray_settings;
-    joltQuery->CastRay(
-        ray,
-        ray_settings,
-        joltCollector,
-        broadPhaseLayerFilter ? *static_cast<const JPH::BroadPhaseLayerFilter*>(broadPhaseLayerFilter) : broad_phase_layer_filter,
-        objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
-        bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
+    auto joltPoint = ToJolt(point);
+
+    CollidePointCollectorCallback collector(callback, userData);
+
+    joltQuery->CollidePoint(
+        joltPoint,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
     );
-    joltCollector.Sort();
-    return !joltCollector.mHits.empty();
+
+    return collector.hadHit;
 }
 
-JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create(void)
+JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery* query,
+    const JPH_Shape* shape, const JPH_Vec3* scale, const JPH_RMatrix4x4* centerOfMassTransform,
+    JPH_RVec3* baseOffset,
+    JPH_CollideShapeCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
-    auto joltCollector = new AllHitCollisionCollector<CastShapeCollector>();
-    return reinterpret_cast<JPH_AllHit_CastShapeCollector*>(joltCollector);
-}
+    JPH_ASSERT(query && shape && scale && centerOfMassTransform && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    auto joltScale = ToJolt(scale);
+    auto joltTransform = ToJolt(*centerOfMassTransform);
 
-void JPH_AllHit_CastShapeCollector_Destroy(JPH_AllHit_CastShapeCollector* collector)
-{
-    if (collector)
-    {
-        delete reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    }
-}
+    CollideShapeSettings settings;
+    settings.mActiveEdgeMode = EActiveEdgeMode::CollideWithAll;
 
-void JPH_AllHit_CastShapeCollector_Reset(JPH_AllHit_CastShapeCollector* collector)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    joltCollector->Reset();
-}
+    auto joltBaseOffset = ToJolt(baseOffset);
 
-JPH_ShapeCastResult* JPH_AllHit_CastShapeCollector_GetHits(JPH_AllHit_CastShapeCollector* collector, size_t * size)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    *size = joltCollector->mHits.size();
-    return reinterpret_cast<JPH_ShapeCastResult*>(joltCollector->mHits.data());
-}
+    CollideShapeCollectorCallback collector(callback, userData);
 
-JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    JPH_ASSERT(index < joltCollector->mHits.size());
-    return joltCollector->mHits[index].mBodyID2.GetIndexAndSequenceNumber();
-}
+    joltQuery->CollideShape(
+        joltShape,
+        joltScale,
+        joltTransform,
+        settings,
+        joltBaseOffset,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
 
-JPH_BodyID JPH_AllHit_CastShapeCollector_GetSubShapeID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    JPH_ASSERT(index < joltCollector->mHits.size());
-    return joltCollector->mHits[index].mSubShapeID2.GetValue();
+    return collector.hadHit;
 }
 
 JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape,
     const JPH_RMatrix4x4* worldTransform, const JPH_Vec3* direction,
     JPH_RVec3* baseOffset,
-    JPH_AllHit_CastShapeCollector* hit_collector)
+    JPH_CastShapeCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
-    JPH_ASSERT(query && worldTransform && direction && hit_collector);
+    JPH_ASSERT(query && shape && worldTransform && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
     auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
 
     RShapeCast shape_cast = RShapeCast::sFromWorldTransform(
@@ -3076,13 +3930,20 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     settings.mBackFaceModeTriangles = EBackFaceMode::CollideWithBackFaces;
     settings.mBackFaceModeConvex = EBackFaceMode::CollideWithBackFaces;
 
-    AllHitCollisionCollector<CastShapeCollector>& joltCollector = *reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(hit_collector);
-
-    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
     auto joltBaseOffset = ToJolt(baseOffset);
+    CastShapeCollectorCallback collector(callback, userData);
 
-    joltQuery->CastShape(shape_cast, settings, joltBaseOffset, joltCollector);
-    return joltCollector.HadHit();
+    joltQuery->CastShape(
+        shape_cast,
+        settings,
+        joltBaseOffset,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
+
+    return collector.hadHit;
 }
 
 /* Body */
@@ -3338,8 +4199,6 @@ uint64_t JPH_Body_GetUserData(JPH_Body* body)
 }
 
 /* Contact Listener */
-static JPH_ContactListener_Procs g_ContactListener_Procs;
-
 class ManagedContactListener final : public JPH::ContactListener
 {
 public:
@@ -3349,15 +4208,20 @@ public:
         JPH_RVec3 baseOffset;
         FromJolt(inBaseOffset, &baseOffset);
 
-        JPH_ValidateResult result = g_ContactListener_Procs.OnContactValidate(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2),
-            &baseOffset,
-            nullptr
-        );
+        if (procs.OnContactValidate)
+        {
+            JPH_ValidateResult result = procs.OnContactValidate(
+                userData,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                &baseOffset,
+                nullptr
+            );
 
-        return (JPH::ValidateResult)result;
+            return (JPH::ValidateResult)result;
+        }
+
+        return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
     }
 
     void OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
@@ -3365,11 +4229,16 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        g_ContactListener_Procs.OnContactAdded(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2)
-        );
+        if (procs.OnContactAdded)
+        {
+            procs.OnContactAdded(
+                userData,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+                reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
+            );
+        }
     }
 
     void OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
@@ -3377,25 +4246,38 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        g_ContactListener_Procs.OnContactPersisted(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2)
-        );
+        if (procs.OnContactPersisted)
+        {
+            procs.OnContactPersisted(
+                userData,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+                reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
+            );
+        }
     }
 
     void OnContactRemoved(const SubShapeIDPair& inSubShapePair) override
     {
-        g_ContactListener_Procs.OnContactRemoved(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
-        );
+        if (procs.OnContactRemoved)
+        {
+            procs.OnContactRemoved(
+                userData,
+                reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
+            );
+        }
     }
+
+    JPH_ContactListener_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs)
+void JPH_ContactListener_SetProcs(JPH_ContactListener* listener, JPH_ContactListener_Procs procs, void* userData)
 {
-    g_ContactListener_Procs = procs;
+    auto managedListener = reinterpret_cast<ManagedContactListener*>(listener);
+    managedListener->procs = procs;
+    managedListener->userData = userData;
 }
 
 JPH_ContactListener* JPH_ContactListener_Create(void)
@@ -3413,33 +4295,42 @@ void JPH_ContactListener_Destroy(JPH_ContactListener* listener)
 }
 
 /* BodyActivationListener */
-static JPH_BodyActivationListener_Procs g_BodyActivationListener_Procs;
-
 class ManagedBodyActivationListener final : public JPH::BodyActivationListener
 {
 public:
     void OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        g_BodyActivationListener_Procs.OnBodyActivated(
-            reinterpret_cast<JPH_BodyActivationListener*>(this),
-            inBodyID.GetIndexAndSequenceNumber(),
-            inBodyUserData
-        );
+        if (procs.OnBodyDeactivated)
+        {
+            procs.OnBodyActivated(
+                userData,
+                inBodyID.GetIndexAndSequenceNumber(),
+                inBodyUserData
+            );
+        }
     }
 
     void OnBodyDeactivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        g_BodyActivationListener_Procs.OnBodyDeactivated(
-            reinterpret_cast<JPH_BodyActivationListener*>(this),
-            inBodyID.GetIndexAndSequenceNumber(),
-            inBodyUserData
-        );
+        if (procs.OnBodyDeactivated)
+        {
+            procs.OnBodyDeactivated(
+                userData,
+                inBodyID.GetIndexAndSequenceNumber(),
+                inBodyUserData
+            );
+        }
     }
+
+    JPH_BodyActivationListener_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs)
+void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* userData)
 {
-    g_BodyActivationListener_Procs = procs;
+    auto managedListener = reinterpret_cast<ManagedBodyActivationListener*>(listener);
+    managedListener->procs = procs;
+    managedListener->userData = userData;
 }
 
 JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void)
@@ -3454,6 +4345,133 @@ void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener)
     {
         delete reinterpret_cast<ManagedBodyActivationListener*>(listener);
     }
+}
+
+/* ContactManifold */
+void JPH_ContactManifold_GetWorldSpaceNormal(const JPH_ContactManifold* manifold, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->mWorldSpaceNormal, result);
+}
+
+float JPH_ContactManifold_GetPenetrationDepth(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mPenetrationDepth;
+}
+
+JPH_SubShapeID JPH_ContactManifold_GetSubShapeID1(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID1.GetValue();
+}
+
+JPH_SubShapeID JPH_ContactManifold_GetSubShapeID2(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID2.GetValue();
+}
+
+uint32_t JPH_ContactManifold_GetPointCount(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mRelativeContactPointsOn1.size();
+}
+
+void JPH_ContactManifold_GetWorldSpaceContactPointOn1(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn1(index), result);
+}
+
+void JPH_ContactManifold_GetWorldSpaceContactPointOn2(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn2(index), result);
+}
+
+/* ContactSettings */
+float JPH_ContactSettings_GetFriction(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedFriction;
+}
+
+void JPH_ContactSettings_SetFriction(JPH_ContactSettings* settings, float friction)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedFriction = friction;
+}
+
+float JPH_ContactSettings_GetRestitution(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedRestitution;
+}
+
+void JPH_ContactSettings_SetRestitution(JPH_ContactSettings* settings, float restitution)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedRestitution = restitution;
+}
+
+float JPH_ContactSettings_GetInvMassScale1(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale1;
+}
+
+void JPH_ContactSettings_SetInvMassScale1(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale1 = scale;
+}
+
+float JPH_ContactSettings_GetInvInertiaScale1(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale1;
+}
+
+void JPH_ContactSettings_SetInvInertiaScale1(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale1 = scale;
+}
+
+float JPH_ContactSettings_GetInvMassScale2(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale2;
+}
+
+void JPH_ContactSettings_SetInvMassScale2(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale2 = scale;
+}
+
+float JPH_ContactSettings_GetInvInertiaScale2(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale2;
+}
+
+void JPH_ContactSettings_SetInvInertiaScale2(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale2 = scale;
+}
+
+JPH_Bool32 JPH_ContactSettings_GetIsSensor(JPH_ContactSettings* settings)
+{
+	return static_cast<JPH_Bool32>(reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor);
+}
+
+void JPH_ContactSettings_SetIsSensor(JPH_ContactSettings* settings, JPH_Bool32 sensor)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor = static_cast<bool>(sensor);
+}
+
+void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeLinearSurfaceVelocity, result);
+}
+
+void JPH_ContactSettings_SetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeLinearSurfaceVelocity = ToJolt(velocity);
+}
+
+void JPH_ContactSettings_GetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeAngularSurfaceVelocity, result);
+}
+
+void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeAngularSurfaceVelocity = ToJolt(velocity);
 }
 
 /* CharacterBaseSettings */
@@ -3552,57 +4570,173 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 }
 
 /* CharacterVirtual */
-JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
+JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
 	uint64_t userData,
     JPH_PhysicsSystem* system)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+    auto joltSettings = reinterpret_cast<const JPH::CharacterVirtualSettings*>(settings);
 
-    auto jolt_character = new JPH::CharacterVirtual(jolt_settings, ToJolt(position), ToJolt(rotation), userData, system->physicsSystem);
-    jolt_character->AddRef();
+    auto joltCharacter = new JPH::CharacterVirtual(joltSettings, ToJolt(position), ToJolt(rotation), userData, system->physicsSystem);
+    joltCharacter->AddRef();
 
-    return reinterpret_cast<JPH_CharacterVirtual*>(jolt_character);
+    return reinterpret_cast<JPH_CharacterVirtual*>(joltCharacter);
+}
+
+void JPH_CharacterVirtual_SetListener(JPH_CharacterVirtual* character, JPH_CharacterContactListener* listener)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	auto joltListener = reinterpret_cast<JPH::CharacterContactListener*>(listener);
+	joltCharacter->SetListener(joltListener);
 }
 
 void JPH_CharacterVirtual_GetLinearVelocity(JPH_CharacterVirtual* character, JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_vector = jolt_character->GetLinearVelocity();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_vector = joltCharacter->GetLinearVelocity();
     FromJolt(jolt_vector, velocity);
 }
 
 void JPH_CharacterVirtual_SetLinearVelocity(JPH_CharacterVirtual* character, const JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetLinearVelocity(ToJolt(velocity));
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetLinearVelocity(ToJolt(velocity));
 }
 
 void JPH_CharacterVirtual_GetPosition(JPH_CharacterVirtual* character, JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_vector = jolt_character->GetPosition();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_vector = joltCharacter->GetPosition();
     FromJolt(jolt_vector, position);
 }
 
 void JPH_CharacterVirtual_SetPosition(JPH_CharacterVirtual* character, const JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetPosition(ToJolt(position));
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetPosition(ToJolt(position));
 }
 
 void JPH_CharacterVirtual_GetRotation(JPH_CharacterVirtual* character, JPH_Quat* rotation)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_quat = jolt_character->GetRotation();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_quat = joltCharacter->GetRotation();
     FromJolt(jolt_quat, rotation);
 }
 
 void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH_Quat* rotation)
 {
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetRotation(ToJolt(rotation));
+}
+
+void JPH_CharacterVirtual_GetWorldTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+
+    const JPH::RMat44& mat = joltCharacter->GetWorldTransform();
+    FromJolt(mat, result);
+}
+
+void JPH_CharacterVirtual_GetCenterOfMassTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+
+    const JPH::RMat44& mat = joltCharacter->GetCenterOfMassTransform();
+    FromJolt(mat, result);
+}
+
+float JPH_CharacterVirtual_GetMass(JPH_CharacterVirtual* character)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMass();
+}
+
+void JPH_CharacterVirtual_SetMass(JPH_CharacterVirtual* character, float value)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMass(value);
+}
+
+float JPH_CharacterVirtual_GetMaxStrength(JPH_CharacterVirtual* character)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMaxStrength();
+}
+
+void JPH_CharacterVirtual_SetMaxStrength(JPH_CharacterVirtual* character, float value)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMaxStrength(value);
+}
+
+float JPH_CharacterVirtual_GetPenetrationRecoverySpeed(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetPenetrationRecoverySpeed();
+}
+
+void JPH_CharacterVirtual_SetPenetrationRecoverySpeed(JPH_CharacterVirtual* character, float value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetPenetrationRecoverySpeed(value);
+}
+
+JPH_Bool32 JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return FromJolt(joltCharacter->GetEnhancedInternalEdgeRemoval());
+}
+
+void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character, JPH_Bool32 value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetEnhancedInternalEdgeRemoval(ToJolt(value));
+}
+
+float JPH_CharacterVirtual_GetCharacterPadding(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetCharacterPadding();
+}
+
+uint32_t JPH_CharacterVirtual_GetMaxNumHits(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMaxNumHits();
+}
+
+void JPH_CharacterVirtual_SetMaxNumHits(JPH_CharacterVirtual* character, uint32_t value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMaxNumHits(value);
+}
+
+float JPH_CharacterVirtual_GetHitReductionCosMaxAngle(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetHitReductionCosMaxAngle();
+}
+
+void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(JPH_CharacterVirtual* character, float value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetHitReductionCosMaxAngle(value);
+}
+
+void JPH_CharacterVirtual_Update(JPH_CharacterVirtual* character, float deltaTime, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
+{
     auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetRotation(ToJolt(rotation));
+	auto jolt_object_layer = static_cast<JPH::ObjectLayer>(layer);
+
+    jolt_character->Update(deltaTime,
+        system->physicsSystem->GetGravity(),
+        system->physicsSystem->GetDefaultBroadPhaseLayerFilter(jolt_object_layer),
+        system->physicsSystem->GetDefaultLayerFilter(jolt_object_layer),
+        {},
+        {},
+        *s_TempAllocator
+    );
 }
 
 void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
@@ -3648,6 +4782,116 @@ void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_O
     );
 }
 
-#ifdef _MSC_VER
-#   pragma warning(pop)
-#endif
+/* CharacterContactListener */
+class ManagedCharacterContactListener final : public JPH::CharacterContactListener
+{
+public:
+    void OnAdjustBodyVelocity(const CharacterVirtual *inCharacter, const Body &inBody2, Vec3 &ioLinearVelocity, Vec3 &ioAngularVelocity) override
+    {
+        JPH_Vec3 linearVelocity, angularVelocity;
+        FromJolt(ioLinearVelocity, &linearVelocity);
+		FromJolt(ioAngularVelocity, &angularVelocity);
+
+        if (procs.OnAdjustBodyVelocity)
+        {
+            procs.OnAdjustBodyVelocity(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                &linearVelocity,
+                &angularVelocity
+            );
+        }
+    }
+
+    bool OnContactValidate(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2) override
+    {
+        if (procs.OnContactValidate)
+        {
+            return procs.OnContactValidate(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue()
+            ) == 1;
+        }
+
+		return true;
+    }
+
+    void OnContactAdded(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2, RVec3Arg inContactPosition, Vec3Arg inContactNormal, CharacterContactSettings &ioSettings) override
+    {
+        JPH_UNUSED(ioSettings);
+
+        if (procs.OnContactAdded)
+        {
+			JPH_RVec3 contactPosition;
+			JPH_Vec3 contactNormal;
+
+			FromJolt(inContactPosition, &contactPosition);
+			FromJolt(inContactNormal, &contactNormal);
+
+            procs.OnContactAdded(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue(),
+                &contactPosition,
+				&contactNormal
+            );
+        }
+    }
+
+    void OnContactSolve(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2,
+		RVec3Arg inContactPosition, Vec3Arg inContactNormal, Vec3Arg inContactVelocity,
+		const PhysicsMaterial *inContactMaterial, Vec3Arg inCharacterVelocity,
+		Vec3 &ioNewCharacterVelocity) override
+    {
+        if (procs.OnContactSolve)
+        {
+			JPH_RVec3 contactPosition;
+			JPH_Vec3 contactNormal, contactVelocity, characterVelocity;
+
+			FromJolt(inContactPosition, &contactPosition);
+			FromJolt(inContactNormal, &contactNormal);
+			FromJolt(inContactVelocity, &contactVelocity);
+			FromJolt(inCharacterVelocity, &characterVelocity);
+			JPH_Vec3 newCharacterVelocity;
+
+            procs.OnContactSolve(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue(),
+				&contactPosition,
+				&contactNormal,
+				&contactVelocity,
+				reinterpret_cast<const JPH_PhysicsMaterial*>(inContactMaterial),
+				&characterVelocity,
+				&newCharacterVelocity
+            );
+
+			ioNewCharacterVelocity = ToJolt(&newCharacterVelocity);
+        }
+    }
+
+    JPH_CharacterContactListener_Procs procs = {};
+    void* userData = nullptr;
+};
+
+
+JPH_CharacterContactListener* JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, void* userData)
+{
+	auto impl = new ManagedCharacterContactListener();
+	impl->procs = procs;
+    impl->userData = userData;
+    return reinterpret_cast<JPH_CharacterContactListener*>(impl);
+}
+
+void JPH_CharacterContactListener_Destroy(JPH_CharacterContactListener* listener)
+{
+	if (listener)
+        delete reinterpret_cast<ManagedCharacterContactListener*>(listener);
+}
+
+JPH_SUPPRESS_WARNING_POP
