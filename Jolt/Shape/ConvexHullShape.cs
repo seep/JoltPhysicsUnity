@@ -70,16 +70,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(ConvexHullShape lhs, ConvexHullShape rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ConvexHullShape lhs, ConvexHullShape rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(ConvexHullShape other)
         {
             return Handle.Equals(other.Handle);
@@ -93,6 +83,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return Handle.GetHashCode();
+        }
+
+        public static bool operator ==(ConvexHullShape lhs, ConvexHullShape rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ConvexHullShape lhs, ConvexHullShape rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

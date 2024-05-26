@@ -48,16 +48,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(CompoundShapeSettings lhs, CompoundShapeSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(CompoundShapeSettings lhs, CompoundShapeSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(CompoundShapeSettings other)
         {
             return Handle.Equals(other.Handle);
@@ -71,6 +61,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return Handle.GetHashCode();
+        }
+
+        public static bool operator ==(CompoundShapeSettings left, CompoundShapeSettings right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(CompoundShapeSettings left, CompoundShapeSettings right)
+        {
+            return !left.Equals(right);
         }
 
         #endregion

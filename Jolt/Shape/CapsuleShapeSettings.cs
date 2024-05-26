@@ -58,16 +58,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(CapsuleShapeSettings lhs, CapsuleShapeSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(CapsuleShapeSettings lhs, CapsuleShapeSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(CapsuleShapeSettings other)
         {
             return Handle.Equals(other.Handle);
@@ -81,6 +71,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return Handle.GetHashCode();
+        }
+
+        public static bool operator ==(CapsuleShapeSettings lhs, CapsuleShapeSettings rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(CapsuleShapeSettings lhs, CapsuleShapeSettings rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion
