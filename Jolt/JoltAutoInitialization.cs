@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Jolt.Native;
 
-using static Jolt.JoltAPI;
+using static Jolt.SafeBindings;
 
 namespace Jolt
 {

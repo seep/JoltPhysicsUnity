@@ -1,7 +1,7 @@
 ﻿using System;
 using Unity.Mathematics;
 using UnityEngine.XR;
-using static Jolt.JoltAPI;
+using static Jolt.SafeBindings;
 
 namespace Jolt
 {
