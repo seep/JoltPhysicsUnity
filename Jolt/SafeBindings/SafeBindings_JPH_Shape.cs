@@ -38,7 +38,7 @@ namespace Jolt
 
         public static float3 JPH_Shape_GetCenterOfMass<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            float3 result = default;
+            float3 result;
 
             Bindings.JPH_Shape_GetCenterOfMass(shape.Reinterpret<JPH_Shape>(), &result);
 
