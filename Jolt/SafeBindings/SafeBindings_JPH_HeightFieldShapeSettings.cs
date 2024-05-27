@@ -22,14 +22,14 @@ namespace Jolt
             fixed (float* maxPtr = &max)
             fixed (float* quantizationPtr = &quantization)
             {
-                Bindings.JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(GetPointer(settings), minPtr, maxPtr,
+                Bindings.JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(settings, minPtr, maxPtr,
                     quantizationPtr);
             }
         }
 
         public static uint JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(NativeHandle<JPH_HeightFieldShapeSettings> settings, float maxError)
         {
-            return Bindings.JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(GetPointer(settings), maxError);
+            return Bindings.JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(settings, maxError);
         }
     }
 }

@@ -9,7 +9,7 @@
 
         public static float JPH_SphereShape_GetRadius(NativeHandle<JPH_SphereShape> shape)
         {
-            return Bindings.JPH_SphereShape_GetRadius(GetPointer(shape));
+            return Bindings.JPH_SphereShape_GetRadius(shape);
         }
     }
 }

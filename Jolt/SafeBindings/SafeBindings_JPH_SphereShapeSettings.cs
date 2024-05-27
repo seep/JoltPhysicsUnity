@@ -9,17 +9,17 @@
 
         public static NativeHandle<JPH_SphereShape> JPH_SphereShapeSettings_CreateShape(NativeHandle<JPH_SphereShapeSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_SphereShapeSettings_CreateShape(GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_SphereShapeSettings_CreateShape(settings));
         }
 
         public static float JPH_SphereShapeSettings_GetRadius(NativeHandle<JPH_SphereShapeSettings> settings)
         {
-            return Bindings.JPH_SphereShapeSettings_GetRadius(GetPointer(settings));
+            return Bindings.JPH_SphereShapeSettings_GetRadius(settings);
         }
 
         public static void JPH_SphereShapeSettings_SetRadius(NativeHandle<JPH_SphereShapeSettings> settings, float radius)
         {
-            Bindings.JPH_SphereShapeSettings_SetRadius(GetPointer(settings), radius);
+            Bindings.JPH_SphereShapeSettings_SetRadius(settings, radius);
         }
     }
 }

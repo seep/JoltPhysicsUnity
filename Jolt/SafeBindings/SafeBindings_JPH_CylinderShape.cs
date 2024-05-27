@@ -9,12 +9,12 @@
 
         public static float JPH_CylinderShape_GetRadius(NativeHandle<JPH_CylinderShape> shape)
         {
-            return Bindings.JPH_CylinderShape_GetRadius(GetPointer(shape));
+            return Bindings.JPH_CylinderShape_GetRadius(shape);
         }
 
         public static float JPH_CylinderShape_GetHalfHeight(NativeHandle<JPH_CylinderShape> shape)
         {
-            return Bindings.JPH_CylinderShape_GetHalfHeight(GetPointer(shape));
+            return Bindings.JPH_CylinderShape_GetHalfHeight(shape);
         }
     }
 }

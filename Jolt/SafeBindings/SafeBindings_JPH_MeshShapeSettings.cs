@@ -24,12 +24,12 @@ namespace Jolt
 
         public static void JPH_MeshShapeSettings_Sanitize(NativeHandle<JPH_MeshShapeSettings> settings)
         {
-            Bindings.JPH_MeshShapeSettings_Sanitize(GetPointer(settings));
+            Bindings.JPH_MeshShapeSettings_Sanitize(settings);
         }
 
         public static NativeHandle<JPH_MeshShape> JPH_MeshShapeSettings_CreateShape(NativeHandle<JPH_MeshShapeSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_MeshShapeSettings_CreateShape(GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_MeshShapeSettings_CreateShape(settings));
         }
     }
 }

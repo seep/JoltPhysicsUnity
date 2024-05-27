@@ -52,6 +52,12 @@ namespace Jolt
             return ptr;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T* (NativeHandle<T> handle)
+        {
+            return handle.Unwrap();
+        }
+
         #region IDisposable
 
         public void Dispose()

@@ -15,11 +15,5 @@ namespace Jolt
         {
             return owner.CreateOwnedHandle(ptr);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T* GetPointer<T>(NativeHandle<T> handle) where T : unmanaged
-        {
-            return handle.Unwrap();
-        }
     }
 }

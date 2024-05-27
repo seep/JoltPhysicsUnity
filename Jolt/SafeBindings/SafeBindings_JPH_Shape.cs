@@ -6,41 +6,41 @@ namespace Jolt
     {
         public static void JPH_Shape_Destroy<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            Bindings.JPH_Shape_Destroy((JPH_Shape*)GetPointer(shape));
+            Bindings.JPH_Shape_Destroy(shape.Reinterpret<JPH_Shape>());
 
             shape.Dispose();
         }
 
         public static ShapeType JPH_Shape_GetType<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_GetType((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_GetType(shape.Reinterpret<JPH_Shape>());
         }
 
         public static ShapeSubType JPH_Shape_GetSubType<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_GetSubType((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_GetSubType(shape.Reinterpret<JPH_Shape>());
         }
 
         public static ulong JPH_Shape_GetUserData<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_GetUserData((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_GetUserData(shape.Reinterpret<JPH_Shape>());
         }
 
         public static void JPH_Shape_SetUserData<T>(NativeHandle<T> shape, ulong userData) where T : unmanaged, INativeShape
         {
-            Bindings.JPH_Shape_SetUserData((JPH_Shape*)GetPointer(shape), userData);
+            Bindings.JPH_Shape_SetUserData(shape.Reinterpret<JPH_Shape>(), userData);
         }
 
         public static bool JPH_Shape_MustBeStatic<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_MustBeStatic((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_MustBeStatic(shape.Reinterpret<JPH_Shape>());
         }
 
         public static float3 JPH_Shape_GetCenterOfMass<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
             float3 result = default;
 
-            Bindings.JPH_Shape_GetCenterOfMass((JPH_Shape*)GetPointer(shape), &result);
+            Bindings.JPH_Shape_GetCenterOfMass(shape.Reinterpret<JPH_Shape>(), &result);
 
             return result;
         }
@@ -49,7 +49,7 @@ namespace Jolt
         {
             AABox result;
 
-            Bindings.JPH_Shape_GetLocalBounds((JPH_Shape*)GetPointer(shape), &result);
+            Bindings.JPH_Shape_GetLocalBounds(shape.Reinterpret<JPH_Shape>(), &result);
 
             return result;
         }
@@ -58,21 +58,21 @@ namespace Jolt
         {
             AABox result;
 
-            Bindings.JPH_Shape_GetWorldSpaceBounds((JPH_Shape*)GetPointer(shape), &centerOfMassTransform, &scale, &result);
+            Bindings.JPH_Shape_GetWorldSpaceBounds(shape.Reinterpret<JPH_Shape>(), &centerOfMassTransform, &scale, &result);
 
             return result;
         }
 
         public static float JPH_Shape_GetInnerRadius<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_GetInnerRadius((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_GetInnerRadius(shape.Reinterpret<JPH_Shape>());
         }
 
         public static MassProperties JPH_Shape_GetMassProperties<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
             MassProperties result;
 
-            Bindings.JPH_Shape_GetMassProperties((JPH_Shape*)GetPointer(shape), &result);
+            Bindings.JPH_Shape_GetMassProperties(shape.Reinterpret<JPH_Shape>(), &result);
 
             return result;
         }
@@ -81,14 +81,14 @@ namespace Jolt
         {
             float3 result;
 
-            Bindings.JPH_Shape_GetSurfaceNormal((JPH_Shape*)GetPointer(shape), subShapeID, &localPosition, &result);
+            Bindings.JPH_Shape_GetSurfaceNormal(shape.Reinterpret<JPH_Shape>(), subShapeID, &localPosition, &result);
 
             return result;
         }
 
         public static float JPH_Shape_GetVolume<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
         {
-            return Bindings.JPH_Shape_GetVolume((JPH_Shape*)GetPointer(shape));
+            return Bindings.JPH_Shape_GetVolume(shape.Reinterpret<JPH_Shape>());
         }
     }
 }

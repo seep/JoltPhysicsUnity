@@ -9,7 +9,7 @@
 
         public static void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(NativeHandle<JPH_BroadPhaseLayerInterface> @interface, ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer)
         {
-            Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(GetPointer(@interface), objectLayer, broadPhaseLayer);
+            Bindings.JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(@interface, objectLayer, broadPhaseLayer);
         }
     }
 }

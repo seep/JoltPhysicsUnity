@@ -13,19 +13,19 @@ namespace Jolt
         {
             float3 result = default;
 
-            Bindings.JPH_BoxShape_GetHalfExtent(GetPointer(shape), &result);
+            Bindings.JPH_BoxShape_GetHalfExtent(shape, &result);
 
             return result;
         }
 
         public static float JPH_BoxShape_GetVolume(NativeHandle<JPH_BoxShape> shape)
         {
-            return Bindings.JPH_BoxShape_GetVolume(GetPointer(shape));
+            return Bindings.JPH_BoxShape_GetVolume(shape);
         }
 
         public static float JPH_BoxShape_GetConvexRadius(NativeHandle<JPH_BoxShape> shape)
         {
-            return Bindings.JPH_BoxShape_GetConvexRadius(GetPointer(shape));
+            return Bindings.JPH_BoxShape_GetConvexRadius(shape);
         }
     }
 }

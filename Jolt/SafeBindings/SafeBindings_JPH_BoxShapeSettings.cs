@@ -11,7 +11,7 @@ namespace Jolt
 
         public static NativeHandle<JPH_BoxShape> JPH_BoxShapeSettings_CreateShape(NativeHandle<JPH_BoxShapeSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_BoxShapeSettings_CreateShape(GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_BoxShapeSettings_CreateShape(settings));
         }
     }
 }

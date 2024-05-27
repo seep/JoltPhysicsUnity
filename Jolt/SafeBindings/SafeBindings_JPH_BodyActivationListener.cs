@@ -17,18 +17,18 @@ namespace Jolt
 
         public static void JPH_BodyActivationListener_SetProcs(NativeHandle<JPH_BodyActivationListener> listener, IBodyActivationListener managed)
         {
-            Bindings.JPH_BodyActivationListener_SetProcs(GetPointer(listener), UnsafeBodyActivationListenerProcs, GetPointer(listener));
+            Bindings.JPH_BodyActivationListener_SetProcs(listener, UnsafeBodyActivationListenerProcs, listener);
 
             // See JoltAPI_JPH_ContactListener for notes about managed listeners.
 
-            managedBodyActivationListeners[(nint) GetPointer(listener)] = managed;
+            managedBodyActivationListeners[(nint) listener.Unwrap()] = managed;
         }
 
         public static void JPH_BodyActivationListener_Destroy(NativeHandle<JPH_BodyActivationListener> listener)
         {
-            managedBodyActivationListeners.Remove((nint) GetPointer(listener));
+            managedBodyActivationListeners.Remove((nint) listener.Unwrap());
 
-            Bindings.JPH_BodyActivationListener_Destroy(GetPointer(listener));
+            Bindings.JPH_BodyActivationListener_Destroy(listener.Unwrap());
 
             listener.Dispose();
         }

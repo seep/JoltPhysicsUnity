@@ -15,7 +15,7 @@ namespace Jolt
 
         public static NativeHandle<JPH_ConvexHullShape> JPH_ConvexHullShapeSettings_CreateShape(NativeHandle<JPH_ConvexHullShapeSettings> settings)
         {
-            return CreateHandle(Bindings.JPH_ConvexHullShapeSettings_CreateShape(GetPointer(settings)));
+            return CreateHandle(Bindings.JPH_ConvexHullShapeSettings_CreateShape(settings));
         }
     }
 }

@@ -17,21 +17,21 @@ namespace Jolt
 
         public static void JPH_ContactListener_SetProcs(NativeHandle<JPH_ContactListener> listener, IContactListener managed)
         {
-            Bindings.JPH_ContactListener_SetProcs(GetPointer(listener), UnsafeContactListenerProcs, GetPointer(listener));
+            Bindings.JPH_ContactListener_SetProcs(listener, UnsafeContactListenerProcs, listener);
 
             // JoltPhysicsSharp uses GCHandle with some delegate indirection to pass a closure pointer as the native
             // "user data" but my understanding is that we cannot safely do a "reverse lookup" of the managed object
             // without pinning the GC handle and reducing GC performance. If there is a better way to maintain a
             // reference to the managed interface than a static dictionary, please file a PR!
 
-            managedContactListeners[(nint) GetPointer(listener)] = managed;
+            managedContactListeners[(nint) listener.Unwrap()] = managed;
         }
 
         public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
         {
-            managedContactListeners.Remove((nint) GetPointer(listener));
+            managedContactListeners.Remove((nint) listener.Unwrap());
 
-            Bindings.JPH_ContactListener_Destroy(GetPointer(listener));
+            Bindings.JPH_ContactListener_Destroy(listener.Unwrap());
 
             listener.Dispose();
         }
