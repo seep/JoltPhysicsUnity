@@ -21,14 +21,14 @@ namespace Jolt
 
             // See JoltAPI_JPH_ContactListener for notes about managed listeners.
 
-            managedBodyActivationListeners[(nint) listener.Unwrap()] = managed;
+            managedBodyActivationListeners[(nint) listener.IntoPointer()] = managed;
         }
 
         public static void JPH_BodyActivationListener_Destroy(NativeHandle<JPH_BodyActivationListener> listener)
         {
-            managedBodyActivationListeners.Remove((nint) listener.Unwrap());
+            managedBodyActivationListeners.Remove((nint) listener.IntoPointer());
 
-            Bindings.JPH_BodyActivationListener_Destroy(listener.Unwrap());
+            Bindings.JPH_BodyActivationListener_Destroy(listener.IntoPointer());
 
             listener.Dispose();
         }

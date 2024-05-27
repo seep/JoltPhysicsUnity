@@ -24,14 +24,14 @@ namespace Jolt
             // without pinning the GC handle and reducing GC performance. If there is a better way to maintain a
             // reference to the managed interface than a static dictionary, please file a PR!
 
-            managedContactListeners[(nint) listener.Unwrap()] = managed;
+            managedContactListeners[(nint) listener.IntoPointer()] = managed;
         }
 
         public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
         {
-            managedContactListeners.Remove((nint) listener.Unwrap());
+            managedContactListeners.Remove((nint) listener.IntoPointer());
 
-            Bindings.JPH_ContactListener_Destroy(listener.Unwrap());
+            Bindings.JPH_ContactListener_Destroy(listener.IntoPointer());
 
             listener.Dispose();
         }
