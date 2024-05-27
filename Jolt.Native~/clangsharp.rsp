@@ -9,6 +9,8 @@ JPH_AllowedDOFs
 JPH_BodyID
 JPH_BodyType
 JPH_ConstraintSpace
+JPH_ConstraintSubType
+JPH_ConstraintType
 JPH_GroundState
 JPH_IndexedTriangle
 JPH_IndexedTriangleNoMaterial
@@ -37,6 +39,8 @@ JPH_BodyID=BodyID
 JPH_BodyType=BodyType
 JPH_BroadPhaseLayer=BroadPhaseLayer
 JPH_ConstraintSpace=ConstraintSpace
+JPH_ConstraintSubType=ConstraintSubType
+JPH_ConstraintType=ConstraintType
 JPH_GroundState=GroundState
 JPH_IndexedTriangle=IndexedTriangle
 JPH_IndexedTriangleNoMaterial=IndexedTriangleNoMaterial

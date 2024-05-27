@@ -5,37 +5,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal enum JPH_ConstraintType
-    {
-        JPH_ConstraintType_Constraint = 0,
-        JPH_ConstraintType_TwoBodyConstraint = 1,
-        _JPH_ConstraintType_Count,
-        _JPH_ConstraintType_Force32 = 0x7fffffff,
-    }
-
-    internal enum JPH_ConstraintSubType
-    {
-        JPH_ConstraintSubType_Fixed = 0,
-        JPH_ConstraintSubType_Point = 1,
-        JPH_ConstraintSubType_Hinge = 2,
-        JPH_ConstraintSubType_Slider = 3,
-        JPH_ConstraintSubType_Distance = 4,
-        JPH_ConstraintSubType_Cone = 5,
-        JPH_ConstraintSubType_SwingTwist = 6,
-        JPH_ConstraintSubType_SixDOF = 7,
-        JPH_ConstraintSubType_Path = 8,
-        JPH_ConstraintSubType_Vehicle = 9,
-        JPH_ConstraintSubType_RackAndPinion = 10,
-        JPH_ConstraintSubType_Gear = 11,
-        JPH_ConstraintSubType_Pulley = 12,
-        JPH_ConstraintSubType_User1 = 13,
-        JPH_ConstraintSubType_User2 = 14,
-        JPH_ConstraintSubType_User3 = 15,
-        JPH_ConstraintSubType_User4 = 16,
-        _JPH_ConstraintSubType_Count,
-        _JPH_ConstraintSubType_Force32 = 0x7fffffff,
-    }
-
     internal enum JPH_SpringMode
     {
         JPH_SpringMode_FrequencyAndDamping = 0,
@@ -1153,10 +1122,12 @@ namespace Jolt
         public static extern JPH_ConstraintSettings* JPH_Constraint_GetConstraintSettings(JPH_Constraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_ConstraintType JPH_Constraint_GetType([NativeTypeName("const JPH_Constraint *")] JPH_Constraint* constraint);
+        [return: NativeTypeName("JPH_ConstraintType")]
+        public static extern ConstraintType JPH_Constraint_GetType([NativeTypeName("const JPH_Constraint *")] JPH_Constraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_ConstraintSubType JPH_Constraint_GetSubType([NativeTypeName("const JPH_Constraint *")] JPH_Constraint* constraint);
+        [return: NativeTypeName("JPH_ConstraintSubType")]
+        public static extern ConstraintSubType JPH_Constraint_GetSubType([NativeTypeName("const JPH_Constraint *")] JPH_Constraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern uint JPH_Constraint_GetConstraintPriority([NativeTypeName("const JPH_Constraint *")] JPH_Constraint* constraint);
