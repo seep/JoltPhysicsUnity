@@ -30,6 +30,16 @@ namespace Jolt
             return new SphereShape(JPH_SphereShapeSettings_CreateShape(Handle));
         }
 
+        public float GetRadius()
+        {
+            return JPH_SphereShapeSettings_GetRadius(Handle);
+        }
+
+        public void SetRadius(float radius)
+        {
+            JPH_SphereShapeSettings_SetRadius(Handle, radius);
+        }
+
         #endregion
 
         #region JPH_ConvexShapeSettings
