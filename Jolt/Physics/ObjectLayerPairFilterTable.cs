@@ -3,9 +3,10 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct ObjectLayerPairFilterTable : IEquatable<ObjectLayerPairFilterTable>
+    [GenerateHandle]
+    public readonly partial struct ObjectLayerPairFilterTable
     {
-        internal NativeHandle<JPH_ObjectLayerPairFilter> Handle;
+        internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;
 
         internal ObjectLayerPairFilterTable(NativeHandle<JPH_ObjectLayerPairFilter> handle)
         {
@@ -41,35 +42,6 @@ namespace Jolt
         public bool ShouldCollide(ObjectLayer layerA, ObjectLayer layerB)
         {
             return JPH_ObjectLayerPairFilterTable_ShouldCollide(Handle, layerA, layerB);
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        public static bool operator ==(ObjectLayerPairFilterTable lhs, ObjectLayerPairFilterTable rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ObjectLayerPairFilterTable lhs, ObjectLayerPairFilterTable rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        public bool Equals(ObjectLayerPairFilterTable other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ObjectLayerPairFilterTable other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
         }
 
         #endregion

@@ -4,7 +4,8 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public readonly struct Constraint : IDisposable, IEquatable<Constraint>
+    [GenerateHandle]
+    public readonly partial struct Constraint : IDisposable
     {
         internal readonly NativeHandle<JPH_Constraint> Handle;
 
@@ -68,35 +69,6 @@ namespace Jolt
         public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM)
         {
             JPH_Constraint_NotifyShapeChanged(Handle, bodyID, deltaCOM);
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        public bool Equals(Constraint other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Constraint other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(Constraint left, Constraint right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Constraint left, Constraint right)
-        {
-            return !left.Equals(right);
         }
 
         #endregion

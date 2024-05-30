@@ -1,11 +1,11 @@
-﻿using System;
-using static Jolt.SafeBindings;
+﻿using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct ObjectVsBroadPhaseLayerFilterMask : IEquatable<ObjectVsBroadPhaseLayerFilterMask>
+    [GenerateHandle]
+    public readonly partial struct ObjectVsBroadPhaseLayerFilterMask
     {
-        internal NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
+        internal readonly NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
 
         internal ObjectVsBroadPhaseLayerFilterMask(NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> handle)
         {
@@ -25,35 +25,6 @@ namespace Jolt
         public static ObjectVsBroadPhaseLayerFilterMask Create(BroadPhaseLayerInterface @interface)
         {
             return new ObjectVsBroadPhaseLayerFilterMask(JPH_ObjectVsBroadPhaseLayerFilterMask_Create(@interface.Handle));
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        public static bool operator ==(ObjectVsBroadPhaseLayerFilterMask lhs, ObjectVsBroadPhaseLayerFilterMask rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ObjectVsBroadPhaseLayerFilterMask lhs, ObjectVsBroadPhaseLayerFilterMask rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        public bool Equals(ObjectVsBroadPhaseLayerFilterMask other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ObjectVsBroadPhaseLayerFilterMask other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
         }
 
         #endregion

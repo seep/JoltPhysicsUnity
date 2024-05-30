@@ -4,9 +4,9 @@ namespace Jolt
 {
     internal static unsafe partial class SafeBindings
     {
-        public static void JPH_CompoundShapeSettings_AddShape<T, U>(NativeHandle<T> settings, float3 position, quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShapeSettings
+        public static void JPH_CompoundShapeSettings_AddShape<T, U>(NativeHandle<T> handle, float3 position, quaternion rotation, NativeHandle<U> settings, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShapeSettings
         {
-            Bindings.JPH_CompoundShapeSettings_AddShape(settings.Reinterpret<JPH_CompoundShapeSettings>(), &position, &rotation, shape.Reinterpret<JPH_ShapeSettings>(), userData);
+            Bindings.JPH_CompoundShapeSettings_AddShape(handle.Reinterpret<JPH_CompoundShapeSettings>(), &position, &rotation, settings.Reinterpret<JPH_ShapeSettings>(), userData);
         }
 
         public static void JPH_CompoundShapeSettings_AddShape2<T, U>(NativeHandle<T> settings, float3 position, quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShape

@@ -4,9 +4,10 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct BodyInterface
+    [GenerateHandle]
+    public readonly partial struct BodyInterface
     {
-        internal NativeHandle<JPH_BodyInterface> Handle;
+        internal readonly NativeHandle<JPH_BodyInterface> Handle;
 
         internal BodyInterface(NativeHandle<JPH_BodyInterface> handle)
         {

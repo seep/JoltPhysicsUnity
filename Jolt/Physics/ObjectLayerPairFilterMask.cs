@@ -1,5 +1,4 @@
-﻿using System;
-using static Jolt.SafeBindings;
+﻿using static Jolt.SafeBindings;
 
 namespace Jolt
 {
@@ -9,7 +8,8 @@ namespace Jolt
     /// <remarks>
     /// Uses group bits and mask bits. Two layers can collide if e.g. Object1.Group & Object2.Mask is non-zero and Object2.Group & Object1.Mask is non-zero.
     /// </remarks>
-    public struct ObjectLayerPairFilterMask : IEquatable<ObjectLayerPairFilterMask>
+    [GenerateHandle]
+    public readonly partial struct ObjectLayerPairFilterMask
     {
         /// <summary>
         /// The number of bits in a group.
@@ -21,7 +21,7 @@ namespace Jolt
         /// </summary>
         private const uint Mask = (1U << (int) NumBits) - 1U;
 
-        internal NativeHandle<JPH_ObjectLayerPairFilter> Handle;
+        internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;
 
         internal ObjectLayerPairFilterMask(NativeHandle<JPH_ObjectLayerPairFilter> handle)
         {
@@ -73,35 +73,6 @@ namespace Jolt
         }
 
         // TODO JPH_ObjectLayerFilterMask_ShouldCollide is missing from bindings but exists on jolt ObjectLayerFilterMask.h
-
-        #endregion
-
-        #region IEquatable
-
-        public static bool operator ==(ObjectLayerPairFilterMask lhs, ObjectLayerPairFilterMask rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ObjectLayerPairFilterMask lhs, ObjectLayerPairFilterMask rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        public bool Equals(ObjectLayerPairFilterMask other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ObjectLayerPairFilterMask other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
 
         #endregion
     }

@@ -4,7 +4,8 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public readonly struct MeshShapeSettings : IShapeSettings, IDisposable, IEquatable<MeshShapeSettings>
+    [GenerateHandle, GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_MeshShapeSettings")]
+    public readonly partial struct MeshShapeSettings : IShapeSettings
     {
         internal readonly NativeHandle<JPH_MeshShapeSettings> Handle;
 
@@ -13,11 +14,19 @@ namespace Jolt
             Handle = handle;
         }
 
-        #region JPH_MeshShapeSettings
+        /// <summary>
+        /// Allocate a new native MeshShapeSettings and return the handle.
+        /// </summary>
+        [OverrideBinding("JPH_MeshShapeSettings_Create")]
+        public MeshShapeSettings Create(ReadOnlySpan<Triangle> triangles)
+        {
+            return new MeshShapeSettings(JPH_MeshShapeSettings_Create(triangles));
+        }
 
         /// <summary>
         /// Allocate a new native MeshShapeSettings and return the handle.
         /// </summary>
+        [OverrideBinding("JPH_MeshShapeSettings_Create2")]
         public static MeshShapeSettings Create(ReadOnlySpan<float3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
         {
             return new MeshShapeSettings(JPH_MeshShapeSettings_Create2(vertices, triangles));
@@ -26,48 +35,10 @@ namespace Jolt
         /// <summary>
         /// Allocate a new native MeshShape from these settings and return the handle.
         /// </summary>
+        [OverrideBinding("JPH_MeshShapeSettings_CreateShape")]
         public MeshShape CreateShape()
         {
             return new MeshShape(JPH_MeshShapeSettings_CreateShape(Handle));
         }
-
-        #endregion
-
-        /// <summary>
-        /// Dispose the native object.
-        /// </summary>
-        public void Dispose()
-        {
-            JPH_ShapeSettings_Destroy(Handle);
-        }
-
-        #region IEquatable
-
-        public bool Equals(MeshShapeSettings other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is MeshShapeSettings other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(MeshShapeSettings lhs, MeshShapeSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(MeshShapeSettings lhs, MeshShapeSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        #endregion
     }
 }

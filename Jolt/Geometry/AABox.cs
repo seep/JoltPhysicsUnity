@@ -12,16 +12,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(AABox lhs, AABox rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(AABox lhs, AABox rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(AABox other)
         {
             return Min.Equals(other.Min) && Max.Equals(other.Max);
@@ -35,6 +25,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return HashCode.Combine(Min, Max);
+        }
+
+        public static bool operator ==(AABox lhs, AABox rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(AABox lhs, AABox rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

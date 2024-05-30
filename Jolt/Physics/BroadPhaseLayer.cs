@@ -25,16 +25,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(BroadPhaseLayer lhs, BroadPhaseLayer rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(BroadPhaseLayer lhs, BroadPhaseLayer rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(BroadPhaseLayer other)
         {
             return Value == other.Value;
@@ -48,6 +38,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return Value.GetHashCode();
+        }
+
+        public static bool operator ==(BroadPhaseLayer lhs, BroadPhaseLayer rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(BroadPhaseLayer lhs, BroadPhaseLayer rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

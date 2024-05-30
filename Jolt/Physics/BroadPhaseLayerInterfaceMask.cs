@@ -1,11 +1,11 @@
-﻿using System;
-using static Jolt.SafeBindings;
+﻿using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct BroadPhaseLayerInterfaceMask : IEquatable<BroadPhaseLayerInterfaceMask>
+    [GenerateHandle]
+    public readonly partial struct BroadPhaseLayerInterfaceMask
     {
-        internal NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
+        internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
 
         internal BroadPhaseLayerInterfaceMask(NativeHandle<JPH_BroadPhaseLayerInterface> handle)
         {
@@ -30,34 +30,6 @@ namespace Jolt
         public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
         {
             JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        public static bool operator ==(BroadPhaseLayerInterfaceMask lhs, BroadPhaseLayerInterfaceMask rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(BroadPhaseLayerInterfaceMask lhs, BroadPhaseLayerInterfaceMask rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-        public bool Equals(BroadPhaseLayerInterfaceMask other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is BroadPhaseLayerInterfaceMask other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
         }
 
         #endregion

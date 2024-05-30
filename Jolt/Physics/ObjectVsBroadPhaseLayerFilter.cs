@@ -1,43 +1,13 @@
-﻿using System;
-
-namespace Jolt
+﻿namespace Jolt
 {
-    public struct ObjectVsBroadPhaseLayerFilter : IEquatable<ObjectVsBroadPhaseLayerFilter>
+    [GenerateHandle]
+    public readonly partial struct ObjectVsBroadPhaseLayerFilter
     {
-        internal NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
+        internal readonly NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
 
         internal ObjectVsBroadPhaseLayerFilter(NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> handle)
         {
             Handle = handle;
         }
-
-        #region IEquatable
-
-        public static bool operator ==(ObjectVsBroadPhaseLayerFilter lhs, ObjectVsBroadPhaseLayerFilter rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ObjectVsBroadPhaseLayerFilter lhs, ObjectVsBroadPhaseLayerFilter rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        public bool Equals(ObjectVsBroadPhaseLayerFilter other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ObjectVsBroadPhaseLayerFilter other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        #endregion
     }
 }

@@ -1,10 +1,13 @@
-﻿using System;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public readonly struct CompoundShapeSettings : IShapeSettings, IDisposable, IEquatable<CompoundShapeSettings>
+    /// <summary>
+    /// A widened CompoundShapeSettings instance handle.
+    /// </summary>
+    [GenerateHandle, GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_CompoundShapeSettings")]
+    public readonly partial struct CompoundShapeSettings : IShapeSettings
     {
         internal readonly NativeHandle<JPH_CompoundShapeSettings> Handle;
 
@@ -12,8 +15,6 @@ namespace Jolt
         {
             Handle = handle;
         }
-
-        #region Reinterpreting
 
         public static implicit operator CompoundShapeSettings(MutableCompoundShapeSettings settings)
         {
@@ -25,54 +26,16 @@ namespace Jolt
             return new CompoundShapeSettings(settings.Handle.Reinterpret<JPH_CompoundShapeSettings>());
         }
 
-        #endregion
-
-        #region JPH_CompoundShapeSettings
-
+        [OverrideBinding("JPH_CompoundShapeSettings_AddShape")]
         public void AddShape(float3 position, quaternion rotation, ShapeSettings shape, uint userData = 0)
         {
             JPH_CompoundShapeSettings_AddShape(Handle, position, rotation, shape.Handle, userData);
         }
 
-        public void AddShape(float3 position, quaternion rotation, Shape shape, uint userData = 0)
+        [OverrideBinding("JPH_CompoundShapeSettings_AddShape2")]
+        public void AddShape(float3 position, quaternion rotation, Shape shape, uint userData)
         {
             JPH_CompoundShapeSettings_AddShape2(Handle, position, rotation, shape.Handle, userData);
         }
-
-        #endregion
-
-        public void Dispose()
-        {
-            JPH_ShapeSettings_Destroy(Handle);
-        }
-
-        #region IEquatable
-
-        public bool Equals(CompoundShapeSettings other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is CompoundShapeSettings other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(CompoundShapeSettings left, CompoundShapeSettings right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(CompoundShapeSettings left, CompoundShapeSettings right)
-        {
-            return !left.Equals(right);
-        }
-
-        #endregion
     }
 }

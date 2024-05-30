@@ -3,7 +3,8 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public readonly struct TaperedCapsuleShapeSettings : IConvexShapeSettings, IDisposable, IEquatable<TaperedCapsuleShapeSettings>
+    [GenerateHandle, GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_TaperedCapsuleShapeSettings")]
+    public readonly partial struct TaperedCapsuleShapeSettings : IConvexShapeSettings
     {
         internal readonly NativeHandle<JPH_TaperedCapsuleShapeSettings> Handle;
 
@@ -12,77 +13,16 @@ namespace Jolt
             Handle = handle;
         }
 
-        #region JPH_TaperedCapsuleShapeSettings
-
-        /// <summary>
-        /// Allocate a new native TaperedCapsuleShapeSettings and return the handle.
-        /// </summary>
+        [OverrideBinding("JPH_TaperedCapsuleShapeSettings_Create")]
         public static TaperedCapsuleShapeSettings Create(float halfHeightOfCylinder, float topRadius, float bottomRadius)
         {
             return new TaperedCapsuleShapeSettings(JPH_TaperedCapsuleShapeSettings_Create(halfHeightOfCylinder, topRadius, bottomRadius));
         }
 
-        /// <summary>
-        /// Allocate a new native TaperedCapsuleShape from these settings and return the handle.
-        /// </summary>
+        [OverrideBinding("JPH_TaperedCapsuleShapeSettings_CreateShape")]
         public TaperedCapsuleShape CreateShape()
         {
             throw new NotImplementedException(); // TODO JPH_TaperedCapsuleShapeSettings_CreateShape is missing from bindings?
         }
-
-        #endregion
-
-        #region JPH_ConvexShapeSettings
-
-        /// <inheritdoc/>
-        public float GetDensity()
-        {
-            return JPH_ConvexShapeSettings_GetDensity(Handle);
-        }
-
-        /// <inheritdoc/>
-        public void SetDensity(float density)
-        {
-            JPH_ConvexShapeSettings_SetDensity(Handle, density);
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Dispose the native object.
-        /// </summary>
-        public void Dispose()
-        {
-            JPH_ShapeSettings_Destroy(Handle);
-        }
-
-        #region IEquatable
-
-        public bool Equals(TaperedCapsuleShapeSettings other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is TaperedCapsuleShapeSettings other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(TaperedCapsuleShapeSettings lhs, TaperedCapsuleShapeSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(TaperedCapsuleShapeSettings lhs, TaperedCapsuleShapeSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        #endregion
     }
 }

@@ -1,14 +1,21 @@
 ﻿using System;
+using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public readonly struct ConstraintSettings : IDisposable, IEquatable<ConstraintSettings>
+    [GenerateHandle]
+    public readonly partial struct ConstraintSettings : IDisposable
     {
-        internal NativeHandle<JPH_ConstraintSettings> Handle;
+        internal readonly NativeHandle<JPH_ConstraintSettings> Handle;
 
         internal ConstraintSettings(NativeHandle<JPH_ConstraintSettings> handle)
         {
             Handle = handle;
+        }
+
+        public void Dispose()
+        {
+            JPH_ConstraintSettings_Destroy(Handle);
         }
     }
 }

@@ -5,25 +5,31 @@ using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct BodyCreationSettings : IDisposable, IEquatable<BodyCreationSettings>
+    [GenerateHandle]
+    public readonly partial struct BodyCreationSettings : IDisposable
     {
-        internal NativeHandle<JPH_BodyCreationSettings> Handle;
+        internal readonly NativeHandle<JPH_BodyCreationSettings> Handle;
+
+        internal BodyCreationSettings(NativeHandle<JPH_BodyCreationSettings> handle)
+        {
+            Handle = handle;
+        }
 
         #region JPH_BodyCreationSettings
 
         public static BodyCreationSettings Create()
         {
-            return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create() };
+            return new BodyCreationSettings(JPH_BodyCreationSettings_Create());
         }
 
         public static BodyCreationSettings FromShapeSettings(ShapeSettings settings, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
-            return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create2(settings.Handle, position, rotation, motion, layer) };
+            return new BodyCreationSettings(JPH_BodyCreationSettings_Create2(settings.Handle, position, rotation, motion, layer));
         }
 
         public static BodyCreationSettings FromShape(Shape shape, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
-            return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motion, layer) };
+            return new BodyCreationSettings(JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motion, layer));
         }
 
         public float3 GetLinearVelocity()
@@ -72,34 +78,5 @@ namespace Jolt
         {
             JPH_BodyCreationSettings_Destroy(Handle);
         }
-
-        #region IEquatable
-
-        public static bool operator ==(BodyCreationSettings lhs, BodyCreationSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(BodyCreationSettings lhs, BodyCreationSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        public bool Equals(BodyCreationSettings other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is BodyCreationSettings other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        #endregion
     }
 }

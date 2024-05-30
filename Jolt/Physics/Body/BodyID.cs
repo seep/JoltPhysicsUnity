@@ -8,16 +8,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(BodyID lhs, BodyID rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(BodyID lhs, BodyID rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(BodyID other)
         {
             return Value == other.Value;
@@ -31,6 +21,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return (int) Value;
+        }
+
+        public static bool operator ==(BodyID lhs, BodyID rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(BodyID lhs, BodyID rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

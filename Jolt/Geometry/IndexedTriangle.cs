@@ -23,16 +23,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(IndexedTriangle lhs, IndexedTriangle rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(IndexedTriangle lhs, IndexedTriangle rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(IndexedTriangle other)
         {
             return I1 == other.I1 && I2 == other.I2 && I3 == other.I3 && MaterialIndex == other.MaterialIndex;
@@ -46,6 +36,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return HashCode.Combine(I1, I2, I3, MaterialIndex);
+        }
+
+        public static bool operator ==(IndexedTriangle lhs, IndexedTriangle rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(IndexedTriangle lhs, IndexedTriangle rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

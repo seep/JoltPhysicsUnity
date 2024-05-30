@@ -1,11 +1,10 @@
-﻿using System;
-
-namespace Jolt
+﻿namespace Jolt
 {
     /// <summary>
     /// Generic ShapeSettings interface for a native ShapeSettings instance.
     /// </summary>
-    public readonly struct ShapeSettings : IEquatable<ShapeSettings>
+    [GenerateHandle, GenerateBindings("JPH_ShapeSettings")]
+    public readonly partial struct ShapeSettings
     {
         internal readonly NativeHandle<JPH_ShapeSettings> Handle;
 
@@ -123,34 +122,5 @@ namespace Jolt
         {
             return new ShapeSettings(settings.Handle.Reinterpret<JPH_ShapeSettings>());
         }
-
-        #region IEquatable
-
-        public bool Equals(ShapeSettings other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ShapeSettings other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(ShapeSettings lhs, ShapeSettings rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ShapeSettings lhs, ShapeSettings rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        #endregion
     }
 }

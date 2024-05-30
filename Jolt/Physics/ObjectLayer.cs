@@ -38,16 +38,6 @@ namespace Jolt
 
         #region IEquatable
 
-        public static bool operator ==(ObjectLayer lhs, ObjectLayer rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ObjectLayer lhs, ObjectLayer rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
         public bool Equals(ObjectLayer other)
         {
             return Value == other.Value;
@@ -61,6 +51,16 @@ namespace Jolt
         public override int GetHashCode()
         {
             return Value.GetHashCode();
+        }
+
+        public static bool operator ==(ObjectLayer lhs, ObjectLayer rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ObjectLayer lhs, ObjectLayer rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

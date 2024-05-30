@@ -1,12 +1,12 @@
-﻿using System;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using static Jolt.SafeBindings;
 
 namespace Jolt
 {
-    public struct Body : IEquatable<Body>
+    [GenerateHandle]
+    public readonly partial struct Body
     {
-        internal NativeHandle<JPH_Body> Handle;
+        internal readonly NativeHandle<JPH_Body> Handle;
 
         internal Body(NativeHandle<JPH_Body> handle)
         {
@@ -243,25 +243,6 @@ namespace Jolt
         public ulong GetUserData()
         {
             return JPH_Body_GetUserData(Handle);
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        public bool Equals(Body other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Body other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
         }
 
         #endregion
