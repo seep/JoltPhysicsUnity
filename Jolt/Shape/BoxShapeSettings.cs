@@ -19,11 +19,5 @@ namespace Jolt
         {
             return new BoxShapeSettings(JPH_BoxShapeSettings_Create(halfExtent, convexRadius));
         }
-
-        [OverrideBinding("JPH_BoxShapeSettings_CreateShape")]
-        public BoxShape CreateShape()
-        {
-            return new BoxShape(JPH_BoxShapeSettings_CreateShape(Handle));
-        }
     }
 }

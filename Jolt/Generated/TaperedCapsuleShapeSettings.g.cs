@@ -1,0 +1,42 @@
+﻿using System;
+using Jolt;
+using Unity.Mathematics;
+
+namespace Jolt
+{
+    public partial struct TaperedCapsuleShapeSettings : IEquatable<TaperedCapsuleShapeSettings>
+    {
+        #region IEquatable
+        
+        public bool Equals(TaperedCapsuleShapeSettings other) => Handle.Equals(other.Handle);
+        
+        public override bool Equals(object obj) => obj is TaperedCapsuleShapeSettings other && Equals(other);
+        
+        public override int GetHashCode() => Handle.GetHashCode();
+        
+        public static bool operator ==(TaperedCapsuleShapeSettings lhs, TaperedCapsuleShapeSettings rhs) => lhs.Equals(rhs);
+        
+        public static bool operator !=(TaperedCapsuleShapeSettings lhs, TaperedCapsuleShapeSettings rhs) => !lhs.Equals(rhs);
+        
+        #endregion
+        
+        #region JPH_ShapeSettings
+        
+        public void Destroy() => SafeBindings.JPH_ShapeSettings_Destroy(Handle);
+        
+        #endregion
+        
+        #region JPH_ConvexShapeSettings
+        
+        public float GetDensity() => SafeBindings.JPH_ConvexShapeSettings_GetDensity(Handle);
+        
+        public void SetDensity(float density) => SafeBindings.JPH_ConvexShapeSettings_SetDensity(Handle, density);
+        
+        #endregion
+        
+        #region JPH_TaperedCapsuleShapeSettings
+        
+        #endregion
+        
+    }
+}

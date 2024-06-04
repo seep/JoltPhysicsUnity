@@ -3,7 +3,9 @@ using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Jolt.Unity")]
 [assembly: InternalsVisibleTo("Jolt.Editor")]
+
 
 namespace Jolt
 {
@@ -29,21 +31,17 @@ namespace Jolt
         [RuntimeInitializeOnLoadMethod]
         internal static void Initialize()
         {
-            if (disposed.IsCreated) disposed.Dispose();
-
             disposed = new NativeHashSet<uint>(1024, Allocator.Persistent);
         }
 
         /// <summary>
         /// Dispose the internal safety handle state.
         /// </summary>
-        internal static void Deinitialize()
+        internal static void Dispose()
         {
-            if (!disposed.IsCreated) return;
-
             // TODO check for unreleased safety handles?
 
-            disposed.Dispose();
+            if (disposed.IsCreated) disposed.Dispose();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,8 +64,6 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AssertExists(in NativeSafetyHandle handle)
         {
-            // TODO handle threading
-
             if (disposed.Contains(handle.Index))
             {
                 throw new ObjectDisposedException("The native resource has been disposed.");

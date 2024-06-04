@@ -3,8 +3,6 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +28,7 @@ internal class JoltSourceGenerator : ISourceGenerator
         {
             try
             {
-                var filename = $"Jolt_{wrapper.TypeName}.g.cs";
+                var filename = $"{wrapper.TypeName}.g.cs";
                 var filetext = GenerateNativeTypeWrapper(wrapper, bindings);
 
                 ctx.AddSource(filename, filetext);
@@ -80,7 +78,7 @@ internal class JoltSourceGenerator : ISourceGenerator
     {
         var result = new List<JoltNativeTypeWrapper>();
 
-        foreach (var decl in recv.Targets)
+        foreach (var decl in recv.Wrappers)
         {
             result.Add(CreateNativeTypeWrapper(ctx, decl));
         }
@@ -198,34 +196,78 @@ internal class JoltSourceGenerator : ISourceGenerator
 
         foreach (var b in bindingsWithPrefix)
         {
-            // TODO skip bindings already defined in the wrapper
-
             if (target.ExcludedBindings.Contains(b.BindingDeclaration.Identifier.ValueText))
             {
                 continue; // target has explicitly excluded this binding
             }
 
-            var publicBindingName        = b.BindingMethodName;
-            var publicBindingParams      = b.BindingDeclaration.ParameterList.Parameters.RemoveAt(0);
-            var publicBindingReturns     = b.BindingDeclaration.ReturnType.ToString();
-            var publicBindingModifiers   = publicBindingName == "GetType" ? "new " : "";
-            var publicBindingDeclaration = $"public {publicBindingModifiers}{publicBindingReturns} {publicBindingName}({publicBindingParams})";
+            var proxiedName    = b.BindingDeclaration.Identifier.ValueText;
+            var proxiedArgs    = new List<string> { "Handle" };
+            var proxiedReturns = b.BindingDeclaration.ReturnType.ToString();
 
-            var proxiedBindingName = b.BindingDeclaration.Identifier.ValueText;
-            var proxiedBindingArgs = new List<string> { "Handle" }; // always pass the handle
+            var declareName    = b.BindingMethodName;
+            var declareArgs    = new List<string>();
+            var declareMods    = declareName == "GetType" ? "new " : "";
+            var declareReturns = proxiedReturns;
 
-            foreach (var param in publicBindingParams)
+            // Build the declared parameters and proxied arguments simultaneously. If any of the proxied arguments are
+            // native handles, we use the wrapper type as the parameter type and pass the wrapped handle to the binding.
+
+            foreach (var p in b.BindingDeclaration.ParameterList.Parameters.RemoveAt(0))
             {
-                proxiedBindingArgs.Add(param.Identifier.ValueText);
+                Debug.Assert(p.Type != null);
+
+                var type = p.Type.ToString();
+                var name = p.Identifier.ValueText;
+
+                if (type.StartsWith("NativeHandle"))
+                {
+                    var nativeGenericType = ExtractGenericHandleType(type);
+                    var publicWrapperType = nativeGenericType.Substring("JPH_".Length);
+
+                    proxiedArgs.Add($"{name}.Handle");
+                    declareArgs.Add($"{publicWrapperType} {name}");
+                }
+                else
+                {
+                    proxiedArgs.Add(name);
+                    declareArgs.Add($"{type} {name}");
+                }
             }
 
-            var proxiedBindingArgsString = string.Join(", ", proxiedBindingArgs);
-            var proxiedBindingExpression = $"SafeBindings.{proxiedBindingName}({proxiedBindingArgsString});";
+            var proxiedBindingArgsString = string.Join(", ", proxiedArgs);
+            var publicBindingParamsString = string.Join(", ", declareArgs);
 
-            WritePaddedLine(writer, $"{publicBindingDeclaration} => {proxiedBindingExpression}");
+            var expression = $"SafeBindings.{proxiedName}({proxiedBindingArgsString})";
+
+            // If the binding return type is a NativeHandle we rewrite some of the expression. We return the public
+            // wrapper type instead and wrap the proxied call with the wrapper constructor.
+
+            if (declareReturns.StartsWith("NativeHandle"))
+            {
+                var nativeGenericType = ExtractGenericHandleType(declareReturns);
+                var publicWrapperType = nativeGenericType.Substring("JPH_".Length);
+
+                declareReturns = publicWrapperType;
+
+                expression = $"new {declareReturns}({expression})";
+            }
+
+            // Interpolate the public declaration.
+
+            var declaration = $"public {declareMods}{declareReturns} {declareName}({publicBindingParamsString})";
+
+            WritePaddedLine(writer, $"{declaration} => {expression};");
         }
 
         WritePaddedLine(writer, "#endregion");
+    }
+
+    private static string ExtractGenericHandleType(string type)
+    {
+        var lbracket = type.IndexOf('<');
+        var rbracket = type.IndexOf('>');
+        return type.Substring(lbracket + 1, rbracket - lbracket - 1);
     }
 
     private static void StartBlock(IndentedTextWriter writer, string line)

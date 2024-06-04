@@ -12,9 +12,4 @@
     <PackageReference ExcludeAssets="runtime" Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
   </ItemGroup>
 
-  <Target Name="Export" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\Jolt.SourceGenerators" />
-    <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="..\Jolt.SourceGenerators" />
-  </Target>
-
 </Project>

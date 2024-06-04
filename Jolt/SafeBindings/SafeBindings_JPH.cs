@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    internal static partial class SafeBindings
+    internal static unsafe partial class SafeBindings
     {
         public static bool JPH_Init(uint tempAllocatorSize)
         {
@@ -18,7 +18,10 @@ namespace Jolt
         {
             Bindings.JPH_SetAssertFailureHandler(Marshal.GetFunctionPointerForDelegate(handler));
         }
-
-        internal delegate void AssertFailureHandler(string expr, string message, string file, uint line);
     }
+
+    /// <summary>
+    /// A delegate for receiving Jolt assertion failures.
+    /// </summary>
+    public delegate void AssertFailureHandler(string expr, string message, string file, uint line);
 }

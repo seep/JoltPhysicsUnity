@@ -24,6 +24,7 @@ namespace Jolt.Native
 
         private static IntPtr libptr;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void LoadLibrary()
         {
             try

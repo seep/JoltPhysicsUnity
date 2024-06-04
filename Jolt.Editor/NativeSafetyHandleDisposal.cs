@@ -17,7 +17,7 @@ namespace Jolt.Editor
         {
             if (change == PlayModeStateChange.EnteredEditMode)
             {
-                NativeSafetyHandle.Deinitialize();
+                NativeSafetyHandle.Dispose();
             }
         }
     }

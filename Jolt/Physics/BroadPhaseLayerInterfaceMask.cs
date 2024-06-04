@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle, GenerateBindings("JPH_BroadPhaseLayerInterfaceMask")]
     public readonly partial struct BroadPhaseLayerInterfaceMask
     {
         internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
@@ -20,18 +20,10 @@ namespace Jolt
             return new BroadPhaseLayerInterface(mask.Handle);
         }
 
-        #region JPH_BroadPhaseLayerInterfaceMask
-
+        [OverrideBinding("JPH_BroadPhaseLayerInterfaceMask_Create")]
         public static BroadPhaseLayerInterfaceMask Create(uint numBroadPhaseLayers)
         {
             return new BroadPhaseLayerInterfaceMask(JPH_BroadPhaseLayerInterfaceMask_Create(numBroadPhaseLayers));
         }
-
-        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
-        {
-            JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
-        }
-
-        #endregion
     }
 }

@@ -7,28 +7,47 @@ namespace Jolt.SourceGenerators;
 
 internal class JoltSyntaxReceiver : ISyntaxReceiver
 {
-    public readonly List<StructDeclarationSyntax> Targets = new ();
+    /// <summary>
+    /// The list of struct declarations that wrap native types.
+    /// </summary>
+    public readonly List<StructDeclarationSyntax> Wrappers = new ();
 
+    /// <summary>
+    /// The list of method declarations that proxy extern methods.
+    /// </summary>
     public readonly List<MethodDeclarationSyntax> Bindings = new ();
 
     public void OnVisitSyntaxNode(SyntaxNode node)
     {
-        if (node is MethodDeclarationSyntax mds && mds.Parent is ClassDeclarationSyntax { Identifier.ValueText: "SafeBindings" }) // TODO check namespace
+        switch (node)
+        {
+            case MethodDeclarationSyntax mds:
+                OnVisitMethodDeclaration(mds);
+                break;
+            case StructDeclarationSyntax sds:
+                OnVisitStructDeclaration(sds);
+                break;
+        }
+    }
+
+    private void OnVisitMethodDeclaration(MethodDeclarationSyntax mds)
+    {
+        if (mds is { Parent: ClassDeclarationSyntax { Identifier.ValueText: "SafeBindings" } })
         {
             Bindings.Add(mds);
         }
+    }
 
-        if (node is StructDeclarationSyntax sds)
+    private void OnVisitStructDeclaration(StructDeclarationSyntax sds)
+    {
+        if (sds.Modifiers.Any(SyntaxKind.PartialKeyword) == false)
         {
-            if (sds.Modifiers.Any(SyntaxKind.PartialKeyword) == false)
-            {
-                return; // skip non-partial
-            }
+            return; // skip non-partial
+        }
 
-            if (IncludesAttributeNamed(sds.AttributeLists, "GenerateHandle")) // TODO check namespace
-            {
-                Targets.Add(sds);
-            }
+        if (IncludesAttributeNamed(sds.AttributeLists, "GenerateHandle"))
+        {
+            Wrappers.Add(sds);
         }
     }
 

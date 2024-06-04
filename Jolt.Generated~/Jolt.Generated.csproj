@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include the source generator project as an analyzer. -->
+    <ProjectReference Include="..\Jolt.SourceGenerators~\Jolt.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <!-- Include all of the Jolt assembly. -->
+    <Compile Include="../Jolt/**/*.cs"/>
+    <!-- Exclude the previous output of the generator. -->
+    <Compile Remove="../Jolt/Generated/**/*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <GeneratedFiles Include="$(CompilerGeneratedFilesOutputPath)\**\*.cs" />
+  </ItemGroup>
+
+  <Target Name="Delete Generated Files" BeforeTargets="Build">
+    <RemoveDir Directories="..\Jolt\Generated" />
+  </Target>
+
+  <Target Name="Export Generated Files" AfterTargets="Build">
+    <Copy SourceFiles="@(GeneratedFiles)" DestinationFolder="..\Jolt\Generated" />
+  </Target>
+
+</Project>

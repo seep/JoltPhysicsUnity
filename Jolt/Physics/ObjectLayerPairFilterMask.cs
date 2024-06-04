@@ -8,7 +8,7 @@ namespace Jolt
     /// <remarks>
     /// Uses group bits and mask bits. Two layers can collide if e.g. Object1.Group & Object2.Mask is non-zero and Object2.Group & Object1.Mask is non-zero.
     /// </remarks>
-    [GenerateHandle]
+    [GenerateHandle, GenerateBindings("")]
     public readonly partial struct ObjectLayerPairFilterMask
     {
         /// <summary>
