@@ -22,7 +22,7 @@ namespace Jolt
         
         #region JPH_ShapeSettings
         
-        public void Destroy() => SafeBindings.JPH_ShapeSettings_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle);
         
         #endregion
         

@@ -22,7 +22,7 @@ namespace Jolt
         
         #region JPH_BroadPhaseLayerInterfaceMask
         
-        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude) => SafeBindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
+        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude) => Bindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
         
         #endregion
         

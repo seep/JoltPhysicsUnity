@@ -60,7 +60,7 @@
     </Target>
 
     <Target Name="Generate Jolt Bindings" AfterTargets="Build">
-        <Exec Command="clangsharppinvokegenerator -f lib\joltc\joltc.h -n Jolt -m Bindings -l joltc -o ..\Jolt.Native\NativeBindings.g.cs @clangsharp.rsp"/>
+        <Exec Command="clangsharppinvokegenerator -f lib\joltc\joltc.h -n Jolt -m UnsafeBindings -l joltc -o ..\Jolt\Bindings\UnsafeBindings.g.cs @clangsharp.rsp"/>
     </Target>
 
 </Project>

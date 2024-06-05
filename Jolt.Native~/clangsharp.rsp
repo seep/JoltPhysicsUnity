@@ -62,7 +62,7 @@ JPH_ValidateResult=ValidateResult
 JPH_Vec3=float3
 JPH_Vec4=float4
 --with-namespace
-NativeBool=Jolt.Native
+NativeBool=Jolt
 double3=Unity.Mathematics
 float3=Unity.Mathematics
 float4=Unity.Mathematics

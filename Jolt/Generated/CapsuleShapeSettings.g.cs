@@ -22,15 +22,15 @@ namespace Jolt
         
         #region JPH_ShapeSettings
         
-        public void Destroy() => SafeBindings.JPH_ShapeSettings_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle);
         
         #endregion
         
         #region JPH_ConvexShapeSettings
         
-        public float GetDensity() => SafeBindings.JPH_ConvexShapeSettings_GetDensity(Handle);
+        public float GetDensity() => Bindings.JPH_ConvexShapeSettings_GetDensity(Handle);
         
-        public void SetDensity(float density) => SafeBindings.JPH_ConvexShapeSettings_SetDensity(Handle, density);
+        public void SetDensity(float density) => Bindings.JPH_ConvexShapeSettings_SetDensity(Handle, density);
         
         #endregion
         

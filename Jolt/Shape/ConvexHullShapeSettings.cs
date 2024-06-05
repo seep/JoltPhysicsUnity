@@ -1,6 +1,6 @@
 ﻿using System;
 using Unity.Mathematics;
-using static Jolt.SafeBindings;
+using static Jolt.Bindings;
 
 namespace Jolt
 {

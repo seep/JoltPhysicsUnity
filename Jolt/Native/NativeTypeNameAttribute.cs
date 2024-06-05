@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Jolt.Native
+namespace Jolt
 {
-    public class NativeTypeNameAttribute : Attribute
+    internal class NativeTypeNameAttribute : Attribute
     {
         public string NativeTypeName;
 

@@ -22,23 +22,23 @@ namespace Jolt
         
         #region JPH_BodyCreationSettings
         
-        public void Destroy() => SafeBindings.JPH_BodyCreationSettings_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_BodyCreationSettings_Destroy(Handle);
         
-        public float3 GetLinearVelocity() => SafeBindings.JPH_BodyCreationSettings_GetLinearVelocity(Handle);
+        public float3 GetLinearVelocity() => Bindings.JPH_BodyCreationSettings_GetLinearVelocity(Handle);
         
-        public void SetLinearVelocity(float3 velocity) => SafeBindings.JPH_BodyCreationSettings_SetLinearVelocity(Handle, velocity);
+        public void SetLinearVelocity(float3 velocity) => Bindings.JPH_BodyCreationSettings_SetLinearVelocity(Handle, velocity);
         
-        public float3 GetAngularVelocity() => SafeBindings.JPH_BodyCreationSettings_GetAngularVelocity(Handle);
+        public float3 GetAngularVelocity() => Bindings.JPH_BodyCreationSettings_GetAngularVelocity(Handle);
         
-        public void SetAngularVelocity(float3 velocity) => SafeBindings.JPH_BodyCreationSettings_SetAngularVelocity(Handle, velocity);
+        public void SetAngularVelocity(float3 velocity) => Bindings.JPH_BodyCreationSettings_SetAngularVelocity(Handle, velocity);
         
-        public MotionType GetMotionType() => SafeBindings.JPH_BodyCreationSettings_GetMotionType(Handle);
+        public MotionType GetMotionType() => Bindings.JPH_BodyCreationSettings_GetMotionType(Handle);
         
-        public void SetMotionType(MotionType value) => SafeBindings.JPH_BodyCreationSettings_SetMotionType(Handle, value);
+        public void SetMotionType(MotionType value) => Bindings.JPH_BodyCreationSettings_SetMotionType(Handle, value);
         
-        public AllowedDOFs GetAllowedDOFs() => SafeBindings.JPH_BodyCreationSettings_GetAllowedDOFs(Handle);
+        public AllowedDOFs GetAllowedDOFs() => Bindings.JPH_BodyCreationSettings_GetAllowedDOFs(Handle);
         
-        public void SetAllowedDOFs(AllowedDOFs value) => SafeBindings.JPH_BodyCreationSettings_SetAllowedDOFs(Handle, value);
+        public void SetAllowedDOFs(AllowedDOFs value) => Bindings.JPH_BodyCreationSettings_SetAllowedDOFs(Handle, value);
         
         #endregion
         

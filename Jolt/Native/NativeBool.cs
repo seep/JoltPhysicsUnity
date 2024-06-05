@@ -1,9 +1,9 @@
-﻿namespace Jolt.Native
+﻿namespace Jolt
 {
     /// <summary>
     /// A uint with implicit bool casting, providing consistent interop with native "bool" uints.
     /// </summary>
-    public struct NativeBool
+    internal struct NativeBool
     {
         public uint Value;
 

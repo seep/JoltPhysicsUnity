@@ -238,7 +238,7 @@ internal class JoltSourceGenerator : ISourceGenerator
             var proxiedBindingArgsString = string.Join(", ", proxiedArgs);
             var publicBindingParamsString = string.Join(", ", declareArgs);
 
-            var expression = $"SafeBindings.{proxiedName}({proxiedBindingArgsString})";
+            var expression = $"Bindings.{proxiedName}({proxiedBindingArgsString})";
 
             // If the binding return type is a NativeHandle we rewrite some of the expression. We return the public
             // wrapper type instead and wrap the proxied call with the wrapper constructor.

@@ -22,27 +22,27 @@ namespace Jolt
         
         #region JPH_Constraint
         
-        public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(SafeBindings.JPH_Constraint_GetConstraintSettings(Handle));
+        public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle));
         
-        public new ConstraintType GetType() => SafeBindings.JPH_Constraint_GetType(Handle);
+        public new ConstraintType GetType() => Bindings.JPH_Constraint_GetType(Handle);
         
-        public ConstraintSubType GetSubType() => SafeBindings.JPH_Constraint_GetSubType(Handle);
+        public ConstraintSubType GetSubType() => Bindings.JPH_Constraint_GetSubType(Handle);
         
-        public uint GetConstraintPriority() => SafeBindings.JPH_Constraint_GetConstraintPriority(Handle);
+        public uint GetConstraintPriority() => Bindings.JPH_Constraint_GetConstraintPriority(Handle);
         
-        public void SetConstraintPriority(uint priority) => SafeBindings.JPH_Constraint_SetConstraintPriority(Handle, priority);
+        public void SetConstraintPriority(uint priority) => Bindings.JPH_Constraint_SetConstraintPriority(Handle, priority);
         
-        public bool GetEnabled() => SafeBindings.JPH_Constraint_GetEnabled(Handle);
+        public bool GetEnabled() => Bindings.JPH_Constraint_GetEnabled(Handle);
         
-        public void SetEnabled(bool enabled) => SafeBindings.JPH_Constraint_SetEnabled(Handle, enabled);
+        public void SetEnabled(bool enabled) => Bindings.JPH_Constraint_SetEnabled(Handle, enabled);
         
-        public ulong GetUserData() => SafeBindings.JPH_Constraint_GetUserData(Handle);
+        public ulong GetUserData() => Bindings.JPH_Constraint_GetUserData(Handle);
         
-        public void SetUserData(ulong userData) => SafeBindings.JPH_Constraint_SetUserData(Handle, userData);
+        public void SetUserData(ulong userData) => Bindings.JPH_Constraint_SetUserData(Handle, userData);
         
-        public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM) => SafeBindings.JPH_Constraint_NotifyShapeChanged(Handle, bodyID, deltaCOM);
+        public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM) => Bindings.JPH_Constraint_NotifyShapeChanged(Handle, bodyID, deltaCOM);
         
-        public void Destroy() => SafeBindings.JPH_Constraint_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_Constraint_Destroy(Handle);
         
         #endregion
         

@@ -22,31 +22,31 @@ namespace Jolt
         
         #region JPH_Shape
         
-        public void Destroy() => SafeBindings.JPH_Shape_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_Shape_Destroy(Handle);
         
-        public new ShapeType GetType() => SafeBindings.JPH_Shape_GetType(Handle);
+        public new ShapeType GetType() => Bindings.JPH_Shape_GetType(Handle);
         
-        public ShapeSubType GetSubType() => SafeBindings.JPH_Shape_GetSubType(Handle);
+        public ShapeSubType GetSubType() => Bindings.JPH_Shape_GetSubType(Handle);
         
-        public ulong GetUserData() => SafeBindings.JPH_Shape_GetUserData(Handle);
+        public ulong GetUserData() => Bindings.JPH_Shape_GetUserData(Handle);
         
-        public void SetUserData(ulong userData) => SafeBindings.JPH_Shape_SetUserData(Handle, userData);
+        public void SetUserData(ulong userData) => Bindings.JPH_Shape_SetUserData(Handle, userData);
         
-        public bool MustBeStatic() => SafeBindings.JPH_Shape_MustBeStatic(Handle);
+        public bool MustBeStatic() => Bindings.JPH_Shape_MustBeStatic(Handle);
         
-        public float3 GetCenterOfMass() => SafeBindings.JPH_Shape_GetCenterOfMass(Handle);
+        public float3 GetCenterOfMass() => Bindings.JPH_Shape_GetCenterOfMass(Handle);
         
-        public AABox GetLocalBounds() => SafeBindings.JPH_Shape_GetLocalBounds(Handle);
+        public AABox GetLocalBounds() => Bindings.JPH_Shape_GetLocalBounds(Handle);
         
-        public AABox GetWorldSpaceBounds(rmatrix4x4 centerOfMassTransform, float3 scale) => SafeBindings.JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransform, scale);
+        public AABox GetWorldSpaceBounds(rmatrix4x4 centerOfMassTransform, float3 scale) => Bindings.JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransform, scale);
         
-        public float GetInnerRadius() => SafeBindings.JPH_Shape_GetInnerRadius(Handle);
+        public float GetInnerRadius() => Bindings.JPH_Shape_GetInnerRadius(Handle);
         
-        public MassProperties GetMassProperties() => SafeBindings.JPH_Shape_GetMassProperties(Handle);
+        public MassProperties GetMassProperties() => Bindings.JPH_Shape_GetMassProperties(Handle);
         
-        public float3 GetSurfaceNormal(uint subShapeID, float3 localPosition) => SafeBindings.JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPosition);
+        public float3 GetSurfaceNormal(uint subShapeID, float3 localPosition) => Bindings.JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPosition);
         
-        public float GetVolume() => SafeBindings.JPH_Shape_GetVolume(Handle);
+        public float GetVolume() => Bindings.JPH_Shape_GetVolume(Handle);
         
         #endregion
         
