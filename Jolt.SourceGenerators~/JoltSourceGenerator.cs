@@ -210,6 +210,11 @@ internal class JoltSourceGenerator : ISourceGenerator
             var declareMods    = declareName == "GetType" ? "new " : "";
             var declareReturns = proxiedReturns;
 
+            if (b.BindingDeclaration.ParameterList.Parameters.Count == 0)
+            {
+                continue; // TODO handle generating Create methods
+            }
+
             // Build the declared parameters and proxied arguments simultaneously. If any of the proxied arguments are
             // native handles, we use the wrapper type as the parameter type and pass the wrapped handle to the binding.
 
