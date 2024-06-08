@@ -118,6 +118,12 @@ static inline void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
+static inline void FromJolt(const JPH::Plane& value, JPH_Plane* result)
+{
+	FromJolt(value.GetNormal(), &result->normal);
+	result->distance = value.GetConstant();
+}
+
 static inline void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
@@ -211,6 +217,11 @@ static inline bool ToJolt(JPH_Bool32 value)
     return value == 1;
 }
 
+static inline JPH::Vec3 ToJolt(const JPH_Vec3& vec)
+{
+    return JPH::Vec3(vec.x, vec.y, vec.z);
+}
+
 static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
@@ -219,6 +230,11 @@ static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 static inline JPH::Quat ToJolt(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
+}
+
+static inline JPH::Plane ToJolt(const JPH_Plane* value)
+{
+    return JPH::Plane(ToJolt(value->normal), value->distance);
 }
 
 static inline JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
@@ -898,7 +914,6 @@ JPH_SphereShape* JPH_SphereShape_Create(float radius)
 
 float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
 {
-    JPH_ASSERT(shape);
     return reinterpret_cast<const JPH::SphereShape*>(shape)->GetRadius();
 }
 
@@ -911,6 +926,30 @@ JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, 
     return reinterpret_cast<JPH_TriangleShapeSettings*>(settings);
 }
 
+JPH_TriangleShape* JPH_TriangleShapeSettings_CreateShape(const JPH_TriangleShapeSettings* settings)
+{
+	const JPH::TriangleShapeSettings* joltSettings = reinterpret_cast<const JPH::TriangleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TriangleShape*>(shape);
+}
+
+JPH_TriangleShape* JPH_TriangleShape_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius)
+{
+	auto shape = new JPH::TriangleShape(ToJolt(v1), ToJolt(v2), ToJolt(v3), convexRadius);
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TriangleShape*>(shape);
+}
+
+float JPH_TriangleShape_GetConvexRadius(const JPH_TriangleShape* shape)
+{
+    return reinterpret_cast<const JPH::TriangleShape*>(shape)->GetConvexRadius();
+}
+
 /* CapsuleShapeSettings */
 JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius)
 {
@@ -918,6 +957,17 @@ JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCyli
     settings->AddRef();
 
     return reinterpret_cast<JPH_CapsuleShapeSettings*>(settings);
+}
+
+JPH_CapsuleShape* JPH_CapsuleShapeSettings_CreateShape(const JPH_CapsuleShapeSettings* settings)
+{
+	const JPH::CapsuleShapeSettings* joltSettings = reinterpret_cast<const JPH::CapsuleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_CapsuleShape*>(shape);
 }
 
 JPH_CapsuleShape* JPH_CapsuleShape_Create(float halfHeightOfCylinder, float radius)
@@ -947,6 +997,17 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
     settings->AddRef();
 
     return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
+}
+
+JPH_CylinderShape* JPH_CylinderShapeSettings_CreateShape(const JPH_CylinderShapeSettings* settings)
+{
+	const JPH::CylinderShapeSettings* joltSettings = reinterpret_cast<const JPH::CylinderShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_CylinderShape*>(shape);
 }
 
 JPH_CylinderShape* JPH_CylinderShape_Create(float halfHeight, float radius)
@@ -1129,6 +1190,17 @@ JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float ha
     settings->AddRef();
 
     return reinterpret_cast<JPH_TaperedCapsuleShapeSettings*>(settings);
+}
+
+JPH_TaperedCapsuleShape* JPH_TaperedCapsuleShapeSettings_CreateShape(JPH_TaperedCapsuleShapeSettings* settings)
+{
+	const JPH::TaperedCapsuleShapeSettings* joltSettings = reinterpret_cast<const JPH::TaperedCapsuleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TaperedCapsuleShape*>(shape);
 }
 
 /* CompoundShape */
@@ -2447,8 +2519,8 @@ float JPH_ConeConstraintSettings_GetHalfConeAngle(JPH_ConeConstraintSettings* se
 
 JPH_ConeConstraint* JPH_ConeConstraintSettings_CreateConstraint(JPH_ConeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
 {
-	auto joltBody1 = body1 ? reinterpret_cast<JPH::Body*>(body1) : &JPH::Body::sFixedToWorld;
-    auto joltBody2 = body2 ? reinterpret_cast<JPH::Body*>(body2) : &JPH::Body::sFixedToWorld;
+    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
     constraint->AddRef();
 
@@ -3281,6 +3353,18 @@ void JPH_BodyInterface_SetPositionAndRotationWhenChanged(JPH_BodyInterface* inte
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     joltBodyInterface->SetPositionAndRotationWhenChanged(JPH::BodyID(bodyId), ToJolt(position), ToJolt(rotation), static_cast<JPH::EActivation>(activationMode));
+}
+
+void JPH_BodyInterface_GetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation)
+{
+	JPH_ASSERT(interface);
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+	JPH::RVec3 joltPosition;
+	JPH::Quat joltRotation;
+	joltBodyInterface->GetPositionAndRotation(JPH::BodyID(bodyId), joltPosition, joltRotation);
+	FromJolt(joltPosition, position);
+	FromJolt(joltRotation, rotation);
 }
 
 void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Vec3* linearVelocity, JPH_Vec3* angularVelocity)
@@ -4198,6 +4282,11 @@ uint64_t JPH_Body_GetUserData(JPH_Body* body)
     return reinterpret_cast<JPH::Body*>(body)->GetUserData();
 }
 
+JPH_Body* JPH_Body_GetFixedToWorldBody(void)
+{
+	return reinterpret_cast<JPH_Body*>(&JPH::Body::sFixedToWorld);
+}
+
 /* Contact Listener */
 class ManagedContactListener final : public JPH::ContactListener
 {
@@ -4479,30 +4568,68 @@ void JPH_CharacterBaseSettings_Destroy(JPH_CharacterBaseSettings* settings)
 {
     if (settings)
     {
-        auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-        jolt_settings->Release();
+        auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+        joltSettings->Release();
     }
 }
 
-void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Vec3* normal, float constant)
+void JPH_CharacterBaseSettings_GetUp(JPH_CharacterBaseSettings* settings, JPH_Vec3* result)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+	FromJolt(reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mUp, result);
+}
 
-    jolt_settings->mSupportingVolume = JPH::Plane(ToJolt(normal), constant);
+void JPH_CharacterBaseSettings_SetUp(JPH_CharacterBaseSettings* settings, const JPH_Vec3* value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mUp = ToJolt(value);
+}
+
+void JPH_CharacterBaseSettings_GetSupportingVolume(JPH_CharacterBaseSettings* settings, JPH_Plane* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mSupportingVolume, result);
+}
+
+void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Plane* value)
+{
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mSupportingVolume = ToJolt(value);
+}
+
+float JPH_CharacterBaseSettings_GetMaxSlopeAngle(JPH_CharacterBaseSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mMaxSlopeAngle;
 }
 
 void JPH_CharacterBaseSettings_SetMaxSlopeAngle(JPH_CharacterBaseSettings* settings, float maxSlopeAngle)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-    jolt_settings->mMaxSlopeAngle = DegreesToRadians(maxSlopeAngle);
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mMaxSlopeAngle = maxSlopeAngle;
 }
 
-void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, JPH_Shape* shape)
+JPH_Bool32 JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    return FromJolt(joltSettings->mEnhancedInternalEdgeRemoval);
+}
 
-    jolt_settings->mShape = jolt_shape;
+void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings, JPH_Bool32 value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mEnhancedInternalEdgeRemoval = ToJolt(value);
+}
+
+const JPH_Shape* JPH_CharacterBaseSettings_GetShape(JPH_CharacterBaseSettings* settings)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+	return reinterpret_cast<const JPH_Shape*>(joltSettings->mShape.GetPtr());
+}
+
+void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, const JPH_Shape* shape)
+{
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+
+    joltSettings->mShape = joltShape;
 }
 
 /* CharacterBase */
@@ -4510,54 +4637,101 @@ void JPH_CharacterBase_Destroy(JPH_CharacterBase* character)
 {
     if (character)
     {
-        auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-        jolt_character->Release();
+        auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+        joltCharacter->Release();
     }
+}
+
+float JPH_CharacterBase_GetCosMaxSlopeAngle(JPH_CharacterBase* character)
+{
+	 auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	 return joltCharacter->GetCosMaxSlopeAngle();
+}
+
+void JPH_CharacterBase_SetMaxSlopeAngle(JPH_CharacterBase* character, float maxSlopeAngle)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	joltCharacter->SetMaxSlopeAngle(maxSlopeAngle);
+}
+
+void JPH_CharacterBase_GetUp(JPH_CharacterBase* character, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterBase*>(character)->GetUp(), result);
+}
+
+void JPH_CharacterBase_SetUp(JPH_CharacterBase* character, const JPH_Vec3* value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    joltCharacter->SetUp(ToJolt(value));
+}
+
+JPH_Bool32 JPH_CharacterBase_IsSlopeTooSteep(JPH_CharacterBase* character, const JPH_Vec3* value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return FromJolt(joltCharacter->IsSlopeTooSteep(ToJolt(value)));
+}
+
+const JPH_Shape* JPH_CharacterBase_GetShape(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return reinterpret_cast<const JPH_Shape*>(joltCharacter->GetShape());
 }
 
 JPH_GroundState JPH_CharacterBase_GetGroundState(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return static_cast<JPH_GroundState>(jolt_character->GetGroundState());
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return static_cast<JPH_GroundState>(joltCharacter->GetGroundState());
 }
 
 JPH_Bool32 JPH_CharacterBase_IsSupported(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->IsSupported();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->IsSupported();
 }
 
 void JPH_CharacterBase_GetGroundPosition(JPH_CharacterBase* character, JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundPosition();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundPosition();
     FromJolt(jolt_vector, position);
 }
 
 void JPH_CharacterBase_GetGroundNormal(JPH_CharacterBase* character, JPH_Vec3* normal)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundNormal();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundNormal();
     FromJolt(jolt_vector, normal);
 }
 
 void JPH_CharacterBase_GetGroundVelocity(JPH_CharacterBase* character, JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundVelocity();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundVelocity();
     FromJolt(jolt_vector, velocity);
+}
+
+const JPH_PhysicsMaterial* JPH_CharacterBase_GetGroundMaterial(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return reinterpret_cast<const JPH_PhysicsMaterial*>(joltCharacter->GetGroundMaterial());
 }
 
 JPH_BodyID JPH_CharacterBase_GetGroundBodyId(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->GetGroundBodyID().GetIndexAndSequenceNumber();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundBodyID().GetIndexAndSequenceNumber();
 }
 
 JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->GetGroundSubShapeID().GetValue();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundSubShapeID().GetValue();
+}
+
+uint64_t JPH_CharacterBase_GetGroundUserData(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundUserData();
 }
 
 /* CharacterVirtualSettings */
@@ -4568,6 +4742,140 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 
     return reinterpret_cast<JPH_CharacterVirtualSettings*>(settings);
 }
+
+float JPH_CharacterVirtualSettings_GetMass(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMass;
+}
+
+void JPH_CharacterVirtualSettings_SetMass(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMass = value;
+}
+
+float JPH_CharacterVirtualSettings_GetMaxStrength(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxStrength;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxStrength(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxStrength = value;
+}
+
+void JPH_CharacterVirtualSettings_GetShapeOffset(JPH_CharacterVirtualSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mShapeOffset, result);
+}
+
+void JPH_CharacterVirtualSettings_SetShapeOffset(JPH_CharacterVirtualSettings* settings, const JPH_Vec3* value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+    joltSettings->mShapeOffset = ToJolt(value);
+}
+
+JPH_BackFaceMode JPH_CharacterVirtualSettings_GetBackFaceMode(JPH_CharacterVirtualSettings* settings)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+	return static_cast<JPH_BackFaceMode>(joltSettings->mBackFaceMode);
+}
+
+void JPH_CharacterVirtualSettings_SetBackFaceMode(JPH_CharacterVirtualSettings* settings, JPH_BackFaceMode value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+	joltSettings->mBackFaceMode = static_cast<JPH::EBackFaceMode>(value);
+}
+
+float JPH_CharacterVirtualSettings_GetPredictiveContactDistance(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPredictiveContactDistance;
+}
+
+void JPH_CharacterVirtualSettings_SetPredictiveContactDistance(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPredictiveContactDistance = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxCollisionIterations(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxCollisionIterations;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxCollisionIterations(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxCollisionIterations = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxConstraintIterations(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxConstraintIterations;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxConstraintIterations(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxConstraintIterations = value;
+}
+
+float JPH_CharacterVirtualSettings_GetMinTimeRemaining(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMinTimeRemaining;
+}
+
+void JPH_CharacterVirtualSettings_SetMinTimeRemaining(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMinTimeRemaining = value;
+}
+
+float JPH_CharacterVirtualSettings_GetCollisionTolerance(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCollisionTolerance;
+}
+
+void JPH_CharacterVirtualSettings_SetCollisionTolerance(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCollisionTolerance = value;
+}
+
+float JPH_CharacterVirtualSettings_GetCharacterPadding(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCharacterPadding;
+}
+
+void JPH_CharacterVirtualSettings_SetCharacterPadding(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCharacterPadding = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxNumHits(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxNumHits;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxNumHits(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxNumHits = value;
+}
+
+float JPH_CharacterVirtualSettings_GetHitReductionCosMaxAngle(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mHitReductionCosMaxAngle;
+}
+
+void JPH_CharacterVirtualSettings_SetHitReductionCosMaxAngle(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mHitReductionCosMaxAngle = value;
+}
+
+float JPH_CharacterVirtualSettings_GetPenetrationRecoverySpeed(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPenetrationRecoverySpeed;
+}
+
+void JPH_CharacterVirtualSettings_SetPenetrationRecoverySpeed(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPenetrationRecoverySpeed = value;
+}
+
 
 /* CharacterVirtual */
 JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,
@@ -4724,6 +5032,30 @@ void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(JPH_CharacterVirtual* chara
 	joltCharacter->SetHitReductionCosMaxAngle(value);
 }
 
+JPH_Bool32 JPH_CharacterVirtual_GetMaxHitsExceeded(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return FromJolt(joltCharacter->GetMaxHitsExceeded());
+}
+
+uint64_t JPH_CharacterVirtual_GetUserData(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetUserData();
+}
+
+void JPH_CharacterVirtual_SetUserData(JPH_CharacterVirtual* character, uint64_t value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetUserData(value);
+}
+
+void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(JPH_CharacterVirtual* character, const JPH_Vec3* desiredVelocity, JPH_Vec3* velocity)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	FromJolt(joltCharacter->CancelVelocityTowardsSteepSlopes(ToJolt(desiredVelocity)), velocity);
+}
+
 void JPH_CharacterVirtual_Update(JPH_CharacterVirtual* character, float deltaTime, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
 {
     auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
@@ -4831,14 +5163,22 @@ public:
 			FromJolt(inContactPosition, &contactPosition);
 			FromJolt(inContactNormal, &contactNormal);
 
+			JPH_CharacterContactSettings settings = {};
+			settings.canPushCharacter = FromJolt(ioSettings.mCanPushCharacter);
+			settings.canReceiveImpulses = FromJolt(ioSettings.mCanReceiveImpulses);
+
             procs.OnContactAdded(
                 userData,
 				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
                 (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
                 (JPH_SubShapeID)inSubShapeID2.GetValue(),
                 &contactPosition,
-				&contactNormal
+				&contactNormal,
+				&settings
             );
+
+			ioSettings.mCanPushCharacter = ToJolt(settings.canPushCharacter);
+			ioSettings.mCanReceiveImpulses = ToJolt(settings.canReceiveImpulses);
         }
     }
 
