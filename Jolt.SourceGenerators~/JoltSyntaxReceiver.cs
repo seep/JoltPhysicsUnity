@@ -32,7 +32,7 @@ internal class JoltSyntaxReceiver : ISyntaxReceiver
 
     private void OnVisitMethodDeclaration(MethodDeclarationSyntax mds)
     {
-        if (mds is { Parent: ClassDeclarationSyntax { Identifier.ValueText: "SafeBindings" } })
+        if (mds is { Parent: ClassDeclarationSyntax { Identifier.ValueText: "Bindings" } })
         {
             Bindings.Add(mds);
         }
