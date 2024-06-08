@@ -20,14 +20,6 @@ namespace Jolt
         _JPH_SpringMode_Force32 = 0x7FFFFFFF,
     }
 
-    internal partial struct JPH_Plane
-    {
-        [NativeTypeName("JPH_Vec3")]
-        public float3 normal;
-
-        public float distance;
-    }
-
     internal partial struct JPH_SpringSettings
     {
         public JPH_SpringMode mode;
@@ -2201,10 +2193,10 @@ namespace Jolt
         public static extern void JPH_CharacterBaseSettings_SetUp(JPH_CharacterBaseSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_CharacterBaseSettings_GetSupportingVolume(JPH_CharacterBaseSettings* settings, JPH_Plane* result);
+        public static extern void JPH_CharacterBaseSettings_GetSupportingVolume(JPH_CharacterBaseSettings* settings, [NativeTypeName("JPH_Plane *")] Plane* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, [NativeTypeName("const JPH_Plane *")] JPH_Plane* value);
+        public static extern void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, [NativeTypeName("const JPH_Plane *")] Plane* value);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern float JPH_CharacterBaseSettings_GetMaxSlopeAngle(JPH_CharacterBaseSettings* settings);
