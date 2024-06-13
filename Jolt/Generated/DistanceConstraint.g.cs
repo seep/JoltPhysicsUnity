@@ -4,19 +4,19 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct FixedConstraint : IEquatable<FixedConstraint>
+    public partial struct DistanceConstraint : IEquatable<DistanceConstraint>
     {
         #region IEquatable
         
-        public bool Equals(FixedConstraint other) => Handle.Equals(other.Handle);
+        public bool Equals(DistanceConstraint other) => Handle.Equals(other.Handle);
         
-        public override bool Equals(object obj) => obj is FixedConstraint other && Equals(other);
+        public override bool Equals(object obj) => obj is DistanceConstraint other && Equals(other);
         
         public override int GetHashCode() => Handle.GetHashCode();
         
-        public static bool operator ==(FixedConstraint lhs, FixedConstraint rhs) => lhs.Equals(rhs);
+        public static bool operator ==(DistanceConstraint lhs, DistanceConstraint rhs) => lhs.Equals(rhs);
         
-        public static bool operator !=(FixedConstraint lhs, FixedConstraint rhs) => !lhs.Equals(rhs);
+        public static bool operator !=(DistanceConstraint lhs, DistanceConstraint rhs) => !lhs.Equals(rhs);
         
         #endregion
         
@@ -46,11 +46,19 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_FixedConstraint
+        #region JPH_DistanceConstraint
         
-        public float3 GetTotalLambdaPosition() => Bindings.JPH_FixedConstraint_GetTotalLambdaPosition(Handle);
+        public void SetDistance(float minDistance, float maxDistance) => Bindings.JPH_DistanceConstraint_SetDistance(Handle, minDistance, maxDistance);
         
-        public float3 GetTotalLambdaRotation() => Bindings.JPH_FixedConstraint_GetTotalLambdaRotation(Handle);
+        public float GetMinDistance() => Bindings.JPH_DistanceConstraint_GetMinDistance(Handle);
+        
+        public float GetMaxDistance() => Bindings.JPH_DistanceConstraint_GetMaxDistance(Handle);
+        
+        public SpringSettings GetLimitsSpringSettings() => Bindings.JPH_DistanceConstraint_GetLimitsSpringSettings(Handle);
+        
+        public void SetLimitsSpringSettings(SpringSettings settings) => Bindings.JPH_DistanceConstraint_SetLimitsSpringSettings(Handle, settings);
+        
+        public float GetTotalLambdaPosition() => Bindings.JPH_DistanceConstraint_GetTotalLambdaPosition(Handle);
         
         #endregion
         

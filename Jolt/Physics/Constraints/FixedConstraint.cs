@@ -1,9 +1,9 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle("JPH_FixedConstraint"), GenerateBindings("JPH_FixedConstraint")]
-    public unsafe partial struct FixedConstraint
+    [GenerateHandle("JPH_FixedConstraint"), GenerateBindings("JPH_Constraint"), GenerateBindings("JPH_FixedConstraint")]
+    public readonly partial struct FixedConstraint
     {
-        internal NativeHandle<JPH_FixedConstraint> Handle;
+        internal readonly NativeHandle<JPH_FixedConstraint> Handle;
 
         internal FixedConstraint(NativeHandle<JPH_FixedConstraint> handle)
         {

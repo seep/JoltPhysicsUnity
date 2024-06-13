@@ -11,7 +11,7 @@
         }
 
         [OverrideBinding("JPH_FixedConstraintSettings_Create")]
-        public FixedConstraintSettings Create()
+        public static FixedConstraintSettings Create()
         {
             return new FixedConstraintSettings(Bindings.JPH_FixedConstraintSettings_Create());
         }
