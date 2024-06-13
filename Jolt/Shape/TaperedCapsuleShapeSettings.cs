@@ -3,8 +3,8 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle, GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_TaperedCapsuleShapeSettings")]
-    public readonly partial struct TaperedCapsuleShapeSettings : IConvexShapeSettings
+    [GenerateHandle("JPH_TaperedCapsuleShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_TaperedCapsuleShapeSettings")]
+    public readonly partial struct TaperedCapsuleShapeSettings
     {
         internal readonly NativeHandle<JPH_TaperedCapsuleShapeSettings> Handle;
 

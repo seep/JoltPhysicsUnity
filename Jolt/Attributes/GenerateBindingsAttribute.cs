@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
     public class GenerateBindingsAttribute : Attribute
     {
         public string NativePrefix;

@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Include the source generator project as an analyzer. -->
     <ProjectReference Include="..\Jolt.SourceGenerators~\Jolt.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    <!-- Include all of the Jolt assembly. -->
-    <Compile Include="../Jolt/**/*.cs"/>
-    <!-- Exclude the previous output of the generator. -->
-    <Compile Remove="../Jolt/Generated/**/*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Jolt\**\*.cs"/>
+    <Compile Remove="..\Jolt\Generated\**\*.cs"/>
   </ItemGroup>
 
   <ItemGroup>

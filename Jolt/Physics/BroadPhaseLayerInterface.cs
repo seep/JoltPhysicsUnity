@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle("JPH_BroadPhaseLayerInterface")]
     public readonly partial struct BroadPhaseLayerInterface
     {
         internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;

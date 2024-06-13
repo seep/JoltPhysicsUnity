@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle, GenerateBindings("JPH_SoftBodyCreationSettings")]
+    [GenerateHandle("JPH_SoftBodyCreationSettings"), GenerateBindings("JPH_SoftBodyCreationSettings")]
     public partial struct SoftBodyCreationSettings
     {
         internal NativeHandle<JPH_SoftBodyCreationSettings> Handle;

@@ -2,8 +2,8 @@
 
 namespace Jolt
 {
-    [GenerateHandle, GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_CylinderShape")]
-    public readonly partial struct CylinderShape: IConvexShape
+    [GenerateHandle("JPH_CylinderShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_CylinderShape")]
+    public readonly partial struct CylinderShape
     {
         internal readonly NativeHandle<JPH_CylinderShape> Handle;
 

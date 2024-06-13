@@ -4,8 +4,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle]
-    public partial struct PhysicsSystem : IDisposable
+    public partial struct PhysicsSystem : IEquatable<PhysicsSystem>, IDisposable
     {
         internal readonly NativeHandle<JPH_PhysicsSystem> Handle;
 
@@ -131,5 +130,19 @@ namespace Jolt
 
             JPH_BodyActivationListener_Destroy(BodyActivationListenerHandle);
         }
+
+        #region IEquatable
+
+        public bool Equals(PhysicsSystem other) => Handle.Equals(other.Handle);
+
+        public override bool Equals(object obj) => obj is PhysicsSystem other && Equals(other);
+
+        public override int GetHashCode() => Handle.GetHashCode();
+
+        public static bool operator ==(PhysicsSystem lhs, PhysicsSystem rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(PhysicsSystem lhs, PhysicsSystem rhs) => !lhs.Equals(rhs);
+
+        #endregion
     }
 }

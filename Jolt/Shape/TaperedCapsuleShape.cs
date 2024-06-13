@@ -1,7 +1,7 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle, GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_TaperedCapsuleShape")]
-    public readonly partial struct TaperedCapsuleShape : IConvexShape
+    [GenerateHandle("JPH_ConvexShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_TaperedCapsuleShape")]
+    public readonly partial struct TaperedCapsuleShape
     {
         internal readonly NativeHandle<JPH_ConvexShape> Handle; // TODO no JPH_TaperedCapsuleShape struct?
 

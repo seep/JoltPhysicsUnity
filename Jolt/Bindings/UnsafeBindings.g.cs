@@ -12,26 +12,10 @@ namespace Jolt
         _JPH_BackFaceMode_Force32 = 0x7FFFFFFF,
     }
 
-    internal enum JPH_SpringMode
-    {
-        JPH_SpringMode_FrequencyAndDamping = 0,
-        JPH_SpringMode_StiffnessAndDamping = 1,
-        _JPH_SpringMode_Count,
-        _JPH_SpringMode_Force32 = 0x7FFFFFFF,
-    }
-
-    internal partial struct JPH_SpringSettings
-    {
-        public JPH_SpringMode mode;
-
-        public float frequencyOrStiffness;
-
-        public float damping;
-    }
-
     internal partial struct JPH_MotorSettings
     {
-        public JPH_SpringSettings springSettings;
+        [NativeTypeName("JPH_SpringSettings")]
+        public SpringSettings springSettings;
 
         public float minForceLimit;
 
@@ -1290,10 +1274,10 @@ namespace Jolt
         public static extern float JPH_DistanceConstraint_GetMaxDistance(JPH_DistanceConstraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_DistanceConstraint_GetLimitsSpringSettings(JPH_DistanceConstraint* constraint, JPH_SpringSettings* result);
+        public static extern void JPH_DistanceConstraint_GetLimitsSpringSettings(JPH_DistanceConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_DistanceConstraint_SetLimitsSpringSettings(JPH_DistanceConstraint* constraint, JPH_SpringSettings* settings);
+        public static extern void JPH_DistanceConstraint_SetLimitsSpringSettings(JPH_DistanceConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern float JPH_DistanceConstraint_GetTotalLambdaPosition([NativeTypeName("const JPH_DistanceConstraint *")] JPH_DistanceConstraint* constraint);
@@ -1424,10 +1408,10 @@ namespace Jolt
         public static extern NativeBool JPH_HingeConstraint_HasLimits(JPH_HingeConstraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_HingeConstraint_GetLimitsSpringSettings(JPH_HingeConstraint* constraint, JPH_SpringSettings* result);
+        public static extern void JPH_HingeConstraint_GetLimitsSpringSettings(JPH_HingeConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_HingeConstraint_SetLimitsSpringSettings(JPH_HingeConstraint* constraint, JPH_SpringSettings* settings);
+        public static extern void JPH_HingeConstraint_SetLimitsSpringSettings(JPH_HingeConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void JPH_HingeConstraint_GetTotalLambdaPosition([NativeTypeName("const JPH_HingeConstraint *")] JPH_HingeConstraint* constraint, [NativeTypeName("JPH_Vec3 *")] float3* result);
@@ -1503,10 +1487,10 @@ namespace Jolt
         public static extern NativeBool JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_SliderConstraint_GetLimitsSpringSettings(JPH_SliderConstraint* constraint, JPH_SpringSettings* result);
+        public static extern void JPH_SliderConstraint_GetLimitsSpringSettings(JPH_SliderConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_SliderConstraint_SetLimitsSpringSettings(JPH_SliderConstraint* constraint, JPH_SpringSettings* settings);
+        public static extern void JPH_SliderConstraint_SetLimitsSpringSettings(JPH_SliderConstraint* constraint, [NativeTypeName("JPH_SpringSettings *")] SpringSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void JPH_SliderConstraint_GetTotalLambdaPosition([NativeTypeName("const JPH_SliderConstraint *")] JPH_SliderConstraint* constraint, float* x, float* y);

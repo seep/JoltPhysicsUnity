@@ -3,8 +3,8 @@
     /// <summary>
     /// A widened ConvexShape instance handle.
     /// </summary>
-    [GenerateHandle, GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape")]
-    public readonly partial struct ConvexShape : IConvexShape
+    [GenerateHandle("JPH_ConvexShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape")]
+    public readonly partial struct ConvexShape
     {
         internal readonly NativeHandle<JPH_ConvexShape> Handle;
 

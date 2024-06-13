@@ -4,7 +4,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle, GenerateBindings("JPH_BodyCreationSettings")]
+    [GenerateHandle("JPH_BodyCreationSettings"), GenerateBindings("JPH_BodyCreationSettings")]
     public readonly partial struct BodyCreationSettings
     {
         internal readonly NativeHandle<JPH_BodyCreationSettings> Handle;

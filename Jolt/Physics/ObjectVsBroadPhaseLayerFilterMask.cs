@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle("JPH_ObjectVsBroadPhaseLayerFilter")]
     public readonly partial struct ObjectVsBroadPhaseLayerFilterMask
     {
         internal readonly NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;

@@ -3,8 +3,8 @@
     /// <summary>
     /// A widened Shape instance handle.
     /// </summary>
-    [GenerateHandle, GenerateBindings("JPH_Shape")]
-    public readonly partial struct Shape : IShape
+    [GenerateHandle("JPH_Shape"), GenerateBindings("JPH_Shape")]
+    public readonly partial struct Shape
     {
         internal readonly NativeHandle<JPH_Shape> Handle;
 

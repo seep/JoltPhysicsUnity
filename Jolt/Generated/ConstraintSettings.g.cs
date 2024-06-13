@@ -20,5 +20,31 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_ConstraintSettings
+        
+        public void Destroy() => Bindings.JPH_ConstraintSettings_Destroy(Handle);
+        
+        public bool GetEnabled() => Bindings.JPH_ConstraintSettings_GetEnabled(Handle);
+        
+        public uint GetConstraintPriority() => Bindings.JPH_ConstraintSettings_GetConstraintPriority(Handle);
+        
+        public uint GetNumVelocityStepsOverride() => Bindings.JPH_ConstraintSettings_GetNumVelocityStepsOverride(Handle);
+        
+        public void SetNumVelocityStepsOverride(uint value) => Bindings.JPH_ConstraintSettings_SetNumVelocityStepsOverride(Handle, value);
+        
+        public uint GetNumPositionStepsOverride() => Bindings.JPH_ConstraintSettings_GetNumPositionStepsOverride(Handle);
+        
+        public void SetNumPositionStepsOverride(uint value) => Bindings.JPH_ConstraintSettings_SetNumPositionStepsOverride(Handle, value);
+        
+        public float GetDrawConstraintSize() => Bindings.JPH_ConstraintSettings_GetDrawConstraintSize(Handle);
+        
+        public void SetDrawConstraintSize(float value) => Bindings.JPH_ConstraintSettings_SetDrawConstraintSize(Handle, value);
+        
+        public ulong GetUserData() => Bindings.JPH_ConstraintSettings_GetUserData(Handle);
+        
+        public void SetUserData(ulong value) => Bindings.JPH_ConstraintSettings_SetUserData(Handle, value);
+        
+        #endregion
+        
     }
 }

@@ -3,7 +3,7 @@
     /// <summary>
     /// Generic ShapeSettings interface for a native ShapeSettings instance.
     /// </summary>
-    [GenerateHandle, GenerateBindings("JPH_ShapeSettings")]
+    [GenerateHandle("JPH_ShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
     public readonly partial struct ShapeSettings
     {
         internal readonly NativeHandle<JPH_ShapeSettings> Handle;

@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle("JPH_MotionProperties")]
     public readonly partial struct MotionProperties
     {
         internal readonly NativeHandle<JPH_MotionProperties> Handle;

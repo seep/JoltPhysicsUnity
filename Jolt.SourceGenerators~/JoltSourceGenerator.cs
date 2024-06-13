@@ -51,20 +51,20 @@ internal class JoltSourceGenerator : ISourceGenerator
         {
             var parts = decl.Identifier.ValueText.Split('_');
 
-            if (parts.Length < 3) continue; // we are only interested in JPH_SomeType_MethodFoo bindings
+            if (parts.Length < 3)
+            {
+                continue; // we are only interested in JPH_SomeType_Method bindings
+            }
 
-            var prefix = $"{parts[0]}_{parts[1]}";
-            var method = parts[2];
+            var details = new JoltNativeBindingDetails($"{parts[0]}_{parts[1]}", decl);
 
-            var details = new JoltNativeBindingDetails(prefix, method, decl);
-
-            if (bindings.BindingsByNativeType.TryGetValue(prefix, out var value))
+            if (bindings.BindingsByNativeType.TryGetValue(details.NativeTypeName, out var value))
             {
                 value.Add(details);
             }
             else
             {
-                bindings.BindingsByNativeType.Add(prefix, [details]);
+                bindings.BindingsByNativeType.Add(details.NativeTypeName, [details]);
             }
         }
 
@@ -88,11 +88,6 @@ internal class JoltSourceGenerator : ISourceGenerator
 
     private static JoltNativeTypeWrapper CreateNativeTypeWrapper(GeneratorExecutionContext ctx, StructDeclarationSyntax decl)
     {
-        var generateBindingsAttributeSymbol = ctx.Compilation.GetTypeByMetadataName("Jolt.GenerateBindingsAttribute");
-        var overrideBindingAttributeSymbol = ctx.Compilation.GetTypeByMetadataName("Jolt.OverrideBindingAttribute");
-
-        Debug.Assert(generateBindingsAttributeSymbol != null);
-
         var symbol = ctx.Compilation.GetSemanticModel(decl.SyntaxTree).GetDeclaredSymbol(decl);
         var result = new JoltNativeTypeWrapper(decl.Identifier.ValueText);
 
@@ -100,19 +95,15 @@ internal class JoltSourceGenerator : ISourceGenerator
 
         foreach (var attr in symbol.GetAttributes())
         {
-            if (!generateBindingsAttributeSymbol.Equals(attr.AttributeClass, SymbolEqualityComparer.Default))
+            if (IsAttributeType(ctx, attr, "Jolt.GenerateHandleAttribute"))
             {
-                continue;
+                result.NativeTypeName = attr.ConstructorArguments[0].Value?.ToString();
             }
 
-            if (attr.ConstructorArguments.IsEmpty)
+            if (IsAttributeType(ctx, attr, "Jolt.GenerateBindingsAttribute"))
             {
-                continue;
+                result.NativeTypePrefixes.Add(attr.ConstructorArguments[0].Value?.ToString());
             }
-
-            var prefix = attr.ConstructorArguments[0].Value?.ToString();
-
-            result.NativeTypePrefixes.Add(prefix);
         }
 
         foreach (var member in symbol.GetMembers())
@@ -121,24 +112,22 @@ internal class JoltSourceGenerator : ISourceGenerator
             {
                 foreach (var attr in method.GetAttributes())
                 {
-                    if (!overrideBindingAttributeSymbol.Equals(attr.AttributeClass, SymbolEqualityComparer.Default))
+                    if (IsAttributeType(ctx, attr, "Jolt.OverrideBindingAttribute"))
                     {
-                        continue;
+                        Log($"Excluding {attr.ConstructorArguments[0].Value?.ToString()} from {result.TypeName}");
+
+                        result.ExcludedBindings.Add(attr.ConstructorArguments[0].Value?.ToString());
                     }
-
-                    if (attr.ConstructorArguments.IsEmpty)
-                    {
-                        continue;
-                    }
-
-                    var excluded = attr.ConstructorArguments[0].Value?.ToString();
-
-                    result.ExcludedBindings.Add(excluded);
                 }
             }
         }
 
         return result;
+    }
+
+    private static bool IsAttributeType(GeneratorExecutionContext ctx, AttributeData attr, string type)
+    {
+        return ctx.Compilation.GetTypeByMetadataName(type)?.Equals(attr.AttributeClass, SymbolEqualityComparer.Default) ?? false;
     }
 
     private static string GenerateNativeTypeWrapper(JoltNativeTypeWrapper target, JoltNativeBindings bindings)
@@ -196,23 +185,36 @@ internal class JoltSourceGenerator : ISourceGenerator
 
         foreach (var b in bindingsWithPrefix)
         {
-            if (target.ExcludedBindings.Contains(b.BindingDeclaration.Identifier.ValueText))
+            var internalName = b.BindingDeclaration.Identifier.ValueText;
+            var declaredName = internalName.Substring(b.NativeTypeName.Length + 1); // JPH_SomeType_Method => Method
+
+            if (target.ExcludedBindings.Contains(internalName))
             {
                 continue; // target has explicitly excluded this binding
             }
 
-            var proxiedName    = b.BindingDeclaration.Identifier.ValueText;
-            var proxiedArgs    = new List<string> { "Handle" };
-            var proxiedReturns = b.BindingDeclaration.ReturnType.ToString();
-
-            var declareName    = b.BindingMethodName;
-            var declareArgs    = new List<string>();
-            var declareMods    = declareName == "GetType" ? "new " : "";
-            var declareReturns = proxiedReturns;
-
             if (b.BindingDeclaration.ParameterList.Parameters.Count == 0)
             {
                 continue; // TODO handle generating Create methods
+            }
+
+            var internalParams = new List<string>();
+            var declaredParams = new List<string>();
+
+            // Reinterpret the handle if the binding is for a different native type. For example, SphereShape generates
+            // bindings for JPH_ConvexShape and JPH_Shape (because the native class is a subclass of these two classes)
+            // and so we can safely call these functions on the native JPH_SphereShape handle.
+
+            var internalHandleParam = b.BindingDeclaration.ParameterList.Parameters[0];
+            var internalHandleNativeTypeName = ExtractGenericHandleType(internalHandleParam.Type!.ToString());
+
+            if (internalHandleNativeTypeName != target.NativeTypeName)
+            {
+                internalParams.Add($"Handle.Reinterpret<{internalHandleNativeTypeName}>()");
+            }
+            else
+            {
+                internalParams.Add("Handle");
             }
 
             // Build the declared parameters and proxied arguments simultaneously. If any of the proxied arguments are
@@ -222,45 +224,51 @@ internal class JoltSourceGenerator : ISourceGenerator
             {
                 Debug.Assert(p.Type != null);
 
-                var type = p.Type.ToString();
-                var name = p.Identifier.ValueText;
+                var internalParamType = p.Type.ToString();
+                var internalParamName = p.Identifier.ValueText;
 
-                if (type.StartsWith("NativeHandle"))
+                if (internalParamType.StartsWith("NativeHandle"))
                 {
-                    var nativeGenericType = ExtractGenericHandleType(type);
-                    var publicWrapperType = nativeGenericType.Substring("JPH_".Length);
+                    var declaredParamType = ExtractGenericHandleType(internalParamType).Substring("JPH_".Length);
 
-                    proxiedArgs.Add($"{name}.Handle");
-                    declareArgs.Add($"{publicWrapperType} {name}");
+                    internalParams.Add($"{internalParamName}.Handle");
+                    declaredParams.Add($"{declaredParamType} {internalParamName}");
                 }
                 else
                 {
-                    proxiedArgs.Add(name);
-                    declareArgs.Add($"{type} {name}");
+                    var declaredParamType = internalParamType; // reuse binding type
+
+                    internalParams.Add(internalParamName);
+                    declaredParams.Add($"{declaredParamType} {internalParamName}");
                 }
             }
 
-            var proxiedBindingArgsString = string.Join(", ", proxiedArgs);
-            var publicBindingParamsString = string.Join(", ", declareArgs);
+            var internalParamsString = string.Join(", ", internalParams);
+            var declaredParamsString = string.Join(", ", declaredParams);
 
-            var expression = $"Bindings.{proxiedName}({proxiedBindingArgsString})";
+            // Build the expression by invoking the binding with the args string.
 
-            // If the binding return type is a NativeHandle we rewrite some of the expression. We return the public
-            // wrapper type instead and wrap the proxied call with the wrapper constructor.
+            var expression = $"Bindings.{internalName}({internalParamsString})";
 
-            if (declareReturns.StartsWith("NativeHandle"))
+            // If the binding return type is a NativeHandle we derive and return the wrapper type instead.
+
+            var internalReturn = b.BindingDeclaration.ReturnType.ToString();
+            var declaredReturn = internalReturn;
+
+            if (declaredReturn.StartsWith("NativeHandle"))
             {
-                var nativeGenericType = ExtractGenericHandleType(declareReturns);
-                var publicWrapperType = nativeGenericType.Substring("JPH_".Length);
+                declaredReturn = ExtractGenericHandleType(declaredReturn).Substring("JPH_".Length);
 
-                declareReturns = publicWrapperType;
-
-                expression = $"new {declareReturns}({expression})";
+                expression = $"new {declaredReturn}({expression})";
             }
+
+            // Handle the special case of the JPH_Shape_GetType binding.
+
+            var declaredModifier = (declaredName == "GetType") ? "new " : "";
 
             // Interpolate the public declaration.
 
-            var declaration = $"public {declareMods}{declareReturns} {declareName}({publicBindingParamsString})";
+            var declaration = $"public {declaredModifier}{declaredReturn} {declaredName}({declaredParamsString})";
 
             WritePaddedLine(writer, $"{declaration} => {expression};");
         }
@@ -320,11 +328,9 @@ internal class JoltNativeBindings
 /// <summary>
 /// Metadata about an individual native extern function we will proxy.
 /// </summary>
-internal class JoltNativeBindingDetails(string type, string method, MethodDeclarationSyntax decl)
+internal class JoltNativeBindingDetails(string type, MethodDeclarationSyntax decl)
 {
     public readonly string NativeTypeName = type;
-
-    public readonly string BindingMethodName = method;
 
     public readonly MethodDeclarationSyntax BindingDeclaration = decl;
 }
@@ -335,6 +341,8 @@ internal class JoltNativeBindingDetails(string type, string method, MethodDeclar
 internal class JoltNativeTypeWrapper(string type)
 {
     public readonly string TypeName = type;
+
+    public string NativeTypeName;
 
     public readonly HashSet<string> NativeTypePrefixes = [];
 

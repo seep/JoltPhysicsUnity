@@ -4,14 +4,14 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
-        public static void JPH_CompoundShapeSettings_AddShape<T, U>(NativeHandle<T> handle, float3 position, quaternion rotation, NativeHandle<U> settings, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShapeSettings
+        public static void JPH_CompoundShapeSettings_AddShape(NativeHandle<JPH_CompoundShapeSettings> handle, float3 position, quaternion rotation, NativeHandle<JPH_ShapeSettings> settings, uint userData)
         {
-            UnsafeBindings.JPH_CompoundShapeSettings_AddShape(handle.Reinterpret<JPH_CompoundShapeSettings>(), &position, &rotation, settings.Reinterpret<JPH_ShapeSettings>(), userData);
+            UnsafeBindings.JPH_CompoundShapeSettings_AddShape(handle, &position, &rotation, settings, userData);
         }
 
-        public static void JPH_CompoundShapeSettings_AddShape2<T, U>(NativeHandle<T> settings, float3 position, quaternion rotation, NativeHandle<U> shape, uint userData) where T : unmanaged, INativeCompoundShapeSettings where U : unmanaged, INativeShape
+        public static void JPH_CompoundShapeSettings_AddShape2(NativeHandle<JPH_CompoundShapeSettings> settings, float3 position, quaternion rotation, NativeHandle<JPH_Shape> shape, uint userData)
         {
-            UnsafeBindings.JPH_CompoundShapeSettings_AddShape2(settings.Reinterpret<JPH_CompoundShapeSettings>(), &position, &rotation, shape.Reinterpret<JPH_Shape>(), userData);
+            UnsafeBindings.JPH_CompoundShapeSettings_AddShape2(settings, &position, &rotation, shape, userData);
         }
 
         public static NativeHandle<JPH_StaticCompoundShapeSettings> JPH_StaticCompoundShapeSettings_Create()

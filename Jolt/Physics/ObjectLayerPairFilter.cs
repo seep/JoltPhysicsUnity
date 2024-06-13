@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle("JPH_ObjectLayerPairFilter")]
     public readonly partial struct ObjectLayerPairFilter
     {
         internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;

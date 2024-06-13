@@ -3,7 +3,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle]
+    [GenerateHandle("JPH_ObjectLayerPairFilter")]
     public readonly partial struct ObjectLayerPairFilterTable
     {
         internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;

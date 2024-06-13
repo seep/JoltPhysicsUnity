@@ -6,8 +6,8 @@ namespace Jolt
     /// <summary>
     /// A widened CompoundShapeSettings instance handle.
     /// </summary>
-    [GenerateHandle, GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_CompoundShapeSettings")]
-    public readonly partial struct CompoundShapeSettings : IShapeSettings
+    [GenerateHandle("JPH_CompoundShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_CompoundShapeSettings")]
+    public readonly partial struct CompoundShapeSettings
     {
         internal readonly NativeHandle<JPH_CompoundShapeSettings> Handle;
 

@@ -4,91 +4,91 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
-        public static void JPH_Shape_Destroy<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static void JPH_Shape_Destroy(NativeHandle<JPH_Shape> shape)
         {
-            UnsafeBindings.JPH_Shape_Destroy(shape.Reinterpret<JPH_Shape>());
+            UnsafeBindings.JPH_Shape_Destroy(shape);
 
             shape.Dispose();
         }
 
-        public static ShapeType JPH_Shape_GetType<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static ShapeType JPH_Shape_GetType(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_GetType(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_GetType(shape);
         }
 
-        public static ShapeSubType JPH_Shape_GetSubType<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static ShapeSubType JPH_Shape_GetSubType(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_GetSubType(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_GetSubType(shape);
         }
 
-        public static ulong JPH_Shape_GetUserData<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static ulong JPH_Shape_GetUserData(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_GetUserData(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_GetUserData(shape);
         }
 
-        public static void JPH_Shape_SetUserData<T>(NativeHandle<T> shape, ulong userData) where T : unmanaged, INativeShape
+        public static void JPH_Shape_SetUserData(NativeHandle<JPH_Shape> shape, ulong userData)
         {
-            UnsafeBindings.JPH_Shape_SetUserData(shape.Reinterpret<JPH_Shape>(), userData);
+            UnsafeBindings.JPH_Shape_SetUserData(shape, userData);
         }
 
-        public static bool JPH_Shape_MustBeStatic<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static bool JPH_Shape_MustBeStatic(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_MustBeStatic(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_MustBeStatic(shape);
         }
 
-        public static float3 JPH_Shape_GetCenterOfMass<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static float3 JPH_Shape_GetCenterOfMass(NativeHandle<JPH_Shape> shape)
         {
             float3 result;
 
-            UnsafeBindings.JPH_Shape_GetCenterOfMass(shape.Reinterpret<JPH_Shape>(), &result);
+            UnsafeBindings.JPH_Shape_GetCenterOfMass(shape, &result);
 
             return result;
         }
 
-        public static AABox JPH_Shape_GetLocalBounds<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static AABox JPH_Shape_GetLocalBounds(NativeHandle<JPH_Shape> shape)
         {
             AABox result;
 
-            UnsafeBindings.JPH_Shape_GetLocalBounds(shape.Reinterpret<JPH_Shape>(), &result);
+            UnsafeBindings.JPH_Shape_GetLocalBounds(shape, &result);
 
             return result;
         }
 
-        public static AABox JPH_Shape_GetWorldSpaceBounds<T>(NativeHandle<T> shape, rmatrix4x4 centerOfMassTransform, float3 scale) where T : unmanaged, INativeShape
+        public static AABox JPH_Shape_GetWorldSpaceBounds(NativeHandle<JPH_Shape> shape, rmatrix4x4 centerOfMassTransform, float3 scale)
         {
             AABox result;
 
-            UnsafeBindings.JPH_Shape_GetWorldSpaceBounds(shape.Reinterpret<JPH_Shape>(), &centerOfMassTransform, &scale, &result);
+            UnsafeBindings.JPH_Shape_GetWorldSpaceBounds(shape, &centerOfMassTransform, &scale, &result);
 
             return result;
         }
 
-        public static float JPH_Shape_GetInnerRadius<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static float JPH_Shape_GetInnerRadius(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_GetInnerRadius(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_GetInnerRadius(shape);
         }
 
-        public static MassProperties JPH_Shape_GetMassProperties<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static MassProperties JPH_Shape_GetMassProperties(NativeHandle<JPH_Shape> shape)
         {
             MassProperties result;
 
-            UnsafeBindings.JPH_Shape_GetMassProperties(shape.Reinterpret<JPH_Shape>(), &result);
+            UnsafeBindings.JPH_Shape_GetMassProperties(shape, &result);
 
             return result;
         }
 
-        public static float3 JPH_Shape_GetSurfaceNormal<T>(NativeHandle<T> shape, uint subShapeID, float3 localPosition) where T : unmanaged, INativeShape
+        public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, uint subShapeID, float3 localPosition)
         {
             float3 result;
 
-            UnsafeBindings.JPH_Shape_GetSurfaceNormal(shape.Reinterpret<JPH_Shape>(), subShapeID, &localPosition, &result);
+            UnsafeBindings.JPH_Shape_GetSurfaceNormal(shape, subShapeID, &localPosition, &result);
 
             return result;
         }
 
-        public static float JPH_Shape_GetVolume<T>(NativeHandle<T> shape) where T : unmanaged, INativeShape
+        public static float JPH_Shape_GetVolume(NativeHandle<JPH_Shape> shape)
         {
-            return UnsafeBindings.JPH_Shape_GetVolume(shape.Reinterpret<JPH_Shape>());
+            return UnsafeBindings.JPH_Shape_GetVolume(shape);
         }
     }
 }
