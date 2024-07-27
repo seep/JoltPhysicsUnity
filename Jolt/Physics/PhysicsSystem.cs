@@ -122,6 +122,16 @@ namespace Jolt
             return JPH_PhysicsSystem_GetGravity(Handle);
         }
 
+        public void AddConstraint(Constraint constraint)
+        {
+            JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+        }
+
+        public void RemoveConstraint(Constraint constraint)
+        {
+            JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+        }
+
         public void Dispose()
         {
             JPH_PhysicsSystem_Destroy(Handle);
