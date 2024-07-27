@@ -1,8 +1,8 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-#ifndef _JOLT_C_H
-#define _JOLT_C_H
+#ifndef JOLT_C_H_
+#define JOLT_C_H_ 1
 
 #if defined(JPH_SHARED_LIBRARY_BUILD)
 #   if defined(_MSC_VER)
@@ -347,7 +347,6 @@ typedef struct JPH_BroadPhaseCastResult {
     float          fraction;
 } JPH_BroadPhaseCastResult;
 
-// NOTE: Needs to be kept in sync with JPH::RayCastResult
 typedef struct JPH_RayCastResult {
     JPH_BodyID     bodyID;
     float          fraction;
@@ -359,7 +358,6 @@ typedef struct JPH_CollidePointResult {
 	JPH_SubShapeID subShapeID2;
 } JPH_CollidePointResult;
 
-// NOTE: Needs to be kept in sync with JPH::ShapeCastResult
 typedef struct JPH_CollideShapeResult
 {
     JPH_Vec3           contactPointOn1;
@@ -557,6 +555,7 @@ JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterTab
 /* JPH_PhysicsSystem */
 typedef struct JPH_PhysicsSystemSettings {
 	uint32_t maxBodies; /* 10240 */
+	uint32_t numBodyMutexes; /* 0 */
 	uint32_t maxBodyPairs; /* 65536 */
 	uint32_t maxContactConstraints; /* 10240 */
 	uint32_t _padding;
@@ -924,7 +923,20 @@ JPH_CAPI float JPH_HingeConstraint_GetTotalLambdaMotor(const JPH_HingeConstraint
 /* JPH_SliderConstraintSettings */
 JPH_CAPI JPH_SliderConstraintSettings* JPH_SliderConstraintSettings_Create(void);
 JPH_CAPI void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, const JPH_Vec3* axis);
-JPH_CAPI void JPH_SliderConstraintSettings_GetSliderAxis(JPH_SliderConstraintSettings* settings, JPH_Vec3* axis);
+JPH_CAPI JPH_Bool32 JPH_SliderConstraintSettings_GetAutoDetectPoint(JPH_SliderConstraintSettings* settings);
+JPH_CAPI void JPH_SliderConstraintSettings_SetAutoDetectPoint(JPH_SliderConstraintSettings* settings, JPH_Bool32 value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetPoint1(JPH_SliderConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_SliderConstraintSettings_SetPoint1(JPH_SliderConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetPoint2(JPH_SliderConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_SliderConstraintSettings_SetPoint2(JPH_SliderConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_SetSliderAxis1(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetSliderAxis1(JPH_SliderConstraintSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_SliderConstraintSettings_SetNormalAxis1(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetNormalAxis1(JPH_SliderConstraintSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_SliderConstraintSettings_SetSliderAxis2(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetSliderAxis2(JPH_SliderConstraintSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_SliderConstraintSettings_SetNormalAxis2(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_SliderConstraintSettings_GetNormalAxis2(JPH_SliderConstraintSettings* settings, JPH_Vec3* result);
 JPH_CAPI JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2); // binding for SliderConstraintSettings::Create()
 
 /* JPH_SliderConstraint */
@@ -1480,4 +1492,4 @@ typedef struct JPH_CharacterContactListener_Procs {
 JPH_CAPI JPH_CharacterContactListener* JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, void* userData);
 JPH_CAPI void JPH_CharacterContactListener_Destroy(JPH_CharacterContactListener* listener);
 
-#endif /* _JOLT_C_H */
+#endif /* JOLT_C_H_ */
