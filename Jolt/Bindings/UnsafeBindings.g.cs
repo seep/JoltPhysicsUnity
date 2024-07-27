@@ -518,6 +518,8 @@ namespace Jolt
     {
         public uint maxBodies;
 
+        public uint numBodyMutexes;
+
         public uint maxBodyPairs;
 
         public uint maxContactConstraints;
@@ -1432,7 +1434,46 @@ namespace Jolt
         public static extern void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* axis);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_SliderConstraintSettings_GetSliderAxis(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_Vec3 *")] float3* axis);
+        public static extern NativeBool JPH_SliderConstraintSettings_GetAutoDetectPoint(JPH_SliderConstraintSettings* settings);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetAutoDetectPoint(JPH_SliderConstraintSettings* settings, NativeBool value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetPoint1(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_RVec3 *")] rvec3* result);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetPoint1(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_RVec3 *")] rvec3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetPoint2(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_RVec3 *")] rvec3* result);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetPoint2(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_RVec3 *")] rvec3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetSliderAxis1(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetSliderAxis1(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_Vec3 *")] float3* result);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetNormalAxis1(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetNormalAxis1(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_Vec3 *")] float3* result);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetSliderAxis2(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetSliderAxis2(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_Vec3 *")] float3* result);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_SetNormalAxis2(JPH_SliderConstraintSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
+
+        [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void JPH_SliderConstraintSettings_GetNormalAxis2(JPH_SliderConstraintSettings* settings, [NativeTypeName("JPH_Vec3 *")] float3* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2);
