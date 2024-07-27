@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Jolt.Samples
 {
@@ -48,7 +50,7 @@ namespace Jolt.Samples
         private PhysicsSystem system;
         private BodyInterface bodies;
 
-        private List<(BodyID, GameObject)> managedGameObjects = new();
+        private ManagedPhysicsContext context = new ();
 
         private void Start()
         {
@@ -82,10 +84,24 @@ namespace Jolt.Samples
                 addon.Initialize(system); // initialize any adjacent addons
             }
 
-            foreach (var authoring in FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
+            foreach (var component in FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
             {
-                var bodyID = PhysicsHelpers.CreateBodyFromGameObject(bodies, authoring.gameObject);
-                managedGameObjects.Add((bodyID, authoring.gameObject));
+                var body = PhysicsHelpers.CreateBodyFromGameObject(bodies, component);
+
+                var bodyID = body.GetID();
+
+                context.ManagedToNative.Add(component, body);
+                context.NativeToManaged.Add(body, component);
+                context.Bodies.Add((bodyID, component));
+
+                bodies.AddBody(bodyID, Activation.Activate);
+            }
+
+            foreach (var component in FindObjectsByType<PhysicsConstraint>(FindObjectsSortMode.None))
+            {
+                var constraint = PhysicsHelpers.CreateConstraint(context, component);
+
+                system.AddConstraint(constraint);
             }
 
             system.OptimizeBroadPhase();
@@ -105,9 +121,20 @@ namespace Jolt.Samples
 
         private void UpdateManagedTransforms()
         {
-            foreach (var (bodyID, gobj) in managedGameObjects)
+            foreach (var (bodyID, component) in context.Bodies)
             {
-                PhysicsHelpers.ApplyTransform(bodies, bodyID, gobj.transform);
+                // assume no scaling and skip decomposition
+
+                #if JOLT_DOUBLE_PRECISION
+                throw new NotImplementedException();
+                #endif
+
+                var wt = (float4x4) bodies.GetWorldTransform(bodyID);
+
+                var position = wt.c3.xyz;
+                var rotation = new quaternion(wt);
+
+                component.transform.SetLocalPositionAndRotation(position, rotation);
             }
         }
 

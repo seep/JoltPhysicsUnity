@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -10,49 +11,39 @@ namespace Jolt.Samples
         Moving = 1,
     }
 
+    public class ManagedPhysicsContext
+    {
+        public Dictionary<PhysicsBody, Body> ManagedToNative = new ();
+        public Dictionary<Body, PhysicsBody> NativeToManaged = new ();
+
+        public List<(BodyID, PhysicsBody)> Bodies = new();
+    }
+
     public static class PhysicsHelpers
     {
-        public static void ApplyTransform(BodyInterface bodies, BodyID bodyID, Transform transform)
+        public static Body CreateBodyFromGameObject(BodyInterface bodies, PhysicsBody component)
         {
-            // assume no scaling and skip decomposition
-
-            #if JOLT_DOUBLE_PRECISION
-            throw new NotImplementedException();
-            #endif
-
-            var wtransform = (float4x4) bodies.GetWorldTransform(bodyID);
-
-            transform.position = wtransform.c3.xyz;
-            transform.rotation = new quaternion(wtransform);
-        }
-
-        public static BodyID CreateBodyFromGameObject(BodyInterface bodies, GameObject gobj)
-        {
-            var body = gobj.GetComponent<PhysicsBody>();
-
-            Debug.Assert(body != null, "The GameObject must have a PhysicsBody component.");
-
-            if (!TryGetShapeSettings(gobj, out ShapeSettings shape))
+            if (!TryGetShapeSettings(component.gameObject, out ShapeSettings shape))
             {
                 throw new NotImplementedException();
             }
 
-            var pos = (float3) body.transform.position;
-            var rot = (quaternion) body.transform.rotation;
+            var pos = (float3) component.transform.position;
+            var rot = (quaternion) component.transform.rotation;
 
-            var layer = body.MotionType == MotionType.Static
+            var layer = component.MotionType == MotionType.Static
                 ? (ushort)PhysicsSamplesLayers.Static
                 : (ushort)PhysicsSamplesLayers.Moving;
 
-            var activation = body.MotionType == MotionType.Static
+            var activation = component.MotionType == MotionType.Static
                 ? Activation.DontActivate
                 : Activation.Activate;
 
             var settings = BodyCreationSettings.FromShapeSettings(
-                shape, pos, rot, body.MotionType, layer
+                shape, pos, rot, component.MotionType, layer
             );
 
-            return bodies.CreateAndAddBody(settings, activation);
+            return bodies.CreateBody(settings);
         }
 
         private static bool TryGetCompoundShapeSettings(GameObject obj, out ShapeSettings settings)
@@ -125,6 +116,28 @@ namespace Jolt.Samples
             {
                 settings = TaperedCapsuleShapeSettings.Create(tapered.HalfHeight, tapered.TopRadius, tapered.BottomRadius);
                 return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static Constraint CreateConstraint(ManagedPhysicsContext context, PhysicsConstraint component)
+        {
+            if (component is PhysicsConstraintDistance dist)
+            {
+                // dist.BodyA;
+                // dist.BodyB;
+
+                var settings = DistanceConstraintSettings.Create();
+
+                settings.SetPoint1(default);
+                settings.SetPoint2(default);
+                settings.SetSpace(ConstraintSpace.LocalToBodyCOM);
+
+                var ba = context.ManagedToNative[dist.BodyA];
+                var bb = context.ManagedToNative[dist.BodyB];
+
+                return settings.CreateConstraint(ba, bb);
             }
 
             throw new NotImplementedException();
