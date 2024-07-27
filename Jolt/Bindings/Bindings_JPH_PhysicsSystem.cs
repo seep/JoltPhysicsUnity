@@ -106,14 +106,14 @@ namespace Jolt
             return gravity;
         }
 
-        public static void JPH_PhysicsSystem_AddConstraint(NativeHandle<JPH_PhysicsSystem> system)
+        public static void JPH_PhysicsSystem_AddConstraint(NativeHandle<JPH_PhysicsSystem> system, NativeHandle<JPH_Constraint> constraint)
         {
-            throw new NotImplementedException();
+            UnsafeBindings.JPH_PhysicsSystem_AddConstraint(system, constraint);
         }
 
-        public static void JPH_PhysicsSystem_RemoveConstraint(NativeHandle<JPH_PhysicsSystem> system)
+        public static void JPH_PhysicsSystem_RemoveConstraint(NativeHandle<JPH_PhysicsSystem> system, NativeHandle<JPH_Constraint> constraint)
         {
-            throw new NotImplementedException();
+            UnsafeBindings.JPH_PhysicsSystem_RemoveConstraint(system, constraint);
         }
 
         public static void JPH_PhysicsSystem_AddConstraints(NativeHandle<JPH_PhysicsSystem> system)
