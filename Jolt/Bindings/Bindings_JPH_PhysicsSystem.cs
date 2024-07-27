@@ -7,9 +7,12 @@ namespace Jolt
     {
         public static NativeHandle<JPH_PhysicsSystem> JPH_PhysicsSystem_Create(PhysicsSystemSettings settings)
         {
+            // TODO use marshalling instead of recreating native settings
+
             var nativeSettings = new JPH_PhysicsSystemSettings
             {
                 maxBodies = settings.MaxBodies,
+                numBodyMutexes = settings.NumBodyMutexes,
                 maxBodyPairs = settings.MaxBodyPairs,
                 maxContactConstraints = settings.MaxContactConstraints,
                 objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle,
