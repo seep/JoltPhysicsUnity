@@ -2,11 +2,11 @@
 
 namespace Jolt
 {
-    internal static unsafe partial class Bindings
+    internal static partial class Bindings
     {
-        public static bool JPH_Init(uint tempAllocatorSize)
+        public static bool JPH_Init()
         {
-            return UnsafeBindings.JPH_Init(tempAllocatorSize);
+            return UnsafeBindings.JPH_Init();
         }
 
         public static void JPH_Shutdown()

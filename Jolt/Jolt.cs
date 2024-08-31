@@ -6,21 +6,19 @@ namespace Jolt
 {
     public static class Jolt
     {
-        public const uint DefaultTempAllocatorSize = 10 * 1024 * 1024; // 10MB
-
         private static bool initialized;
 
         /// <summary>
         /// Initialize Jolt, returning true if initialization succeeded.
         /// </summary>
-        public static bool Initialize(uint tempAllocatorSize = DefaultTempAllocatorSize)
+        public static bool Initialize()
         {
             if (initialized)
             {
                 throw new Exception("Jolt is already initialized.");
             }
 
-            return (initialized = JPH_Init(tempAllocatorSize));
+            return initialized = JPH_Init();
         }
 
         /// <summary>
