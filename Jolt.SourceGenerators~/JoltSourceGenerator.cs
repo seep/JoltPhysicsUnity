@@ -306,14 +306,7 @@ internal class JoltSourceGenerator : ISourceGenerator
 
     private static void Log(string message)
     {
-        try
-        {
-            File.AppendAllText(Path.Combine(@"C:\Users\Chris", "JoltSourceGenerator.log"), $"{message}{Environment.NewLine}");
-        }
-        catch
-        {
-            // ignore
-        }
+        // TODO implement useful logging
     }
 }
 
