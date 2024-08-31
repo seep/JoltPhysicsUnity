@@ -26,6 +26,7 @@ JPH_SUPPRESS_WARNINGS
 #include "Jolt/Physics/Collision/CollideShape.h"
 #include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
+#include "Jolt/Physics/Collision/Shape/PlaneShape.h"
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 #include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Jolt/Physics/Collision/Shape/TriangleShape.h"
@@ -66,16 +67,26 @@ JPH_SUPPRESS_WARNINGS
 using namespace JPH;
 
 // Callback for traces, connect this to your own trace function if you have one
-static void TraceImpl(const char* inFMT, ...)
+static JPH_TraceFunc s_TraceFunc = nullptr;
+
+static void TraceImpl(const char* fmt, ...)
 {
     // Format the message
-    va_list list;
-    va_start(list, inFMT);
-    char buffer[1024];
-    vsnprintf(buffer, sizeof(buffer), inFMT, list);
+	va_list list;
+	va_start(list, fmt);
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), fmt, list);
+	va_end(list);
 
     // Print to the TTY
-    std::cout << buffer << std::endl;
+	if(s_TraceFunc)
+	{
+		s_TraceFunc(buffer);
+	}
+	else
+	{
+		std::cout << buffer << std::endl;
+	}
 }
 
 #ifdef JPH_ENABLE_ASSERTS
@@ -310,7 +321,9 @@ void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* p
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
 	JPH::MassProperties joltProperties = ToJolt(properties);
-    joltProperties.ScaleToMass(mass);
+	joltProperties.ScaleToMass(mass);
+	properties->mass = joltProperties.mMass;
+	FromJolt(joltProperties.mInertia, &properties->inertia);
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
@@ -320,13 +333,14 @@ static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
 
 static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangle)
 {
-    return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex);
+    return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex, triangle.userData);
 }
 
-static JPH::TempAllocatorImpl* s_TempAllocator = nullptr;
-static JPH::JobSystemThreadPool* s_JobSystem  = nullptr;
+// 10 MB was not enough for large simulation, let's use TempAllocatorMalloc
+static TempAllocator* s_TempAllocator = nullptr;
+static JobSystemThreadPool* s_JobSystem  = nullptr;
 
-JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize)
+JPH_Bool32 JPH_Init(void)
 {
     JPH::RegisterDefaultAllocator();
 
@@ -341,7 +355,7 @@ JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize)
     JPH::RegisterTypes();
 
 	// Init temp allocator
-	s_TempAllocator = new TempAllocatorImpl(tempAllocatorSize ? tempAllocatorSize : 10 * 1024 * 1024);
+	s_TempAllocator = new TempAllocatorImplWithMallocFallback(8 * 1024 * 1024);
 
 	// Init Job system.
     s_JobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, (int)std::thread::hardware_concurrency() - 1);
@@ -360,6 +374,11 @@ void JPH_Shutdown(void)
     // Destroy the factory
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
+}
+
+void JPH_SetTraceHandler(JPH_TraceFunc handler)
+{
+	s_TraceFunc = handler;
 }
 
 void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler)
@@ -794,6 +813,24 @@ void JPH_Quaternion_FromTo(const JPH_Vec3* from, const JPH_Vec3* to, JPH_Quat* q
     FromJolt(JPH::Quat::sFromTo(ToJolt(from), ToJolt(to)), quat);
 }
 
+/* Material */
+JPH_PhysicsMaterial* JPH_PhysicsMaterial_Create(void)
+{
+    auto material = new JPH::PhysicsMaterial();
+    material->AddRef();
+
+    return reinterpret_cast<JPH_PhysicsMaterial*>(material);
+}
+
+void JPH_PhysicsMaterial_Destroy(JPH_PhysicsMaterial* material)
+{
+    if (material)
+    {
+        auto joltMaterial = reinterpret_cast<JPH::PhysicsMaterial*>(material);
+        joltMaterial->Release();
+    }
+}
+
 /* ShapeSettings */
 void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
 {
@@ -917,7 +954,49 @@ float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
     return reinterpret_cast<const JPH::SphereShape*>(shape)->GetRadius();
 }
 
-/* TriangleShapeSettings */
+/* PlaneShape */
+JPH_PlaneShapeSettings* JPH_PlaneShapeSettings_Create(const JPH_Plane* plane, const JPH_PhysicsMaterial* material, float halfExtent)
+{
+    const JPH::PhysicsMaterial* joltMaterial = material != nullptr ? reinterpret_cast<const JPH::PhysicsMaterial*>(material) : nullptr;
+
+    auto settings = new JPH::PlaneShapeSettings(ToJolt(plane), joltMaterial, halfExtent);
+    settings->AddRef();
+
+    return reinterpret_cast<JPH_PlaneShapeSettings*>(settings);
+}
+
+JPH_PlaneShape* JPH_PlaneShapeSettings_CreateShape(const JPH_PlaneShapeSettings* settings)
+{
+    const JPH::PlaneShapeSettings* joltSettings = reinterpret_cast<const JPH::PlaneShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_PlaneShape*>(shape);
+}
+
+JPH_PlaneShape* JPH_PlaneShape_Create(const JPH_Plane* plane, const JPH_PhysicsMaterial* material, float halfExtent)
+{
+    const JPH::PhysicsMaterial* joltMaterial = material != nullptr ? reinterpret_cast<const JPH::PhysicsMaterial*>(material) : nullptr;
+
+    auto shape = new JPH::PlaneShape(ToJolt(plane), joltMaterial, halfExtent);
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_PlaneShape*>(shape);
+}
+
+void JPH_PlaneShape_GetPlane(const JPH_PlaneShape* shape, JPH_Plane* result)
+{
+    FromJolt(reinterpret_cast<const JPH::PlaneShape*>(shape)->GetPlane(), result);
+}
+
+float JPH_PlaneShape_GetHalfExtent(const JPH_PlaneShape* shape)
+{
+    return reinterpret_cast<const JPH::PlaneShape*>(shape)->GetHalfExtent();
+}
+
+/* TriangleShape */
 JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius)
 {
     auto settings = new JPH::TriangleShapeSettings(ToJolt(v1), ToJolt(v2), ToJolt(v3), convexRadius);
@@ -1508,6 +1587,40 @@ void JPH_Shape_GetSurfaceNormal(const JPH_Shape* shape, JPH_SubShapeID subShapeI
 float JPH_Shape_GetVolume(const JPH_Shape* shape)
 {
 	return reinterpret_cast<const JPH::Shape*>(shape)->GetVolume();
+}
+
+JPH_Bool32 JPH_Shape_CastRay(const JPH_Shape* shape, const JPH_Vec3* origin, const JPH_Vec3* direction, JPH_RayCastResult* hit)
+{
+    JPH_ASSERT(shape && origin && direction && hit);
+
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    JPH::RayCast ray(ToJolt(origin), ToJolt(direction));
+    SubShapeIDCreator creator;
+    RayCastResult result;
+
+    bool hadHit = joltShape->CastRay(ray, creator, result);
+
+    if (hadHit)
+    {
+        hit->fraction = result.mFraction;
+        hit->bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit->subShapeID2 = result.mSubShapeID2.GetValue();
+    }
+
+    return static_cast<JPH_Bool32>(hadHit);
+}
+
+JPH_Bool32 JPH_Shape_CollidePoint(const JPH_Shape* shape, JPH_Vec3* point)
+{
+    JPH_ASSERT(shape && point);
+
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    SubShapeIDCreator creator;
+    AnyHitCollisionCollector<CollidePointCollector> collector;
+
+    joltShape->CollidePoint(ToJolt(point), creator, collector);
+
+    return static_cast<JPH_Bool32>(collector.HadHit());
 }
 
 /* JPH_BodyCreationSettings */
