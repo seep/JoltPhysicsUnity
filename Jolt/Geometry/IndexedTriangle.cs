@@ -14,7 +14,7 @@ namespace Jolt
 
         public readonly uint UserData;
 
-        public IndexedTriangle(uint i1, uint i2, uint i3, uint materialIndex, uint userData)
+        public IndexedTriangle(uint i1, uint i2, uint i3, uint materialIndex, uint userData = 0)
         {
             I1 = i1;
             I2 = i2;
