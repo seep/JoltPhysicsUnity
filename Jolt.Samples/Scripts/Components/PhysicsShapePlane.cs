@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 
 namespace Jolt.Samples
 {
@@ -8,7 +9,10 @@ namespace Jolt.Samples
 
         public Plane BuildPlane()
         {
-            return new Plane { Normal = transform.up, Distance = 0f };
+            // The body transform uses the game object transform, so we only need to define the plane in object space.
+            // For simplicity the sample component always uses the positive Y normal with no distance.
+            
+            return new Plane { Normal = new float3(0f, 1f, 0f), Distance = 0f };
         }
     }
 }
