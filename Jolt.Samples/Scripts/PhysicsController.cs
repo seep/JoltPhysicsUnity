@@ -1,10 +1,11 @@
-using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Jolt.Samples
 {
+    /// <summary>
+    /// The general purpose physics controller for all of the sample scenes. Handles initialization and updating the physics system.
+    /// </summary>
     public class PhysicsController : MonoBehaviour
     {
         /// <summary>
@@ -87,21 +88,15 @@ namespace Jolt.Samples
             foreach (var component in FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
             {
                 var body = PhysicsHelpers.CreateBodyFromGameObject(bodies, component);
-
-                var bodyID = body.GetID();
-
-                context.ManagedToNative.Add(component, body);
-                context.NativeToManaged.Add(body, component);
-                context.Bodies.Add((bodyID, component));
-
-                bodies.AddBody(bodyID, Activation.Activate);
+                
+                bodies.AddBody(body.GetID(), Activation.Activate);
+                
+                context.Add(body, component);
             }
 
-            foreach (var component in FindObjectsByType<PhysicsConstraint>(FindObjectsSortMode.None))
+            foreach (var component in FindObjectsByType<PhysicsConstraintBase>(FindObjectsSortMode.None))
             {
-                var constraint = PhysicsHelpers.CreateConstraint(context, component);
-
-                system.AddConstraint(constraint);
+                system.AddConstraint(component.Initialize(context));
             }
 
             system.OptimizeBroadPhase();
@@ -134,7 +129,7 @@ namespace Jolt.Samples
                 var position = wt.c3.xyz;
                 var rotation = new quaternion(wt);
 
-                component.transform.SetLocalPositionAndRotation(position, rotation);
+                component.transform.SetPositionAndRotation(position, rotation);
             }
         }
 

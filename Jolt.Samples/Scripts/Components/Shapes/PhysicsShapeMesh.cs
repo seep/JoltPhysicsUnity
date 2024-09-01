@@ -4,11 +4,16 @@ using UnityEngine;
 
 namespace Jolt.Samples
 {
-    public class PhysicsShapeMesh : MonoBehaviour, IPhysicsShapeComponent
+    public class PhysicsShapeMesh : PhysicsShapeBase
     {
         public Mesh Mesh;
 
-        public ReadOnlySpan<float3> BuildMeshVertices()
+        internal override ShapeSettings CreateShapeSettings()
+        {
+            return MeshShapeSettings.Create(BuildMeshVertices(), BuildMeshTriangles());
+        }
+        
+        private ReadOnlySpan<float3> BuildMeshVertices()
         {
             var result = new float3[Mesh.vertices.Length];
 
@@ -20,7 +25,7 @@ namespace Jolt.Samples
             return result;
         }
 
-        public ReadOnlySpan<IndexedTriangle> BuildMeshTriangles()
+        private ReadOnlySpan<IndexedTriangle> BuildMeshTriangles()
         {
             var result = new IndexedTriangle[Mesh.triangles.Length];
 
