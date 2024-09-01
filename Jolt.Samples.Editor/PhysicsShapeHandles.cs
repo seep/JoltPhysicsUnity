@@ -38,6 +38,17 @@ namespace Jolt.Samples
             ResetHandle();
         }
 
+        public static void DrawPlaneShape(float3 position, quaternion rotation, PhysicsShapePlane plane)
+        {
+            StartHandle(position, rotation);
+            
+            DrawQuadXZ(float3.zero, new float2(plane.HalfExtent * 2f));
+            
+            Handles.DrawLine(float3.zero, new float3(0f, 1f, 0f));
+            
+            ResetHandle();
+        }
+
         public static void DrawSphereShape(float3 position, quaternion rotation, PhysicsShapeSphere shape)
         {
             StartHandle(position, rotation);

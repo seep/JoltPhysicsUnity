@@ -82,6 +82,12 @@ namespace Jolt.Samples
                 return true;
             }
 
+            if (shape is PhysicsShapePlane plane)
+            {
+                settings = PlaneShapeSettings.Create(plane.BuildPlane(), plane.HalfExtent);
+                return true;
+            }
+            
             if (shape is PhysicsShapeSphere sphere)
             {
                 settings = SphereShapeSettings.Create(sphere.Radius);

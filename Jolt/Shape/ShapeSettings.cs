@@ -25,6 +25,17 @@
         }
 
         /// <summary>
+        /// Reinterpret PlaneShapeSettings as a generic ShapeSettings instance.
+        /// </summary>
+        /// <remarks>
+        /// This does not reallocate the shape settings; the underlying pointer is the same.
+        /// </remarks>
+        public static implicit operator ShapeSettings(PlaneShapeSettings settings)
+        {
+            return new ShapeSettings(settings.Handle.Reinterpret<JPH_ShapeSettings>());
+        }
+        
+        /// <summary>
         /// Reinterpret CapsuleShapeSettings as a generic ShapeSettings instance.
         /// </summary>
         /// <remarks>

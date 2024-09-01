@@ -1,9 +1,11 @@
-﻿using Unity.Mathematics;
-
-namespace Jolt
+﻿namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
+        /// <summary>
+        /// Create a new plane shape. The negative space is infinite. The plane face is technically infinite but the
+        /// half extent restricts the bounding box to optimize collision checks. Planes cannot be on dynamic bodies.
+        /// </summary>
         public static NativeHandle<JPH_PlaneShape> JPH_PlaneShape_Create(Plane plane, float halfExtent)
         {
             // TODO include JPH_PhysicsMaterial argument
@@ -11,6 +13,9 @@ namespace Jolt
             return CreateHandle(UnsafeBindings.JPH_PlaneShape_Create(&plane, default, halfExtent));
         }
 
+        /// <summary>
+        /// Get the plane that defines the shape.
+        /// </summary>
         public static Plane JPH_PlaneShape_GetPlane(NativeHandle<JPH_PlaneShape> shape)
         {
             Plane result = default;
@@ -19,7 +24,10 @@ namespace Jolt
 
             return result;
         }
-        
+
+        /// <summary>
+        /// Get the half extend that restricts the bounding box of the shape.
+        /// </summary>
         public static float JPH_PlaneShape_GetHalfExtent(NativeHandle<JPH_PlaneShape> shape)
         {
             return UnsafeBindings.JPH_PlaneShape_GetHalfExtent(shape);
