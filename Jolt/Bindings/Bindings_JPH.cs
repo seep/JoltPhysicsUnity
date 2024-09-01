@@ -9,6 +9,11 @@ namespace Jolt
             return UnsafeBindings.JPH_Init();
         }
 
+        public static void JPH_SetTraceHandler(TraceHandler handler)
+        {
+            UnsafeBindings.JPH_SetTraceHandler(Marshal.GetFunctionPointerForDelegate(handler));
+        }
+        
         public static void JPH_Shutdown()
         {
             UnsafeBindings.JPH_Shutdown();
@@ -21,7 +26,12 @@ namespace Jolt
     }
 
     /// <summary>
+    /// A delegate for receiving Jolt traces.
+    /// </summary>
+    public delegate void TraceHandler(string message);
+    
+    /// <summary>
     /// A delegate for receiving Jolt assertion failures.
     /// </summary>
-    public delegate void AssertFailureHandler(string expr, string message, string file, uint line);
+    public delegate bool AssertFailureHandler(string expr, string message, string file, uint line);
 }

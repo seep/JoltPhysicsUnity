@@ -19,9 +19,10 @@ namespace Jolt.Unity
             }
         }
 
-        private static void OnAssertFailure(string expr, string message, string file, uint line)
+        private static bool OnAssertFailure(string expr, string message, string file, uint line)
         {
             Debug.Log($"Jolt Assertion Failed:\n{expr}\n{message}\n{file}\n{line}");
+            return false;
         }
     }
 }
