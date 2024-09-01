@@ -1,4 +1,5 @@
-﻿// Shims for a handful of Unity types that are needed to generate the Jolt wrappers without errors.
+﻿// Shims for a handful of Unity types that are needed to generate the Jolt wrappers without errors. The implementation
+// is irrelevant, we just need the types to be present so that the project can compile.
 
 namespace Unity.Mathematics
 {
