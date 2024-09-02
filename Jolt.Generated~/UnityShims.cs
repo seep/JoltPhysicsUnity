@@ -5,6 +5,8 @@ namespace Unity.Mathematics
 {
     public struct double3 { }
 
+    public struct float2 { }
+
     public struct float3 { }
 
     public struct float4 { }
