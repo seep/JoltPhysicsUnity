@@ -2,7 +2,7 @@
   "name": "com.seep.jolt",
   "displayName": "Jolt Physics",
   "description": "Unity compatible bindings for the Jolt physics library",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "unity": "2022.3",
   "dependencies": {
     "com.unity.mathematics": "1.0.0",
