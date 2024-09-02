@@ -18,6 +18,7 @@ JPH_MassProperties
 JPH_Matrix4x4
 JPH_MotionType
 JPH_MotionQuality
+JPH_MotorSettings
 JPH_MotorState
 JPH_PhysicsUpdateError
 JPH_Plane
@@ -52,6 +53,7 @@ JPH_MassProperties=MassProperties
 JPH_Matrix4x4=float4x4
 JPH_MotionType=MotionType
 JPH_MotionQuality=MotionQuality
+JPH_MotorSettings=MotorSettings
 JPH_MotorState=MotorState
 JPH_ObjectLayer=ObjectLayer
 JPH_PhysicsUpdateError=PhysicsUpdateError

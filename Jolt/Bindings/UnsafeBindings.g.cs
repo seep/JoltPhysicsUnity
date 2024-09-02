@@ -12,20 +12,6 @@ namespace Jolt
         _JPH_BackFaceMode_Force32 = 0x7FFFFFFF,
     }
 
-    internal partial struct JPH_MotorSettings
-    {
-        [NativeTypeName("JPH_SpringSettings")]
-        public SpringSettings springSettings;
-
-        public float minForceLimit;
-
-        public float maxForceLimit;
-
-        public float minTorqueLimit;
-
-        public float maxTorqueLimit;
-    }
-
     internal partial struct JPH_SubShapeIDPair
     {
         [NativeTypeName("JPH_BodyID")]
@@ -1403,10 +1389,10 @@ namespace Jolt
         public static extern float JPH_HingeConstraint_GetMaxFrictionTorque(JPH_HingeConstraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_HingeConstraint_SetMotorSettings(JPH_HingeConstraint* constraint, JPH_MotorSettings* settings);
+        public static extern void JPH_HingeConstraint_SetMotorSettings(JPH_HingeConstraint* constraint, [NativeTypeName("JPH_MotorSettings *")] MotorSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_HingeConstraint_GetMotorSettings(JPH_HingeConstraint* constraint, JPH_MotorSettings* result);
+        public static extern void JPH_HingeConstraint_GetMotorSettings(JPH_HingeConstraint* constraint, [NativeTypeName("JPH_MotorSettings *")] MotorSettings* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void JPH_HingeConstraint_SetMotorState(JPH_HingeConstraint* constraint, [NativeTypeName("JPH_MotorState")] MotorState state);
@@ -1521,10 +1507,10 @@ namespace Jolt
         public static extern float JPH_SliderConstraint_GetMaxFrictionForce(JPH_SliderConstraint* constraint);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_SliderConstraint_SetMotorSettings(JPH_SliderConstraint* constraint, JPH_MotorSettings* settings);
+        public static extern void JPH_SliderConstraint_SetMotorSettings(JPH_SliderConstraint* constraint, [NativeTypeName("JPH_MotorSettings *")] MotorSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_SliderConstraint_GetMotorSettings(JPH_SliderConstraint* constraint, JPH_MotorSettings* result);
+        public static extern void JPH_SliderConstraint_GetMotorSettings(JPH_SliderConstraint* constraint, [NativeTypeName("JPH_MotorSettings *")] MotorSettings* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void JPH_SliderConstraint_SetMotorState(JPH_SliderConstraint* constraint, [NativeTypeName("JPH_MotorState")] MotorState state);
