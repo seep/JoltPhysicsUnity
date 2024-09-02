@@ -48,6 +48,10 @@ namespace Jolt
         
         public float GetVolume() => Bindings.JPH_Shape_GetVolume(Handle);
         
+        public bool CastRay(float3 origin, float3 direction, out RayCastResult result) => Bindings.JPH_Shape_CastRay(Handle, origin, direction, out result);
+        
+        public bool CollidePoint(float3 point) => Bindings.JPH_Shape_CollidePoint(Handle, point);
+        
         #endregion
         
     }

@@ -227,20 +227,34 @@ internal class JoltSourceGenerator : ISourceGenerator
                 var internalParamType = p.Type.ToString();
                 var internalParamName = p.Identifier.ValueText;
 
+                string internalParam; // the string we will use for the arg passed to the binding
+                string declaredParam; // the string we will use for the arg on the public method
+
                 if (internalParamType.StartsWith("NativeHandle"))
                 {
                     var declaredParamType = ExtractGenericHandleType(internalParamType).Substring("JPH_".Length);
+                    var declaredParamName = internalParamName;
 
-                    internalParams.Add($"{internalParamName}.Handle");
-                    declaredParams.Add($"{declaredParamType} {internalParamName}");
+                    internalParam = $"{internalParamName}.Handle"; // use internal handle 
+                    declaredParam = $"{declaredParamType} {declaredParamName}";
                 }
                 else
                 {
                     var declaredParamType = internalParamType; // reuse binding type
+                    var declaredParamName = internalParamName;
 
-                    internalParams.Add(internalParamName);
-                    declaredParams.Add($"{declaredParamType} {internalParamName}");
+                    internalParam = internalParamName;
+                    declaredParam = $"{declaredParamType} {declaredParamName}";
+                    
+                    if (p.Modifiers.Any(SyntaxKind.OutKeyword))
+                    {
+                        internalParam = $"out {internalParam}";
+                        declaredParam = $"out {declaredParam}";
+                    }
                 }
+                
+                internalParams.Add(internalParam);
+                declaredParams.Add(declaredParam);
             }
 
             var internalParamsString = string.Join(", ", internalParams);
