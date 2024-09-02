@@ -6,5 +6,10 @@
         {
             return CreateHandle(UnsafeBindings.JPH_CapsuleShapeSettings_Create(halfHeightOfCylinder, radius));
         }
+
+        public static NativeHandle<JPH_CapsuleShape> JPH_CapsuleShapeSettings_CreateShape(NativeHandle<JPH_CapsuleShapeSettings> settings)
+        {
+            return CreateHandle(UnsafeBindings.JPH_CapsuleShapeSettings_CreateShape(settings));
+        }
     }
 }

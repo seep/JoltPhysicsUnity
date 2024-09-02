@@ -22,7 +22,7 @@ namespace Jolt
         [OverrideBinding("JPH_CapsuleShapeSettings_CreateShape")]
         public CapsuleShape CreateShape()
         {
-            throw new NotImplementedException(); // TODO JPH_CapsuleShapeSettings_CreateShape is missing from bindings?
+            return new CapsuleShape(JPH_CapsuleShapeSettings_CreateShape(Handle));
         }
     }
 }
