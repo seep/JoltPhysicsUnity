@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 3346551176815594531}
   - component: {fileID: 2245476161599527040}
   m_Layer: 0
-  m_Name: Tapered Capsule Body
+  m_Name: Jolt Tapered Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

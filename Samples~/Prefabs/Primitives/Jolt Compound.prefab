@@ -438,7 +438,7 @@ GameObject:
   - component: {fileID: 3346551176815594531}
   - component: {fileID: 858485075063419668}
   m_Layer: 0
-  m_Name: Compound Shape
+  m_Name: Jolt Compound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
