@@ -22,6 +22,7 @@ JPH_MotorState
 JPH_PhysicsUpdateError
 JPH_Plane
 JPH_Quat
+JPH_RayCastResult
 JPH_RMatrix4x4
 JPH_RVec3
 JPH_ShapeType
@@ -56,6 +57,7 @@ JPH_ObjectLayer=ObjectLayer
 JPH_PhysicsUpdateError=PhysicsUpdateError
 JPH_Plane=Plane
 JPH_Quat=quaternion
+JPH_RayCastResult=RayCastResult
 JPH_RMatrix4x4=rmatrix4x4
 JPH_RVec3=rvec3
 JPH_ShapeType=ShapeType
