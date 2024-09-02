@@ -3,11 +3,11 @@
 namespace Jolt
 {
     [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
-    public class GenerateBindingsAttribute : Attribute
+    internal class GenerateBindingsAttribute : Attribute
     {
-        public string NativePrefix;
+        internal string NativePrefix;
 
-        public GenerateBindingsAttribute(string prefix)
+        internal GenerateBindingsAttribute(string prefix)
         {
             NativePrefix = prefix;
         }

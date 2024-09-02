@@ -5,9 +5,9 @@ namespace Jolt
     [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
     internal class GenerateHandleAttribute : Attribute
     {
-        public string NativePrefix;
+        internal string NativePrefix;
 
-        public GenerateHandleAttribute(string prefix)
+        internal GenerateHandleAttribute(string prefix)
         {
             NativePrefix = prefix;
         }

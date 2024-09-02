@@ -3,11 +3,11 @@
 namespace Jolt
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class OverrideBindingAttribute : Attribute
+    internal class OverrideBindingAttribute : Attribute
     {
-        public string BindingName;
+        internal string BindingName;
 
-        public OverrideBindingAttribute(string name)
+        internal OverrideBindingAttribute(string name)
         {
             BindingName = name;
         }
