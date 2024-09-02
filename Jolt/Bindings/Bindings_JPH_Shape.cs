@@ -90,5 +90,20 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_Shape_GetVolume(shape);
         }
+
+        public static bool JPH_Shape_CastRay(NativeHandle<JPH_Shape> shape, float3 origin, float3 direction, out RayCastResult result)
+        {
+            result = default;
+            
+            fixed (RayCastResult* resultptr = &result)
+            {
+                return UnsafeBindings.JPH_Shape_CastRay(shape, &origin, &direction, resultptr);
+            }
+        }
+
+        public static bool JPH_Shape_CollidePoint(NativeHandle<JPH_Shape> shape, float3 point)
+        {
+            return UnsafeBindings.JPH_Shape_CollidePoint(shape, &point);
+        }
     }
 }
