@@ -19,5 +19,15 @@
         {
             return new Constraint(constraint.Handle.Reinterpret<JPH_Constraint>());
         }
+        
+        public static implicit operator Constraint(PointConstraint constraint)
+        {
+            return new Constraint(constraint.Handle.Reinterpret<JPH_Constraint>());
+        }
+        
+        public static implicit operator Constraint(HingeConstraint constraint)
+        {
+            return new Constraint(constraint.Handle.Reinterpret<JPH_Constraint>());
+        }
     }
 }
