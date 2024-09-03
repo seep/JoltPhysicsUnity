@@ -45,6 +45,19 @@ namespace Jolt.Samples
             ResetHandle();
         }
 
+        public static void DrawPoint(float3 position, quaternion rotation)
+        {
+            StartHandle(position, rotation);
+
+            const float scale = 0.2f;
+            
+            Handles.DrawLine(scale * math.forward(), scale * math.back());
+            Handles.DrawLine(scale * math.left(), scale * math.right());
+            Handles.DrawLine(scale * math.up(), scale * math.down());
+            
+            ResetHandle();
+        }
+
         public static void DrawBoxShape(float3 position, quaternion rotation, PhysicsShapeBox shape)
         {
             StartHandle(position, rotation);
