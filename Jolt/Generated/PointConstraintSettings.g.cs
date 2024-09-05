@@ -46,43 +46,21 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_FixedConstraintSettings
+        #region JPH_PointConstraintSettings
         
-        public void SetConstraintPriority(uint value) => Bindings.JPH_FixedConstraintSettings_SetConstraintPriority(Handle.Reinterpret<JPH_ConstraintSettings>(), value);
+        public ConstraintSpace GetSpace() => Bindings.JPH_PointConstraintSettings_GetSpace(Handle);
         
-        public ConstraintSpace GetSpace() => Bindings.JPH_FixedConstraintSettings_GetSpace(Handle.Reinterpret<JPH_FixedConstraintSettings>());
+        public void SetSpace(ConstraintSpace space) => Bindings.JPH_PointConstraintSettings_SetSpace(Handle, space);
         
-        public void SetSpace(ConstraintSpace space) => Bindings.JPH_FixedConstraintSettings_SetSpace(Handle.Reinterpret<JPH_FixedConstraintSettings>(), space);
+        public rvec3 GetPoint1() => Bindings.JPH_PointConstraintSettings_GetPoint1(Handle);
         
-        public bool GetAutoDetectPoint() => Bindings.JPH_FixedConstraintSettings_GetAutoDetectPoint(Handle.Reinterpret<JPH_FixedConstraintSettings>());
+        public void SetPoint1(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint1(Handle, value);
         
-        public void SetAutoDetectPoint(bool value) => Bindings.JPH_FixedConstraintSettings_SetAutoDetectPoint(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
+        public rvec3 GetPoint2() => Bindings.JPH_PointConstraintSettings_GetPoint2(Handle);
         
-        public rvec3 GetPoint1() => Bindings.JPH_FixedConstraintSettings_GetPoint1(Handle.Reinterpret<JPH_FixedConstraintSettings>());
+        public void SetPoint2(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint2(Handle, value);
         
-        public void SetPoint1(rvec3 value) => Bindings.JPH_FixedConstraintSettings_SetPoint1(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public float3 GetAxisX1() => Bindings.JPH_FixedConstraintSettings_GetAxisX1(Handle.Reinterpret<JPH_FixedConstraintSettings>());
-        
-        public void SetAxisX1(float3 value) => Bindings.JPH_FixedConstraintSettings_SetAxisX1(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public float3 GetAxisY1() => Bindings.JPH_FixedConstraintSettings_GetAxisY1(Handle.Reinterpret<JPH_FixedConstraintSettings>());
-        
-        public void SetAxisY1(float3 value) => Bindings.JPH_FixedConstraintSettings_SetAxisY1(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public rvec3 GetPoint2() => Bindings.JPH_FixedConstraintSettings_GetPoint2(Handle.Reinterpret<JPH_FixedConstraintSettings>());
-        
-        public void SetPoint2(rvec3 value) => Bindings.JPH_FixedConstraintSettings_SetPoint2(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public float3 GetAxisX2() => Bindings.JPH_FixedConstraintSettings_GetAxisX2(Handle.Reinterpret<JPH_FixedConstraintSettings>());
-        
-        public void SetAxisX2(float3 value) => Bindings.JPH_FixedConstraintSettings_SetAxisX2(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public float3 GetAxisY2() => Bindings.JPH_FixedConstraintSettings_GetAxisY2(Handle.Reinterpret<JPH_FixedConstraintSettings>());
-        
-        public void SetAxisY2(float3 value) => Bindings.JPH_FixedConstraintSettings_SetAxisY2(Handle.Reinterpret<JPH_FixedConstraintSettings>(), value);
-        
-        public FixedConstraint CreateConstraint(Body bodyA, Body bodyB) => new FixedConstraint(Bindings.JPH_FixedConstraintSettings_CreateConstraint(Handle.Reinterpret<JPH_FixedConstraintSettings>(), bodyA.Handle, bodyB.Handle));
+        public PointConstraint CreateConstraint(Body bodyA, Body bodyB) => new PointConstraint(Bindings.JPH_PointConstraintSettings_CreateConstraint(Handle, bodyA.Handle, bodyB.Handle));
         
         #endregion
         
