@@ -80,6 +80,11 @@ namespace Jolt
             UnsafeBindings.JPH_PhysicsSystem_SetBodyActivationListener(system, listener);
         }
 
+        public static bool JPH_PhysicsSystem_WereBodiesInContact(NativeHandle<JPH_PhysicsSystem> system, BodyID a, BodyID b)
+        {
+            return UnsafeBindings.JPH_PhysicsSystem_WereBodiesInContact(system, a, b);
+        }
+
         public static uint JPH_PhysicsSystem_GetNumBodies(NativeHandle<JPH_PhysicsSystem> system)
         {
             return UnsafeBindings.JPH_PhysicsSystem_GetNumBodies(system);
@@ -95,6 +100,11 @@ namespace Jolt
             return UnsafeBindings.JPH_PhysicsSystem_GetMaxBodies(system);
         }
 
+        public static uint JPH_PhysicsSystem_GetNumConstraints(NativeHandle<JPH_PhysicsSystem> system)
+        {
+            return UnsafeBindings.JPH_PhysicsSystem_GetMaxBodies(system);
+        }
+        
         public static void JPH_PhysicsSystem_SetGravity(NativeHandle<JPH_PhysicsSystem> system, float3 gravity)
         {
             UnsafeBindings.JPH_PhysicsSystem_SetGravity(system, &gravity);

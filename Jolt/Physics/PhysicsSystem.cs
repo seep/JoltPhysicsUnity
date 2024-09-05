@@ -88,6 +88,11 @@ namespace Jolt
             return (error = JPH_PhysicsSystem_Step(Handle, deltaTime, collisionSteps)) == PhysicsUpdateError.None;
         }
 
+        public bool WereBodiesInContact(BodyID a, BodyID b)
+        {
+            return JPH_PhysicsSystem_WereBodiesInContact(Handle, a, b);
+        }
+        
         /// <summary>
         /// Get the current number of bodies in the body manager.
         /// </summary>
@@ -112,6 +117,11 @@ namespace Jolt
             return JPH_PhysicsSystem_GetMaxBodies(Handle);
         }
 
+        public uint GetNumConstraints()
+        {
+            return JPH_PhysicsSystem_GetNumConstraints(Handle);
+        }
+
         public void SetGravity(float3 gravity)
         {
             JPH_PhysicsSystem_SetGravity(Handle, gravity);
@@ -129,7 +139,7 @@ namespace Jolt
 
         public void RemoveConstraint(Constraint constraint)
         {
-            JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+            JPH_PhysicsSystem_RemoveConstraint(Handle, constraint.Handle);
         }
 
         public void Dispose()
