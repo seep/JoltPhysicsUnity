@@ -24,6 +24,24 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_PointConstraintSettings
+        
+        public ConstraintSpace GetSpace() => Bindings.JPH_PointConstraintSettings_GetSpace(Handle);
+        
+        public void SetSpace(ConstraintSpace space) => Bindings.JPH_PointConstraintSettings_SetSpace(Handle, space);
+        
+        public rvec3 GetPoint1() => Bindings.JPH_PointConstraintSettings_GetPoint1(Handle);
+        
+        public void SetPoint1(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint1(Handle, value);
+        
+        public rvec3 GetPoint2() => Bindings.JPH_PointConstraintSettings_GetPoint2(Handle);
+        
+        public void SetPoint2(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint2(Handle, value);
+        
+        public PointConstraint CreateConstraint(Body bodyA, Body bodyB) => new PointConstraint(Bindings.JPH_PointConstraintSettings_CreateConstraint(Handle, bodyA.Handle, bodyB.Handle));
+        
+        #endregion
+        
         #region JPH_ConstraintSettings
         
         public void Destroy() => Bindings.JPH_ConstraintSettings_Destroy(Handle.Reinterpret<JPH_ConstraintSettings>());
@@ -47,24 +65,6 @@ namespace Jolt
         public ulong GetUserData() => Bindings.JPH_ConstraintSettings_GetUserData(Handle.Reinterpret<JPH_ConstraintSettings>());
         
         public void SetUserData(ulong value) => Bindings.JPH_ConstraintSettings_SetUserData(Handle.Reinterpret<JPH_ConstraintSettings>(), value);
-        
-        #endregion
-        
-        #region JPH_PointConstraintSettings
-        
-        public ConstraintSpace GetSpace() => Bindings.JPH_PointConstraintSettings_GetSpace(Handle);
-        
-        public void SetSpace(ConstraintSpace space) => Bindings.JPH_PointConstraintSettings_SetSpace(Handle, space);
-        
-        public rvec3 GetPoint1() => Bindings.JPH_PointConstraintSettings_GetPoint1(Handle);
-        
-        public void SetPoint1(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint1(Handle, value);
-        
-        public rvec3 GetPoint2() => Bindings.JPH_PointConstraintSettings_GetPoint2(Handle);
-        
-        public void SetPoint2(rvec3 value) => Bindings.JPH_PointConstraintSettings_SetPoint2(Handle, value);
-        
-        public PointConstraint CreateConstraint(Body bodyA, Body bodyB) => new PointConstraint(Bindings.JPH_PointConstraintSettings_CreateConstraint(Handle, bodyA.Handle, bodyB.Handle));
         
         #endregion
         

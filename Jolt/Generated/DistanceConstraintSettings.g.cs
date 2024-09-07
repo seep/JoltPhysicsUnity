@@ -24,6 +24,24 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_DistanceConstraintSettings
+        
+        public ConstraintSpace GetSpace() => Bindings.JPH_DistanceConstraintSettings_GetSpace(Handle);
+        
+        public void SetSpace(ConstraintSpace space) => Bindings.JPH_DistanceConstraintSettings_SetSpace(Handle, space);
+        
+        public rvec3 GetPoint1() => Bindings.JPH_DistanceConstraintSettings_GetPoint1(Handle);
+        
+        public void SetPoint1(rvec3 value) => Bindings.JPH_DistanceConstraintSettings_SetPoint1(Handle, value);
+        
+        public rvec3 GetPoint2() => Bindings.JPH_DistanceConstraintSettings_GetPoint2(Handle);
+        
+        public void SetPoint2(rvec3 value) => Bindings.JPH_DistanceConstraintSettings_SetPoint2(Handle, value);
+        
+        public DistanceConstraint CreateConstraint(Body bodyA, Body bodyB) => new DistanceConstraint(Bindings.JPH_DistanceConstraintSettings_CreateConstraint(Handle, bodyA.Handle, bodyB.Handle));
+        
+        #endregion
+        
         #region JPH_ConstraintSettings
         
         public void Destroy() => Bindings.JPH_ConstraintSettings_Destroy(Handle.Reinterpret<JPH_ConstraintSettings>());
@@ -47,24 +65,6 @@ namespace Jolt
         public ulong GetUserData() => Bindings.JPH_ConstraintSettings_GetUserData(Handle.Reinterpret<JPH_ConstraintSettings>());
         
         public void SetUserData(ulong value) => Bindings.JPH_ConstraintSettings_SetUserData(Handle.Reinterpret<JPH_ConstraintSettings>(), value);
-        
-        #endregion
-        
-        #region JPH_DistanceConstraintSettings
-        
-        public ConstraintSpace GetSpace() => Bindings.JPH_DistanceConstraintSettings_GetSpace(Handle);
-        
-        public void SetSpace(ConstraintSpace space) => Bindings.JPH_DistanceConstraintSettings_SetSpace(Handle, space);
-        
-        public rvec3 GetPoint1() => Bindings.JPH_DistanceConstraintSettings_GetPoint1(Handle);
-        
-        public void SetPoint1(rvec3 value) => Bindings.JPH_DistanceConstraintSettings_SetPoint1(Handle, value);
-        
-        public rvec3 GetPoint2() => Bindings.JPH_DistanceConstraintSettings_GetPoint2(Handle);
-        
-        public void SetPoint2(rvec3 value) => Bindings.JPH_DistanceConstraintSettings_SetPoint2(Handle, value);
-        
-        public DistanceConstraint CreateConstraint(Body bodyA, Body bodyB) => new DistanceConstraint(Bindings.JPH_DistanceConstraintSettings_CreateConstraint(Handle, bodyA.Handle, bodyB.Handle));
         
         #endregion
         

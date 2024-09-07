@@ -24,6 +24,10 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_CylinderShapeSettings
+        
+        #endregion
+        
         #region JPH_ConvexShapeSettings
         
         public float GetDensity() => Bindings.JPH_ConvexShapeSettings_GetDensity(Handle.Reinterpret<JPH_ConvexShapeSettings>());
@@ -32,7 +36,9 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_CylinderShapeSettings
+        #region JPH_ShapeSettings
+        
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
         
         #endregion
         

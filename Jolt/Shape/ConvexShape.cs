@@ -3,7 +3,7 @@
     /// <summary>
     /// A widened ConvexShape instance handle.
     /// </summary>
-    [GenerateHandle("JPH_ConvexShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape")]
+    [GenerateHandle("JPH_ConvexShape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_Shape")]
     public readonly partial struct ConvexShape
     {
         public static implicit operator ConvexShape(BoxShape shape)

@@ -24,9 +24,11 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ShapeSettings
+        #region JPH_SphereShapeSettings
         
-        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
+        public float GetRadius() => Bindings.JPH_SphereShapeSettings_GetRadius(Handle);
+        
+        public void SetRadius(float radius) => Bindings.JPH_SphereShapeSettings_SetRadius(Handle, radius);
         
         #endregion
         
@@ -38,11 +40,9 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_SphereShapeSettings
+        #region JPH_ShapeSettings
         
-        public float GetRadius() => Bindings.JPH_SphereShapeSettings_GetRadius(Handle);
-        
-        public void SetRadius(float radius) => Bindings.JPH_SphereShapeSettings_SetRadius(Handle, radius);
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
         
         #endregion
         

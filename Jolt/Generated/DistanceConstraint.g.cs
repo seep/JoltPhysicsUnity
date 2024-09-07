@@ -24,6 +24,22 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_DistanceConstraint
+        
+        public void SetDistance(float minDistance, float maxDistance) => Bindings.JPH_DistanceConstraint_SetDistance(Handle, minDistance, maxDistance);
+        
+        public float GetMinDistance() => Bindings.JPH_DistanceConstraint_GetMinDistance(Handle);
+        
+        public float GetMaxDistance() => Bindings.JPH_DistanceConstraint_GetMaxDistance(Handle);
+        
+        public SpringSettings GetLimitsSpringSettings() => Bindings.JPH_DistanceConstraint_GetLimitsSpringSettings(Handle);
+        
+        public void SetLimitsSpringSettings(SpringSettings settings) => Bindings.JPH_DistanceConstraint_SetLimitsSpringSettings(Handle, settings);
+        
+        public float GetTotalLambdaPosition() => Bindings.JPH_DistanceConstraint_GetTotalLambdaPosition(Handle);
+        
+        #endregion
+        
         #region JPH_Constraint
         
         public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle.Reinterpret<JPH_Constraint>()));
@@ -47,22 +63,6 @@ namespace Jolt
         public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM) => Bindings.JPH_Constraint_NotifyShapeChanged(Handle.Reinterpret<JPH_Constraint>(), bodyID, deltaCOM);
         
         public void Destroy() => Bindings.JPH_Constraint_Destroy(Handle.Reinterpret<JPH_Constraint>());
-        
-        #endregion
-        
-        #region JPH_DistanceConstraint
-        
-        public void SetDistance(float minDistance, float maxDistance) => Bindings.JPH_DistanceConstraint_SetDistance(Handle, minDistance, maxDistance);
-        
-        public float GetMinDistance() => Bindings.JPH_DistanceConstraint_GetMinDistance(Handle);
-        
-        public float GetMaxDistance() => Bindings.JPH_DistanceConstraint_GetMaxDistance(Handle);
-        
-        public SpringSettings GetLimitsSpringSettings() => Bindings.JPH_DistanceConstraint_GetLimitsSpringSettings(Handle);
-        
-        public void SetLimitsSpringSettings(SpringSettings settings) => Bindings.JPH_DistanceConstraint_SetLimitsSpringSettings(Handle, settings);
-        
-        public float GetTotalLambdaPosition() => Bindings.JPH_DistanceConstraint_GetTotalLambdaPosition(Handle);
         
         #endregion
         

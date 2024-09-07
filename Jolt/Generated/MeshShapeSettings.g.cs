@@ -24,15 +24,15 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ShapeSettings
-        
-        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
-        
-        #endregion
-        
         #region JPH_MeshShapeSettings
         
         public void Sanitize() => Bindings.JPH_MeshShapeSettings_Sanitize(Handle);
+        
+        #endregion
+        
+        #region JPH_ShapeSettings
+        
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
         
         #endregion
         

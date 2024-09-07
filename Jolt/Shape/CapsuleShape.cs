@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_CapsuleShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_CapsuleShape")]
+    [GenerateHandle("JPH_CapsuleShape"), GenerateBindings("JPH_CapsuleShape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_Shape")]
     public readonly partial struct CapsuleShape
     {
         [OverrideBinding("JPH_CapsuleShape_Create")]

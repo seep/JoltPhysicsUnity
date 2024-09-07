@@ -24,9 +24,7 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ShapeSettings
-        
-        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
+        #region JPH_ConvexHullShapeSettings
         
         #endregion
         
@@ -38,7 +36,9 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ConvexHullShapeSettings
+        #region JPH_ShapeSettings
+        
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
         
         #endregion
         

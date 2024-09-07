@@ -1,5 +1,5 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle("JPH_PointConstraint"), GenerateBindings("JPH_Constraint"), GenerateBindings("JPH_PointConstraint")]
+    [GenerateHandle("JPH_PointConstraint"), GenerateBindings("JPH_PointConstraint"), GenerateBindings("JPH_Constraint")]
     public readonly partial struct PointConstraint { }
 }

@@ -24,6 +24,16 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_PointConstraint
+        
+        public void SetPoint1(ConstraintSpace space, rvec3 value) => Bindings.JPH_PointConstraint_SetPoint1(Handle, space, value);
+        
+        public void SetPoint2(ConstraintSpace space, rvec3 value) => Bindings.JPH_PointConstraint_SetPoint2(Handle, space, value);
+        
+        public float3 GetTotalLambdaPosition() => Bindings.JPH_PointConstraint_GetTotalLambdaPosition(Handle);
+        
+        #endregion
+        
         #region JPH_Constraint
         
         public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle.Reinterpret<JPH_Constraint>()));
@@ -47,16 +57,6 @@ namespace Jolt
         public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM) => Bindings.JPH_Constraint_NotifyShapeChanged(Handle.Reinterpret<JPH_Constraint>(), bodyID, deltaCOM);
         
         public void Destroy() => Bindings.JPH_Constraint_Destroy(Handle.Reinterpret<JPH_Constraint>());
-        
-        #endregion
-        
-        #region JPH_PointConstraint
-        
-        public void SetPoint1(ConstraintSpace space, rvec3 value) => Bindings.JPH_PointConstraint_SetPoint1(Handle, space, value);
-        
-        public void SetPoint2(ConstraintSpace space, rvec3 value) => Bindings.JPH_PointConstraint_SetPoint2(Handle, space, value);
-        
-        public float3 GetTotalLambdaPosition() => Bindings.JPH_PointConstraint_GetTotalLambdaPosition(Handle);
         
         #endregion
         

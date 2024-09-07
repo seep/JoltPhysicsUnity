@@ -24,9 +24,9 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ShapeSettings
+        #region JPH_BoxShapeSettings
         
-        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
+        public BoxShape CreateShape() => new BoxShape(Bindings.JPH_BoxShapeSettings_CreateShape(Handle));
         
         #endregion
         
@@ -38,9 +38,9 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_BoxShapeSettings
+        #region JPH_ShapeSettings
         
-        public BoxShape CreateShape() => new BoxShape(Bindings.JPH_BoxShapeSettings_CreateShape(Handle));
+        public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle.Reinterpret<JPH_ShapeSettings>());
         
         #endregion
         

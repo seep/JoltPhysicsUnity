@@ -3,7 +3,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_CapsuleShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_CapsuleShapeSettings")]
+    [GenerateHandle("JPH_CapsuleShapeSettings"), GenerateBindings("JPH_CapsuleShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
     public readonly partial struct CapsuleShapeSettings
     {
         [OverrideBinding("JPH_CapsuleShapeSettings_Create")]

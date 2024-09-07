@@ -4,7 +4,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_MeshShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_MeshShapeSettings")]
+    [GenerateHandle("JPH_MeshShapeSettings"), GenerateBindings("JPH_MeshShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
     public readonly partial struct MeshShapeSettings
     {
         /// <summary>

@@ -24,6 +24,20 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_SphereShape
+        
+        public float GetRadius() => Bindings.JPH_SphereShape_GetRadius(Handle);
+        
+        #endregion
+        
+        #region JPH_ConvexShape
+        
+        public float GetDensity() => Bindings.JPH_ConvexShape_GetDensity(Handle.Reinterpret<JPH_ConvexShape>());
+        
+        public void SetDensity(float density) => Bindings.JPH_ConvexShape_SetDensity(Handle.Reinterpret<JPH_ConvexShape>(), density);
+        
+        #endregion
+        
         #region JPH_Shape
         
         public void Destroy() => Bindings.JPH_Shape_Destroy(Handle.Reinterpret<JPH_Shape>());
@@ -55,20 +69,6 @@ namespace Jolt
         public bool CastRay(float3 origin, float3 direction, out RayCastResult result) => Bindings.JPH_Shape_CastRay(Handle.Reinterpret<JPH_Shape>(), origin, direction, out result);
         
         public bool CollidePoint(float3 point) => Bindings.JPH_Shape_CollidePoint(Handle.Reinterpret<JPH_Shape>(), point);
-        
-        #endregion
-        
-        #region JPH_ConvexShape
-        
-        public float GetDensity() => Bindings.JPH_ConvexShape_GetDensity(Handle.Reinterpret<JPH_ConvexShape>());
-        
-        public void SetDensity(float density) => Bindings.JPH_ConvexShape_SetDensity(Handle.Reinterpret<JPH_ConvexShape>(), density);
-        
-        #endregion
-        
-        #region JPH_SphereShape
-        
-        public float GetRadius() => Bindings.JPH_SphereShape_GetRadius(Handle);
         
         #endregion
         
