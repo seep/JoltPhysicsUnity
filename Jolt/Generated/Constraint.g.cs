@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct Constraint : IEquatable<Constraint>
+    public readonly partial struct Constraint : IEquatable<Constraint>
     {
+        internal readonly NativeHandle<JPH_Constraint> Handle;
+        
+        internal Constraint(NativeHandle<JPH_Constraint> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(Constraint other) => Handle.Equals(other.Handle);

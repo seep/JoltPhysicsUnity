@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct BroadPhaseLayerInterfaceMask : IEquatable<BroadPhaseLayerInterfaceMask>
+    public readonly partial struct BroadPhaseLayerInterfaceMask : IEquatable<BroadPhaseLayerInterfaceMask>
     {
+        internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
+        
+        internal BroadPhaseLayerInterfaceMask(NativeHandle<JPH_BroadPhaseLayerInterface> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(BroadPhaseLayerInterfaceMask other) => Handle.Equals(other.Handle);

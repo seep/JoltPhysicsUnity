@@ -6,13 +6,6 @@ namespace Jolt
     [GenerateHandle("JPH_StaticCompoundShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_CompoundShapeSettings"), GenerateBindings("JPH_StaticCompoundShapeSettings")]
     public readonly partial struct StaticCompoundShapeSettings
     {
-        internal readonly NativeHandle<JPH_StaticCompoundShapeSettings> Handle;
-
-        internal StaticCompoundShapeSettings(NativeHandle<JPH_StaticCompoundShapeSettings> handle)
-        {
-            Handle = handle;
-        }
-
         [OverrideBinding("JPH_StaticCompoundShapeSettings_Create")]
         public static StaticCompoundShapeSettings Create()
         {

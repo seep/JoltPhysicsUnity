@@ -6,13 +6,6 @@
     [GenerateHandle("JPH_Shape"), GenerateBindings("JPH_Shape")]
     public readonly partial struct Shape
     {
-        internal readonly NativeHandle<JPH_Shape> Handle;
-
-        internal Shape(NativeHandle<JPH_Shape> handle)
-        {
-            Handle = handle;
-        }
-
         public static implicit operator Shape(BoxShape shape)
         {
             return new Shape(shape.Handle.Reinterpret<JPH_Shape>());

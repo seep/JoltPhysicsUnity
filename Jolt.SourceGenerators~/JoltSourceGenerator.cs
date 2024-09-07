@@ -140,9 +140,11 @@ internal class JoltSourceGenerator : ISourceGenerator
         writer.WriteLine();
 
         StartBlock(writer, "namespace Jolt");
-        StartBlock(writer, $"public partial struct {target.TypeName} : IEquatable<{target.TypeName}>");
+        StartBlock(writer, $"public readonly partial struct {target.TypeName} : IEquatable<{target.TypeName}>");
 
-        GenerateEquatableInterface(writer, target.TypeName);
+        GenerateHandle(writer, target);
+        
+        GenerateEquatableInterface(writer, target);
 
         foreach (var prefix in target.NativeTypePrefixes)
         {
@@ -157,19 +159,26 @@ internal class JoltSourceGenerator : ISourceGenerator
         return writer.InnerWriter.ToString();
     }
 
-    private static void GenerateEquatableInterface(IndentedTextWriter writer, string type)
+    private static void GenerateHandle(IndentedTextWriter writer, JoltNativeTypeWrapper target)
+    {
+        WritePaddedLine(writer, $"internal readonly NativeHandle<{target.NativeTypeName}> Handle;");
+        
+        WritePaddedLine(writer, $"internal {target.TypeName}(NativeHandle<{target.NativeTypeName}> handle) => Handle = handle;");
+    }
+
+    private static void GenerateEquatableInterface(IndentedTextWriter writer, JoltNativeTypeWrapper target)
     {
         WritePaddedLine(writer, "#region IEquatable");
 
-        WritePaddedLine(writer, $"public bool Equals({type} other) => Handle.Equals(other.Handle);");
+        WritePaddedLine(writer, $"public bool Equals({target.TypeName} other) => Handle.Equals(other.Handle);");
 
-        WritePaddedLine(writer, $"public override bool Equals(object obj) => obj is {type} other && Equals(other);");
+        WritePaddedLine(writer, $"public override bool Equals(object obj) => obj is {target.TypeName} other && Equals(other);");
 
         WritePaddedLine(writer, "public override int GetHashCode() => Handle.GetHashCode();");
 
-        WritePaddedLine(writer, $"public static bool operator ==({type} lhs, {type} rhs) => lhs.Equals(rhs);");
+        WritePaddedLine(writer, $"public static bool operator ==({target.TypeName} lhs, {target.TypeName} rhs) => lhs.Equals(rhs);");
 
-        WritePaddedLine(writer, $"public static bool operator !=({type} lhs, {type} rhs) => !lhs.Equals(rhs);");
+        WritePaddedLine(writer, $"public static bool operator !=({target.TypeName} lhs, {target.TypeName} rhs) => !lhs.Equals(rhs);");
 
         WritePaddedLine(writer, "#endregion");
     }

@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct ConvexShape : IEquatable<ConvexShape>
+    public readonly partial struct ConvexShape : IEquatable<ConvexShape>
     {
+        internal readonly NativeHandle<JPH_ConvexShape> Handle;
+        
+        internal ConvexShape(NativeHandle<JPH_ConvexShape> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(ConvexShape other) => Handle.Equals(other.Handle);

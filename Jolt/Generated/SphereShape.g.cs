@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct SphereShape : IEquatable<SphereShape>
+    public readonly partial struct SphereShape : IEquatable<SphereShape>
     {
+        internal readonly NativeHandle<JPH_SphereShape> Handle;
+        
+        internal SphereShape(NativeHandle<JPH_SphereShape> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(SphereShape other) => Handle.Equals(other.Handle);

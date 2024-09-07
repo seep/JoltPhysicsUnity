@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct SoftBodyCreationSettings : IEquatable<SoftBodyCreationSettings>
+    public readonly partial struct SoftBodyCreationSettings : IEquatable<SoftBodyCreationSettings>
     {
+        internal readonly NativeHandle<JPH_SoftBodyCreationSettings> Handle;
+        
+        internal SoftBodyCreationSettings(NativeHandle<JPH_SoftBodyCreationSettings> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(SoftBodyCreationSettings other) => Handle.Equals(other.Handle);

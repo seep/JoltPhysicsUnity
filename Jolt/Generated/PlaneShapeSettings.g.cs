@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct PlaneShapeSettings : IEquatable<PlaneShapeSettings>
+    public readonly partial struct PlaneShapeSettings : IEquatable<PlaneShapeSettings>
     {
+        internal readonly NativeHandle<JPH_PlaneShapeSettings> Handle;
+        
+        internal PlaneShapeSettings(NativeHandle<JPH_PlaneShapeSettings> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(PlaneShapeSettings other) => Handle.Equals(other.Handle);

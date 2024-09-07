@@ -5,13 +5,6 @@ namespace Jolt
     [GenerateHandle("JPH_CylinderShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_CylinderShapeSettings")]
     public readonly partial struct CylinderShapeSettings
     {
-        internal readonly NativeHandle<JPH_CylinderShapeSettings> Handle;
-
-        internal CylinderShapeSettings(NativeHandle<JPH_CylinderShapeSettings> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Allocate a new native CylinderShapeSettings and return the handle.
         /// </summary>

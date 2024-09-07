@@ -7,13 +7,6 @@ namespace Jolt
     [GenerateHandle("JPH_BodyCreationSettings"), GenerateBindings("JPH_BodyCreationSettings")]
     public readonly partial struct BodyCreationSettings
     {
-        internal readonly NativeHandle<JPH_BodyCreationSettings> Handle;
-
-        internal BodyCreationSettings(NativeHandle<JPH_BodyCreationSettings> handle)
-        {
-            Handle = handle;
-        }
-
         [OverrideBinding("JPH_BodyCreationSettings_Create")]
         public static BodyCreationSettings Create()
         {

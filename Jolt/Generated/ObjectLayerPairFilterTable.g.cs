@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct ObjectLayerPairFilterTable : IEquatable<ObjectLayerPairFilterTable>
+    public readonly partial struct ObjectLayerPairFilterTable : IEquatable<ObjectLayerPairFilterTable>
     {
+        internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;
+        
+        internal ObjectLayerPairFilterTable(NativeHandle<JPH_ObjectLayerPairFilter> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(ObjectLayerPairFilterTable other) => Handle.Equals(other.Handle);

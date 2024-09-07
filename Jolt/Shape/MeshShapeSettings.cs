@@ -7,13 +7,6 @@ namespace Jolt
     [GenerateHandle("JPH_MeshShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_MeshShapeSettings")]
     public readonly partial struct MeshShapeSettings
     {
-        internal readonly NativeHandle<JPH_MeshShapeSettings> Handle;
-
-        internal MeshShapeSettings(NativeHandle<JPH_MeshShapeSettings> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Allocate a new native MeshShapeSettings and return the handle.
         /// </summary>

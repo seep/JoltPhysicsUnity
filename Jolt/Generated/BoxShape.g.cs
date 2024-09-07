@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct BoxShape : IEquatable<BoxShape>
+    public readonly partial struct BoxShape : IEquatable<BoxShape>
     {
+        internal readonly NativeHandle<JPH_BoxShape> Handle;
+        
+        internal BoxShape(NativeHandle<JPH_BoxShape> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(BoxShape other) => Handle.Equals(other.Handle);

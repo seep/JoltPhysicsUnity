@@ -6,13 +6,6 @@
     [GenerateHandle("JPH_ShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
     public readonly partial struct ShapeSettings
     {
-        internal readonly NativeHandle<JPH_ShapeSettings> Handle;
-
-        internal ShapeSettings(NativeHandle<JPH_ShapeSettings> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Reinterpret BoxShapeSettings as a generic ShapeSettings instance.
         /// </summary>

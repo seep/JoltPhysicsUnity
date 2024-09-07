@@ -5,13 +5,6 @@ namespace Jolt
     [GenerateHandle("JPH_ObjectVsBroadPhaseLayerFilter")]
     public readonly partial struct ObjectVsBroadPhaseLayerFilterTable
     {
-        internal readonly NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> Handle;
-
-        internal ObjectVsBroadPhaseLayerFilterTable(NativeHandle<JPH_ObjectVsBroadPhaseLayerFilter> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Implicit reinterpret cast as a base ObjectVsBroadPhaseLayerFilter.
         /// </summary>

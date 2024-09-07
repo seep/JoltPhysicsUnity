@@ -5,13 +5,6 @@ namespace Jolt
     [GenerateHandle("JPH_BroadPhaseLayerInterface"), GenerateBindings("JPH_BroadPhaseLayerInterfaceTable")]
     public readonly partial struct BroadPhaseLayerInterfaceTable
     {
-        internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
-
-        internal BroadPhaseLayerInterfaceTable(NativeHandle<JPH_BroadPhaseLayerInterface> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Implicit reinterpret cast as the base class BroadPhaseLayerInterface.
         /// </summary>

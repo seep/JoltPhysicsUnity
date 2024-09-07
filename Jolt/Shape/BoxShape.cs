@@ -6,13 +6,6 @@ namespace Jolt
     [GenerateHandle("JPH_BoxShape"), GenerateBindings("JPH_Shape"), GenerateBindings("JPH_ConvexShape"), GenerateBindings("JPH_BoxShape")]
     public readonly partial struct BoxShape
     {
-        internal readonly NativeHandle<JPH_BoxShape> Handle;
-
-        internal BoxShape(NativeHandle<JPH_BoxShape> handle)
-        {
-            Handle = handle;
-        }
-
         [OverrideBinding("JPH_BoxShape_Create")]
         public static BoxShape Create(float3 halfExtent, float convexRadius = PhysicsSettings.DefaultConvexRadius)
         {

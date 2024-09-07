@@ -21,13 +21,6 @@ namespace Jolt
         /// </summary>
         private const uint Mask = (1U << (int) NumBits) - 1U;
 
-        internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;
-
-        internal ObjectLayerPairFilterMask(NativeHandle<JPH_ObjectLayerPairFilter> handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Implicit reinterpret cast as a base ObjectLayerPairFilter.
         /// </summary>

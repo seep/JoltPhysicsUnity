@@ -9,13 +9,6 @@ namespace Jolt
     [GenerateHandle("JPH_CompoundShapeSettings"), GenerateBindings("JPH_ShapeSettings"), GenerateBindings("JPH_CompoundShapeSettings")]
     public readonly partial struct CompoundShapeSettings
     {
-        internal readonly NativeHandle<JPH_CompoundShapeSettings> Handle;
-
-        internal CompoundShapeSettings(NativeHandle<JPH_CompoundShapeSettings> handle)
-        {
-            Handle = handle;
-        }
-
         public static implicit operator CompoundShapeSettings(MutableCompoundShapeSettings settings)
         {
             return new CompoundShapeSettings(settings.Handle.Reinterpret<JPH_CompoundShapeSettings>());

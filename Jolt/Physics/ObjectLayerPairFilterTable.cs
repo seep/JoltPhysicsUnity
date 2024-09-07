@@ -6,13 +6,6 @@ namespace Jolt
     [GenerateHandle("JPH_ObjectLayerPairFilter")]
     public readonly partial struct ObjectLayerPairFilterTable
     {
-        internal readonly NativeHandle<JPH_ObjectLayerPairFilter> Handle;
-
-        internal ObjectLayerPairFilterTable(NativeHandle<JPH_ObjectLayerPairFilter> handle)
-        {
-            Handle = handle;
-        }
-
         public static ObjectLayerPairFilterTable Create(uint numObjectLayers)
         {
             return new ObjectLayerPairFilterTable(JPH_ObjectLayerPairFilterTable_Create(numObjectLayers));

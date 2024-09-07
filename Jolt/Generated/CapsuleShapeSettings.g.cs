@@ -4,8 +4,12 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public partial struct CapsuleShapeSettings : IEquatable<CapsuleShapeSettings>
+    public readonly partial struct CapsuleShapeSettings : IEquatable<CapsuleShapeSettings>
     {
+        internal readonly NativeHandle<JPH_CapsuleShapeSettings> Handle;
+        
+        internal CapsuleShapeSettings(NativeHandle<JPH_CapsuleShapeSettings> handle) => Handle = handle;
+        
         #region IEquatable
         
         public bool Equals(CapsuleShapeSettings other) => Handle.Equals(other.Handle);
