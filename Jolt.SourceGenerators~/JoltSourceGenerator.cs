@@ -97,12 +97,15 @@ internal class JoltSourceGenerator : ISourceGenerator
         {
             if (IsAttributeType(ctx, attr, "Jolt.GenerateHandleAttribute"))
             {
-                result.NativeTypeName = attr.ConstructorArguments[0].Value?.ToString();
+                result.NativeTypeName = attr.ConstructorArguments[0].Value!.ToString();
             }
 
             if (IsAttributeType(ctx, attr, "Jolt.GenerateBindingsAttribute"))
             {
-                result.NativeTypePrefixes.Add(attr.ConstructorArguments[0].Value?.ToString());
+                foreach (var type in attr.ConstructorArguments[0].Values)
+                {
+                    result.NativeTypePrefixes.Add(type.Value!.ToString());
+                }
             }
         }
 
@@ -114,15 +117,29 @@ internal class JoltSourceGenerator : ISourceGenerator
                 {
                     if (IsAttributeType(ctx, attr, "Jolt.OverrideBindingAttribute"))
                     {
-                        Log($"Excluding {attr.ConstructorArguments[0].Value?.ToString()} from {result.TypeName}");
+                        Log($"Excluding {attr.ConstructorArguments[0].Value} from {result.TypeName}");
 
-                        result.ExcludedBindings.Add(attr.ConstructorArguments[0].Value?.ToString());
+                        result.ExcludedBindings.Add(attr.ConstructorArguments[0].Value!.ToString());
                     }
                 }
             }
         }
 
         return result;
+    }
+
+    private static bool TryGetConstructArgument(AttributeData attr, int index, out TypedConstant value)
+    {
+        value = default;
+        
+        if (attr.ConstructorArguments.Length < index)
+        {
+            return false;
+        }
+
+        value = attr.ConstructorArguments[index];
+
+        return true;
     }
 
     private static bool IsAttributeType(GeneratorExecutionContext ctx, AttributeData attr, string type)

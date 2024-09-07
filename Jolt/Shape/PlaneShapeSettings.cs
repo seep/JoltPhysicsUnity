@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_PlaneShapeSettings"), GenerateBindings("JPH_PlaneShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
+    [GenerateHandle("JPH_PlaneShapeSettings"), GenerateBindings("JPH_PlaneShapeSettings", "JPH_ShapeSettings")]
     public readonly partial struct PlaneShapeSettings
     {
         [OverrideBinding("JPH_PlaneShapeSettings_Create")]

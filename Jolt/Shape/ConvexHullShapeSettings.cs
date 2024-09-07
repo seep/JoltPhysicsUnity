@@ -4,7 +4,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_ConvexHullShapeSettings"), GenerateBindings("JPH_ConvexHullShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
+    [GenerateHandle("JPH_ConvexHullShapeSettings"), GenerateBindings("JPH_ConvexHullShapeSettings", "JPH_ConvexShapeSettings", "JPH_ShapeSettings")]
     public readonly partial struct ConvexHullShapeSettings
     {
         [OverrideBinding("JPH_ConvexHullShapeSettings_Create")]

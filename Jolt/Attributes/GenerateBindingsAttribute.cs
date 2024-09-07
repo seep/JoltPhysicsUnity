@@ -2,14 +2,14 @@
 
 namespace Jolt
 {
-    [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Struct)]
     internal class GenerateBindingsAttribute : Attribute
     {
-        internal string NativePrefix;
+        internal string[] NativeTypes;
 
-        internal GenerateBindingsAttribute(string prefix)
+        internal GenerateBindingsAttribute(params string[] types)
         {
-            NativePrefix = prefix;
+            NativeTypes = types;
         }
     }
 }

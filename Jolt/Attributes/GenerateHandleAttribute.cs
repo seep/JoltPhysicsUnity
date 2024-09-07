@@ -2,14 +2,14 @@
 
 namespace Jolt
 {
-    [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Struct)]
     internal class GenerateHandleAttribute : Attribute
     {
-        internal string NativePrefix;
+        internal string NativeType;
 
-        internal GenerateHandleAttribute(string prefix)
+        internal GenerateHandleAttribute(string type)
         {
-            NativePrefix = prefix;
+            NativeType = type;
         }
     }
 }

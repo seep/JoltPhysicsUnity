@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [GenerateHandle("JPH_SphereShapeSettings"), GenerateBindings("JPH_SphereShapeSettings"), GenerateBindings("JPH_ConvexShapeSettings"), GenerateBindings("JPH_ShapeSettings")]
+    [GenerateHandle("JPH_SphereShapeSettings"), GenerateBindings("JPH_SphereShapeSettings", "JPH_ConvexShapeSettings", "JPH_ShapeSettings")]
     public readonly partial struct SphereShapeSettings
     {
         /// <summary>

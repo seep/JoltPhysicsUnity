@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle("JPH_DistanceConstraintSettings"),  GenerateBindings("JPH_DistanceConstraintSettings"), GenerateBindings("JPH_ConstraintSettings")]
+    [GenerateHandle("JPH_DistanceConstraintSettings"),  GenerateBindings("JPH_DistanceConstraintSettings", "JPH_ConstraintSettings")]
     public readonly partial struct DistanceConstraintSettings
     {
         [OverrideBinding("JPH_DistanceConstraintSettings_Create")]

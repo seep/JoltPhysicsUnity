@@ -1,6 +1,6 @@
 ﻿namespace Jolt
 {
-    [GenerateHandle("JPH_SliderConstraintSettings"), GenerateBindings("JPH_SliderConstraintSettings"), GenerateBindings("JPH_ConstraintSettings")]
+    [GenerateHandle("JPH_SliderConstraintSettings"), GenerateBindings("JPH_SliderConstraintSettings", "JPH_ConstraintSettings")]
     public readonly partial struct SliderConstraintSettings
     {
         [OverrideBinding("JPH_SliderConstraintSettings_Create")]
