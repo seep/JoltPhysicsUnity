@@ -17,18 +17,14 @@ namespace Jolt
         public static AABox JPH_Body_GetWorldSpaceBounds(NativeHandle<JPH_Body> body)
         {
             AABox result;
-
             UnsafeBindings.JPH_Body_GetWorldSpaceBounds(body, &result);
-
             return result;
         }
 
         public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subShapeID, rvec3 position)
         {
             float3 result;
-
             UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID, &position, &result);
-
             return result;
         }
 
@@ -84,7 +80,7 @@ namespace Jolt
 
         public static bool JPH_Body_GetUseManifoldReductionWithBody(NativeHandle<JPH_Body> body, NativeHandle<JPH_Body> other)
         {
-            return UnsafeBindings.JPH_Body_GetUseManifoldReductionWithBody(body, body);
+            return UnsafeBindings.JPH_Body_GetUseManifoldReductionWithBody(body, other);
         }
 
         public static void JPH_Body_SetApplyGyroscopicForce(NativeHandle<JPH_Body> body, bool value)
@@ -150,9 +146,7 @@ namespace Jolt
         public static float3 JPH_Body_GetLinearVelocity(NativeHandle<JPH_Body> body)
         {
             float3 result;
-
             UnsafeBindings.JPH_Body_GetLinearVelocity(body, &result);
-
             return result;
         }
 
@@ -164,9 +158,7 @@ namespace Jolt
         public static float3 JPH_Body_GetAngularVelocity(NativeHandle<JPH_Body> body)
         {
             float3 result;
-
             UnsafeBindings.JPH_Body_GetAngularVelocity(body, &result);
-
             return result;
         }
 
@@ -193,18 +185,14 @@ namespace Jolt
         public static float3 JPH_Body_GetAccumulatedForce(NativeHandle<JPH_Body> body)
         {
             float3 result;
-
             UnsafeBindings.JPH_Body_GetAccumulatedForce(body, &result);
-
             return result;
         }
 
         public static float3 JPH_Body_GetAccumulatedTorque(NativeHandle<JPH_Body> body)
         {
             float3 result;
-
             UnsafeBindings.JPH_Body_GetAccumulatedTorque(body, &result);
-
             return result;
         }
 
@@ -226,45 +214,35 @@ namespace Jolt
         public static rvec3 JPH_Body_GetPosition(NativeHandle<JPH_Body> body)
         {
             rvec3 result;
-
             UnsafeBindings.JPH_Body_GetPosition(body, &result);
-
             return result;
         }
 
         public static quaternion JPH_Body_GetRotation(NativeHandle<JPH_Body> body)
         {
             quaternion result;
-
             UnsafeBindings.JPH_Body_GetRotation(body, &result);
-
             return result;
         }
 
         public static rvec3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
         {
             rvec3 result;
-
             UnsafeBindings.JPH_Body_GetCenterOfMassPosition(body, &result);
-
             return result;
         }
 
         public static rmatrix4x4 JPH_Body_GetWorldTransform(NativeHandle<JPH_Body> body)
         {
             rmatrix4x4 result;
-
             UnsafeBindings.JPH_Body_GetWorldTransform(body, &result);
-
             return result;
         }
 
         public static rmatrix4x4 JPH_Body_GetCenterOfMassTransform(NativeHandle<JPH_Body> body)
         {
             rmatrix4x4 result;
-
             UnsafeBindings.JPH_Body_GetCenterOfMassTransform(body, &result);
-
             return result;
         }
 
@@ -276,6 +254,11 @@ namespace Jolt
         public static ulong JPH_Body_GetUserData(NativeHandle<JPH_Body> body)
         {
             return UnsafeBindings.JPH_Body_GetUserData(body);
+        }
+
+        public static NativeHandle<JPH_Body> JPH_Body_GetFixedToWorldBody()
+        {
+            return CreateHandle(UnsafeBindings.JPH_Body_GetFixedToWorldBody()); // TODO use single static safety handle?
         }
     }
 }
