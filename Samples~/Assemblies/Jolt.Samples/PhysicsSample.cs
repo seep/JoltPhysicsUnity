@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace Jolt.Samples
     /// <summary>
     /// The general purpose physics controller for all of the sample scenes. Handles initialization and updating the physics system.
     /// </summary>
-    public class PhysicsController : MonoBehaviour
+    public class PhysicsSample : MonoBehaviour
     {
         /// <summary>
         /// The max amount of rigid bodies that can be added to the physics system. Adding more will raise a native exception.
@@ -51,8 +52,24 @@ namespace Jolt.Samples
         private PhysicsSystem system;
         private BodyInterface bodies;
 
-        private ManagedPhysicsContext context = new ();
+        private readonly List<PhysicsSampleAddon> addons = new ();
 
+        public readonly ManagedPhysicsContext ManagedPhysicsContext = new ();
+        
+        /// <summary>
+        /// The accumulated time of the physics system updates.
+        /// </summary>
+        public float PhysicsTime { get; private set; } 
+        
+        private void Awake()
+        {
+            // FindObjectsByType is used throughout the samples as a simple way to discover scene dependencies, so
+            // that the sample code can remain focused on how the Jolt bindings work. A real project should use a
+            // better strategy to initialize Jolt from scene data.
+            
+            addons.AddRange(FindObjectsByType<PhysicsSampleAddon>(FindObjectsSortMode.None));
+        }
+        
         private void Start()
         {
             var objectLayerPairFilter = ObjectLayerPairFilterTable.Create(ObjectLayers.NumLayers);
@@ -80,43 +97,65 @@ namespace Jolt.Samples
             system = new PhysicsSystem(settings);
             bodies = system.GetBodyInterface();
 
-            foreach (var addon in GetComponents<IPhysicsSystemAddon>())
-            {
-                addon.Initialize(system); // initialize any adjacent addons
-            }
-
+            // Initialize bodies found in the scene.
+            
             foreach (var component in FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
             {
                 var body = PhysicsHelpers.CreateBodyFromGameObject(bodies, component);
                 
                 bodies.AddBody(body.GetID(), Activation.Activate);
                 
-                context.Add(body, component);
+                ManagedPhysicsContext.Add(body, component);
             }
 
+            // Initialize constraints found in the scene.
+            
             foreach (var component in FindObjectsByType<PhysicsConstraintBase>(FindObjectsSortMode.None))
             {
-                system.AddConstraint(component.Initialize(context));
+                system.AddConstraint(component.Initialize(ManagedPhysicsContext));
             }
+
+            // Initialize addons (extended behavior for individual samples).
+            
+            foreach (var addon in addons)
+            {
+                addon.Initialize(system, ManagedPhysicsContext);
+            }
+            
+            // Optimize after the world is well defined.
 
             system.OptimizeBroadPhase();
         }
 
         private void FixedUpdate()
         {
-            if (system.Step(Time.fixedDeltaTime, CollisionSteps, out var error))
+            foreach (var addon in addons)
             {
+                addon.PrePhysicsStep(system, ManagedPhysicsContext);
+            }
+
+            var dt = Time.fixedDeltaTime;
+            
+            if (system.Step(dt, CollisionSteps, out var error))
+            {
+                PhysicsTime += dt;
+                
                 UpdateManagedTransforms();
             }
             else
             {
                 Debug.LogError(error);
             }
+            
+            foreach (var addon in addons)
+            {
+                addon.PostPhysicsStep(system, ManagedPhysicsContext);
+            }
         }
 
         private void UpdateManagedTransforms()
         {
-            foreach (var (bodyID, component) in context.Bodies)
+            foreach (var (bodyID, component) in ManagedPhysicsContext.Bodies)
             {
                 // assume no scaling and skip decomposition
 

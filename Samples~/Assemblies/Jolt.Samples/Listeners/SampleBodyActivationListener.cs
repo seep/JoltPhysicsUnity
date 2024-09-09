@@ -2,9 +2,9 @@
 
 namespace Jolt.Samples
 {
-    public class SampleBodyActivationListener : MonoBehaviour, IPhysicsSystemAddon, IBodyActivationListener
+    public class SampleBodyActivationListener : PhysicsSampleAddon, IBodyActivationListener
     {
-        public void Initialize(PhysicsSystem system)
+        public override void Initialize(PhysicsSystem system, ManagedPhysicsContext _)
         {
             system.SetBodyActivationListener(this);
         }

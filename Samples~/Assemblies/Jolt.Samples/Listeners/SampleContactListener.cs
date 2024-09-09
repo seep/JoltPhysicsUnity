@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Jolt.Samples
 {
-    public class SampleContactListener : MonoBehaviour, IPhysicsSystemAddon, IContactListener
+    public class SampleContactListener : PhysicsSampleAddon, IContactListener
     {
-        public void Initialize(PhysicsSystem system)
+        public override void Initialize(PhysicsSystem system, ManagedPhysicsContext _)
         {
             system.SetContactListener(this);
         }

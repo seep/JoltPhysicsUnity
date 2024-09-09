@@ -22,5 +22,10 @@
         {
             return new Constraint(constraint.Handle.Reinterpret<JPH_Constraint>());
         }
+        
+        public static implicit operator Constraint(SliderConstraint constraint)
+        {
+            return new Constraint(constraint.Handle.Reinterpret<JPH_Constraint>());
+        }
     }
 }
