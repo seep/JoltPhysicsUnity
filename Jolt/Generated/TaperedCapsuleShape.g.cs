@@ -6,9 +6,9 @@ namespace Jolt
 {
     public readonly partial struct TaperedCapsuleShape : IEquatable<TaperedCapsuleShape>
     {
-        internal readonly NativeHandle<JPH_ConvexShape> Handle;
+        internal readonly NativeHandle<JPH_TaperedCapsuleShape> Handle;
         
-        internal TaperedCapsuleShape(NativeHandle<JPH_ConvexShape> handle) => Handle = handle;
+        internal TaperedCapsuleShape(NativeHandle<JPH_TaperedCapsuleShape> handle) => Handle = handle;
         
         #region IEquatable
         
@@ -24,11 +24,21 @@ namespace Jolt
         
         #endregion
         
+        #region JPH_TaperedCapsuleShape
+        
+        public float GetTopRadius() => Bindings.JPH_TaperedCapsuleShape_GetTopRadius(Handle);
+        
+        public float GetBottomRadius() => Bindings.JPH_TaperedCapsuleShape_GetBottomRadius(Handle);
+        
+        public float GetHalfHeight() => Bindings.JPH_TaperedCapsuleShape_GetHalfHeight(Handle);
+        
+        #endregion
+        
         #region JPH_ConvexShape
         
-        public float GetDensity() => Bindings.JPH_ConvexShape_GetDensity(Handle);
+        public float GetDensity() => Bindings.JPH_ConvexShape_GetDensity(Handle.Reinterpret<JPH_ConvexShape>());
         
-        public void SetDensity(float density) => Bindings.JPH_ConvexShape_SetDensity(Handle, density);
+        public void SetDensity(float density) => Bindings.JPH_ConvexShape_SetDensity(Handle.Reinterpret<JPH_ConvexShape>(), density);
         
         #endregion
         

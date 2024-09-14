@@ -1,5 +1,4 @@
-﻿using System;
-using static Jolt.Bindings;
+﻿using static Jolt.Bindings;
 
 namespace Jolt
 {
@@ -15,7 +14,7 @@ namespace Jolt
         [OverrideBinding("JPH_TaperedCapsuleShapeSettings_CreateShape")]
         public TaperedCapsuleShape CreateShape()
         {
-            throw new NotImplementedException(); // TODO JPH_TaperedCapsuleShapeSettings_CreateShape is missing from bindings?
+            return new TaperedCapsuleShape(JPH_TaperedCapsuleShapeSettings_CreateShape(Handle));
         }
     }
 }

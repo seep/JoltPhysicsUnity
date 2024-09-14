@@ -6,5 +6,10 @@
         {
             return CreateHandle(UnsafeBindings.JPH_TaperedCapsuleShapeSettings_Create(halfHeightOfTaperedCylinder, topRadius, bottomRadius));
         }
+
+        public static NativeHandle<JPH_TaperedCapsuleShape> JPH_TaperedCapsuleShapeSettings_CreateShape(NativeHandle<JPH_TaperedCapsuleShapeSettings> settings)
+        {
+            return CreateHandle(UnsafeBindings.JPH_TaperedCapsuleShapeSettings_CreateShape(settings));
+        }
     }
 }
