@@ -39,6 +39,8 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_PhysicsSystem_Update(system, deltaTime, collisionSteps);
         }
+        
+        // JPH_PhysicsSystem_Step excluded, does same thing as JPH_PhysicsSystem_Update
 
         public static NativeHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterface(NativeHandle<JPH_PhysicsSystem> system)
         {
