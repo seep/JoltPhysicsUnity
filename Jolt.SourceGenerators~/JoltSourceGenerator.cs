@@ -12,6 +12,8 @@ namespace Jolt.SourceGenerators;
 [Generator]
 internal class JoltSourceGenerator : ISourceGenerator
 {
+    private static readonly LogStream Log = new ();
+    
     public void Initialize(GeneratorInitializationContext ctx)
     {
         ctx.RegisterForSyntaxNotifications(() => new JoltSyntaxReceiver());
@@ -28,16 +30,21 @@ internal class JoltSourceGenerator : ISourceGenerator
         {
             try
             {
+                Log.Debug($"Generating {wrapper.TypeName}");
+                
                 var filename = $"{wrapper.TypeName}.g.cs";
                 var filetext = GenerateNativeTypeWrapper(wrapper, bindings);
 
                 ctx.AddSource(filename, filetext);
             }
-            catch
+            catch (Exception ex)
             {
-                continue; // TODO surface error
+                Log.Error($"Exception while generating {wrapper.TypeName}:");
+                Log.Error($"{ex}");
             }
         }
+        
+        Log.Flush();
     }
 
     /// <summary>
@@ -117,7 +124,7 @@ internal class JoltSourceGenerator : ISourceGenerator
                 {
                     if (IsAttributeType(ctx, attr, "Jolt.OverrideBindingAttribute"))
                     {
-                        Log($"Excluding {attr.ConstructorArguments[0].Value} from {result.TypeName}");
+                        Log.Debug($"Excluding {attr.ConstructorArguments[0].Value} from {result.TypeName}");
 
                         result.ExcludedBindings.Add(attr.ConstructorArguments[0].Value!.ToString());
                     }
@@ -126,20 +133,6 @@ internal class JoltSourceGenerator : ISourceGenerator
         }
 
         return result;
-    }
-
-    private static bool TryGetConstructArgument(AttributeData attr, int index, out TypedConstant value)
-    {
-        value = default;
-        
-        if (attr.ConstructorArguments.Length < index)
-        {
-            return false;
-        }
-
-        value = attr.ConstructorArguments[index];
-
-        return true;
     }
 
     private static bool IsAttributeType(GeneratorExecutionContext ctx, AttributeData attr, string type)
@@ -227,16 +220,24 @@ internal class JoltSourceGenerator : ISourceGenerator
             var internalParams = new List<string>();
             var declaredParams = new List<string>();
 
-            // Reinterpret the handle if the binding is for a different native type. For example, SphereShape generates
-            // bindings for JPH_ConvexShape and JPH_Shape (because the native class is a subclass of these two classes)
-            // and so we can safely call these functions on the native JPH_SphereShape handle.
+            var internalSelfParam = b.BindingDeclaration.ParameterList.Parameters[0];
 
-            var internalHandleParam = b.BindingDeclaration.ParameterList.Parameters[0];
-            var internalHandleNativeTypeName = ExtractGenericHandleType(internalHandleParam.Type!.ToString());
-
-            if (internalHandleNativeTypeName != target.NativeTypeName)
+            if (internalSelfParam.Type!.ToString().StartsWith("NativeHandle") == false)
             {
-                internalParams.Add($"Handle.Reinterpret<{internalHandleNativeTypeName}>()");
+                continue; // TODO this is the Create category, or generally anything that is not a method binding 
+            }
+            
+            var internalSelfParamNativeType = ExtractGenericHandleType(internalSelfParam.Type!.ToString());
+
+            // Reinterpret the handle if the self param of the binding (ie first parameter) is for a different native
+            // type. For example, SphereShape generates bindings for JPH_ConvexShape and JPH_Shape (because the native
+            // class is a subclass of these two classes) and so we can safely call these functions on the native
+            // JPH_SphereShape handle. JPH_ConvexShape bindings will take a NativeHandle<JPH_ConvexShape> as the
+            // first parameter.
+
+            if (internalSelfParamNativeType != target.NativeTypeName)
+            {
+                internalParams.Add($"Handle.Reinterpret<{internalSelfParamNativeType}>()");
             }
             else
             {
@@ -343,11 +344,6 @@ internal class JoltSourceGenerator : ISourceGenerator
         writer.WriteLine(line);
         writer.WriteLine();
     }
-
-    private static void Log(string message)
-    {
-        // TODO implement useful logging
-    }
 }
 
 /// <summary>
@@ -380,4 +376,41 @@ internal class JoltNativeTypeWrapper(string type)
     public readonly HashSet<string> NativeTypePrefixes = [];
 
     public readonly HashSet<string> ExcludedBindings = [];
+}
+
+/// <summary>
+/// Simple log stream that writes to a temp file if possible.
+/// </summary>
+internal class LogStream
+{
+    private StreamWriter writer;
+
+    public LogStream()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "JoltPhysicsUnitySourceGenerator.log");
+        
+        try
+        {
+            writer = new StreamWriter(File.Open(path, FileMode.Append, FileAccess.Write));
+        }
+        catch
+        {
+            // skip logging
+        }
+    }
+
+    public void Debug(string message)
+    {
+        writer?.WriteLine($"[DEBUG {DateTime.Now}] {message}");
+    }
+
+    public void Error(string message)
+    {
+        writer?.WriteLine($"[ERROR {DateTime.Now}] {message}");
+    }
+    
+    public void Flush()
+    {
+        writer?.Flush();
+    }
 }
