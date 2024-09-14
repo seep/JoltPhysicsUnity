@@ -28,6 +28,14 @@ namespace Jolt
         
         public void Destroy() => Bindings.JPH_BodyCreationSettings_Destroy(Handle);
         
+        public rvec3 GetPosition() => Bindings.JPH_BodyCreationSettings_GetPosition(Handle);
+        
+        public void SetPosition(rvec3 value) => Bindings.JPH_BodyCreationSettings_SetPosition(Handle, value);
+        
+        public quaternion GetRotation() => Bindings.JPH_BodyCreationSettings_GetRotation(Handle);
+        
+        public void SetRotation(quaternion value) => Bindings.JPH_BodyCreationSettings_SetRotation(Handle, value);
+        
         public float3 GetLinearVelocity() => Bindings.JPH_BodyCreationSettings_GetLinearVelocity(Handle);
         
         public void SetLinearVelocity(float3 velocity) => Bindings.JPH_BodyCreationSettings_SetLinearVelocity(Handle, velocity);

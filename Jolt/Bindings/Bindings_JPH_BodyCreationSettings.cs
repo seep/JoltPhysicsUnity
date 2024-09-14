@@ -26,12 +26,34 @@ namespace Jolt
             settings.Dispose();
         }
 
+        public static rvec3 JPH_BodyCreationSettings_GetPosition(NativeHandle<JPH_BodyCreationSettings> settings)
+        {
+            rvec3 result;
+            UnsafeBindings.JPH_BodyCreationSettings_GetPosition(settings, &result);
+            return result;
+        }
+
+        public static void JPH_BodyCreationSettings_SetPosition(NativeHandle<JPH_BodyCreationSettings> settings, rvec3 value)
+        {
+            UnsafeBindings.JPH_BodyCreationSettings_SetPosition(settings, &value);
+        }
+
+        public static quaternion JPH_BodyCreationSettings_GetRotation(NativeHandle<JPH_BodyCreationSettings> settings)
+        {
+            quaternion result;
+            UnsafeBindings.JPH_BodyCreationSettings_GetRotation(settings, &result);
+            return result;
+        }
+
+        public static void JPH_BodyCreationSettings_SetRotation(NativeHandle<JPH_BodyCreationSettings> settings, quaternion value)
+        {
+            UnsafeBindings.JPH_BodyCreationSettings_SetRotation(settings, &value);
+        }
+
         public static float3 JPH_BodyCreationSettings_GetLinearVelocity(NativeHandle<JPH_BodyCreationSettings> settings)
         {
             float3 result;
-
             UnsafeBindings.JPH_BodyCreationSettings_GetLinearVelocity(settings, &result);
-
             return result;
         }
 
@@ -43,9 +65,7 @@ namespace Jolt
         public static float3 JPH_BodyCreationSettings_GetAngularVelocity(NativeHandle<JPH_BodyCreationSettings> settings)
         {
             float3 result;
-
             UnsafeBindings.JPH_BodyCreationSettings_GetAngularVelocity(settings, &result);
-
             return result;
         }
 
