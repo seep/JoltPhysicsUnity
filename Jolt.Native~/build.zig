@@ -132,6 +132,7 @@ pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
         jolt_dir ++ "Jolt/Physics/Collision/Shape/SphereShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/StaticCompoundShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/TaperedCapsuleShape.cpp",
+        jolt_dir ++ "Jolt/Physics/Collision/Shape/TaperedCylinderShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/TriangleShape.cpp",
         jolt_dir ++ "Jolt/Physics/Constraints/ConeConstraint.cpp",
         jolt_dir ++ "Jolt/Physics/Constraints/Constraint.cpp",
