@@ -8,5 +8,10 @@ namespace Jolt
         {
             return CreateHandle(UnsafeBindings.JPH_TriangleShapeSettings_Create(&va, &vb, &vc, convexRadius));
         }
+
+        public static NativeHandle<JPH_TriangleShape> JPH_TriangleShapeSettings_CreateShape(NativeHandle<JPH_TriangleShapeSettings> settings)
+        {
+            return CreateHandle(UnsafeBindings.JPH_TriangleShapeSettings_CreateShape(settings));
+        }
     }
 }
