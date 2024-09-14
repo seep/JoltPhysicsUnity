@@ -24,14 +24,5 @@ namespace Jolt
         {
             return new MeshShapeSettings(JPH_MeshShapeSettings_Create(vertices, triangles));
         }
-
-        /// <summary>
-        /// Allocate a new native MeshShape from these settings and return the handle.
-        /// </summary>
-        [OverrideBinding("JPH_MeshShapeSettings_CreateShape")]
-        public MeshShape CreateShape()
-        {
-            return new MeshShape(JPH_MeshShapeSettings_CreateShape(Handle));
-        }
     }
 }

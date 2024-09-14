@@ -26,6 +26,8 @@ namespace Jolt
         
         #region JPH_ConvexHullShapeSettings
         
+        public ConvexHullShape CreateShape() => new ConvexHullShape(Bindings.JPH_ConvexHullShapeSettings_CreateShape(Handle));
+        
         #endregion
         
         #region JPH_ConvexShapeSettings

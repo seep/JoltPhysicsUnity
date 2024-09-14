@@ -26,6 +26,8 @@ namespace Jolt
         
         #region JPH_TaperedCapsuleShapeSettings
         
+        public TaperedCapsuleShape CreateShape() => new TaperedCapsuleShape(Bindings.JPH_TaperedCapsuleShapeSettings_CreateShape(Handle));
+        
         #endregion
         
         #region JPH_ConvexShapeSettings

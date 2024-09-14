@@ -28,6 +28,8 @@ namespace Jolt
         
         public void Sanitize() => Bindings.JPH_MeshShapeSettings_Sanitize(Handle);
         
+        public MeshShape CreateShape() => new MeshShape(Bindings.JPH_MeshShapeSettings_CreateShape(Handle));
+        
         #endregion
         
         #region JPH_ShapeSettings

@@ -10,11 +10,5 @@ namespace Jolt
         {
             return new TaperedCapsuleShapeSettings(JPH_TaperedCapsuleShapeSettings_Create(halfHeightOfCylinder, topRadius, bottomRadius));
         }
-
-        [OverrideBinding("JPH_TaperedCapsuleShapeSettings_CreateShape")]
-        public TaperedCapsuleShape CreateShape()
-        {
-            return new TaperedCapsuleShape(JPH_TaperedCapsuleShapeSettings_CreateShape(Handle));
-        }
     }
 }

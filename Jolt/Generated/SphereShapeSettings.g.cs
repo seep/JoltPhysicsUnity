@@ -26,6 +26,8 @@ namespace Jolt
         
         #region JPH_SphereShapeSettings
         
+        public SphereShape CreateShape() => new SphereShape(Bindings.JPH_SphereShapeSettings_CreateShape(Handle));
+        
         public float GetRadius() => Bindings.JPH_SphereShapeSettings_GetRadius(Handle);
         
         public void SetRadius(float radius) => Bindings.JPH_SphereShapeSettings_SetRadius(Handle, radius);
