@@ -136,7 +136,7 @@ namespace Jolt.Samples
 
             var dt = Time.fixedDeltaTime;
             
-            if (system.Step(dt, CollisionSteps, out var error))
+            if (system.Update(dt, CollisionSteps, out var error))
             {
                 PhysicsTime += dt;
                 

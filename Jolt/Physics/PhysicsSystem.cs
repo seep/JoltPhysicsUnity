@@ -83,9 +83,9 @@ namespace Jolt
         /// <remarks>
         /// The out parameter will contain the error if any.
         /// </remarks>
-        public bool Step(float deltaTime, int collisionSteps, out PhysicsUpdateError error)
+        public bool Update(float deltaTime, int collisionSteps, out PhysicsUpdateError error)
         {
-            return (error = JPH_PhysicsSystem_Step(Handle, deltaTime, collisionSteps)) == PhysicsUpdateError.None;
+            return (error = JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps)) == PhysicsUpdateError.None;
         }
 
         public bool WereBodiesInContact(BodyID a, BodyID b)
