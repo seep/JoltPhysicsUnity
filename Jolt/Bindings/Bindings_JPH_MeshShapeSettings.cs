@@ -13,7 +13,7 @@ namespace Jolt
             }
         }
 
-        public static NativeHandle<JPH_MeshShapeSettings> JPH_MeshShapeSettings_Create2(ReadOnlySpan<float3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
+        public static NativeHandle<JPH_MeshShapeSettings> JPH_MeshShapeSettings_Create(ReadOnlySpan<float3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
         {
             fixed (float3* verticesPtr = vertices)
             fixed (IndexedTriangle* trianglesPtr = triangles)

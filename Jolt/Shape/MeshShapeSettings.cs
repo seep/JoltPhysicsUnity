@@ -19,10 +19,10 @@ namespace Jolt
         /// <summary>
         /// Allocate a new native MeshShapeSettings and return the handle.
         /// </summary>
-        [OverrideBinding("JPH_MeshShapeSettings_Create2")]
+        [OverrideBinding("JPH_MeshShapeSettings_Create")]
         public static MeshShapeSettings Create(ReadOnlySpan<float3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
         {
-            return new MeshShapeSettings(JPH_MeshShapeSettings_Create2(vertices, triangles));
+            return new MeshShapeSettings(JPH_MeshShapeSettings_Create(vertices, triangles));
         }
 
         /// <summary>

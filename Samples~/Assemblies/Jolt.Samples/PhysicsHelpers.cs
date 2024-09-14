@@ -25,7 +25,7 @@ namespace Jolt.Samples
                 ? (ushort)PhysicsSamplesLayers.Static
                 : (ushort)PhysicsSamplesLayers.Moving;
             
-            var settings = BodyCreationSettings.FromShapeSettings(
+            var settings = BodyCreationSettings.Create(
                 shapeComponent.CreateShapeSettings(), pos, rot, component.MotionType, layer
             );
 

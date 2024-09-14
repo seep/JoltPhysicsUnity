@@ -28,7 +28,7 @@ namespace Jolt.Samples
                 var pos = transform.InverseTransformPoint(shape.transform.position);
                 var rot = Quaternion.Inverse(transform.rotation) * shape.transform.rotation;
                 
-                settings.AddShape(pos, rot, shape.CreateShapeSettings());
+                settings.AddShape(pos, rot, shape.CreateShapeSettings(), 0);
             }
 
             return settings;

@@ -9,12 +9,12 @@ namespace Jolt
             return CreateHandle(UnsafeBindings.JPH_BodyCreationSettings_Create());
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create2(NativeHandle<JPH_ShapeSettings> settings, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create(NativeHandle<JPH_ShapeSettings> settings, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
             return CreateHandle(UnsafeBindings.JPH_BodyCreationSettings_Create2(settings, &position, &rotation, motion, layer));
         }
 
-        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create3(NativeHandle<JPH_Shape> shape, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
+        public static NativeHandle<JPH_BodyCreationSettings> JPH_BodyCreationSettings_Create(NativeHandle<JPH_Shape> shape, rvec3 position, quaternion rotation, MotionType motion, ushort layer)
         {
             return CreateHandle(UnsafeBindings.JPH_BodyCreationSettings_Create3(shape, &position, &rotation, motion, layer));
         }

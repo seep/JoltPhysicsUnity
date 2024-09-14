@@ -30,6 +30,10 @@ namespace Jolt
         
         #region JPH_CompoundShapeSettings
         
+        public void AddShape(float3 position, quaternion rotation, ShapeSettings settings, uint userData) => Bindings.JPH_CompoundShapeSettings_AddShape(Handle.Reinterpret<JPH_CompoundShapeSettings>(), position, rotation, settings.Handle, userData);
+        
+        public void AddShape(float3 position, quaternion rotation, Shape shape, uint userData) => Bindings.JPH_CompoundShapeSettings_AddShape(Handle.Reinterpret<JPH_CompoundShapeSettings>(), position, rotation, shape.Handle, userData);
+        
         #endregion
         
         #region JPH_ShapeSettings
