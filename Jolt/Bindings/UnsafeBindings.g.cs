@@ -4,14 +4,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal partial struct JPH_BroadPhaseCastResult
-    {
-        [NativeTypeName("JPH_BodyID")]
-        public BodyID bodyID;
-
-        public float fraction;
-    }
-
     internal partial struct JPH_CollidePointResult
     {
         [NativeTypeName("JPH_BodyID")]
@@ -72,7 +64,7 @@ namespace Jolt
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal unsafe delegate float JPH_RayCastBodyCollector(void* context, JPH_BroadPhaseCastResult* result);
+    internal unsafe delegate float JPH_RayCastBodyCollector(void* context, [NativeTypeName("JPH_BroadPhaseCastResult *")] BroadPhaseCastResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate void JPH_CollideShapeBodyCollector(void* context, [NativeTypeName("JPH_BodyID")] BodyID result);

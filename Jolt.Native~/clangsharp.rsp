@@ -9,6 +9,8 @@ JPH_AllowedDOFs
 JPH_BackFaceMode
 JPH_BodyID
 JPH_BodyType
+JPH_BroadPhaseCastResult
+JPH_BroadPhaseLayer
 JPH_ConstraintSpace
 JPH_ConstraintSubType
 JPH_ConstraintType
@@ -46,6 +48,7 @@ JPH_BackFaceMode=BackFaceMode
 JPH_Bool32=NativeBool
 JPH_BodyID=BodyID
 JPH_BodyType=BodyType
+JPH_BroadPhaseCastResult=BroadPhaseCastResult
 JPH_BroadPhaseLayer=BroadPhaseLayer
 JPH_ConstraintSpace=ConstraintSpace
 JPH_ConstraintSubType=ConstraintSubType
