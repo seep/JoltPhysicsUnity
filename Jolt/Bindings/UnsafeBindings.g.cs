@@ -4,15 +4,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal partial struct JPH_CollidePointResult
-    {
-        [NativeTypeName("JPH_BodyID")]
-        public BodyID bodyID;
-
-        [NativeTypeName("JPH_SubShapeID")]
-        public SubShapeID subShapeID2;
-    }
-
     internal partial struct JPH_CollideShapeResult
     {
         [NativeTypeName("JPH_Vec3")]
@@ -73,7 +64,7 @@ namespace Jolt
     internal unsafe delegate float JPH_CastRayCollector(void* context, [NativeTypeName("JPH_RayCastResult *")] RayCastResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal unsafe delegate float JPH_CollidePointCollector(void* context, JPH_CollidePointResult* result);
+    internal unsafe delegate float JPH_CollidePointCollector(void* context, [NativeTypeName("JPH_CollidePointResult *")] CollidePointResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate float JPH_CollideShapeCollector(void* context, JPH_CollideShapeResult* result);

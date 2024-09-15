@@ -11,6 +11,7 @@ JPH_BodyID
 JPH_BodyType
 JPH_BroadPhaseCastResult
 JPH_BroadPhaseLayer
+JPH_CollidePointResult
 JPH_ConstraintSpace
 JPH_ConstraintSubType
 JPH_ConstraintType
@@ -50,6 +51,7 @@ JPH_BodyID=BodyID
 JPH_BodyType=BodyType
 JPH_BroadPhaseCastResult=BroadPhaseCastResult
 JPH_BroadPhaseLayer=BroadPhaseLayer
+JPH_CollidePointResult=CollidePointResult
 JPH_ConstraintSpace=ConstraintSpace
 JPH_ConstraintSubType=ConstraintSubType
 JPH_ConstraintType=ConstraintType
