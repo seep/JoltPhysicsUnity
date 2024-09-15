@@ -4,29 +4,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal partial struct JPH_CollideShapeResult
-    {
-        [NativeTypeName("JPH_Vec3")]
-        public float3 contactPointOn1;
-
-        [NativeTypeName("JPH_Vec3")]
-        public float3 contactPointOn2;
-
-        [NativeTypeName("JPH_Vec3")]
-        public float3 penetrationAxis;
-
-        public float penetrationDepth;
-
-        [NativeTypeName("JPH_SubShapeID")]
-        public SubShapeID subShapeID1;
-
-        [NativeTypeName("JPH_SubShapeID")]
-        public SubShapeID subShapeID2;
-
-        [NativeTypeName("JPH_BodyID")]
-        public BodyID bodyID2;
-    }
-
     internal partial struct JPH_ShapeCastResult
     {
         [NativeTypeName("JPH_Vec3")]
@@ -67,7 +44,7 @@ namespace Jolt
     internal unsafe delegate float JPH_CollidePointCollector(void* context, [NativeTypeName("JPH_CollidePointResult *")] CollidePointResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal unsafe delegate float JPH_CollideShapeCollector(void* context, JPH_CollideShapeResult* result);
+    internal unsafe delegate float JPH_CollideShapeCollector(void* context, [NativeTypeName("JPH_CollideShapeResult *")] CollideShapeResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate float JPH_CastShapeCollector(void* context, JPH_ShapeCastResult* result);
