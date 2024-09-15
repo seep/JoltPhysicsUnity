@@ -49,7 +49,7 @@ namespace Jolt
 
         private delegate void UnsafeContactPersisted(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB);
 
-        private delegate void UnsafeContactRemoved(IntPtr udata, JPH_SubShapeIDPair* pair);
+        private delegate void UnsafeContactRemoved(IntPtr udata, SubShapeIDPair* pair);
 
         private static ValidateResult UnsafeContactValidateCallback(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, JPH_CollideShapeResult* result)
         {
@@ -77,7 +77,7 @@ namespace Jolt
             }
         }
 
-        private static void UnsafeContactRemovedCallback(IntPtr udata, JPH_SubShapeIDPair* pair)
+        private static void UnsafeContactRemovedCallback(IntPtr udata, SubShapeIDPair* pair)
         {
             try
             {

@@ -77,7 +77,7 @@ namespace Jolt
             return result;
         }
 
-        public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, uint subShapeID, float3 localPosition)
+        public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, SubShapeID subShapeID, float3 localPosition)
         {
             float3 result;
 

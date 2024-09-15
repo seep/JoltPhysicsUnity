@@ -4,21 +4,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal partial struct JPH_SubShapeIDPair
-    {
-        [NativeTypeName("JPH_BodyID")]
-        public BodyID Body1ID;
-
-        [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID1;
-
-        [NativeTypeName("JPH_BodyID")]
-        public BodyID Body2ID;
-
-        [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID2;
-    }
-
     internal partial struct JPH_BroadPhaseCastResult
     {
         [NativeTypeName("JPH_BodyID")]
@@ -33,7 +18,7 @@ namespace Jolt
         public BodyID bodyID;
 
         [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID2;
+        public SubShapeID subShapeID2;
     }
 
     internal partial struct JPH_CollideShapeResult
@@ -50,10 +35,10 @@ namespace Jolt
         public float penetrationDepth;
 
         [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID1;
+        public SubShapeID subShapeID1;
 
         [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID2;
+        public SubShapeID subShapeID2;
 
         [NativeTypeName("JPH_BodyID")]
         public BodyID bodyID2;
@@ -73,10 +58,10 @@ namespace Jolt
         public float penetrationDepth;
 
         [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID1;
+        public SubShapeID subShapeID1;
 
         [NativeTypeName("JPH_SubShapeID")]
-        public uint subShapeID2;
+        public SubShapeID subShapeID2;
 
         [NativeTypeName("JPH_BodyID")]
         public BodyID bodyID2;
@@ -1010,7 +995,7 @@ namespace Jolt
         public static extern void JPH_CompoundShape_GetSubShape([NativeTypeName("const JPH_CompoundShape *")] JPH_CompoundShape* shape, uint index, [NativeTypeName("const JPH_Shape **")] JPH_Shape** subShape, [NativeTypeName("JPH_Vec3 *")] float3* positionCOM, [NativeTypeName("JPH_Quat *")] quaternion* rotation, [NativeTypeName(" *")] uint* userData);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern uint JPH_CompoundShape_GetSubShapeIndexFromID([NativeTypeName("const JPH_CompoundShape *")] JPH_CompoundShape* shape, [NativeTypeName("JPH_SubShapeID")] uint id, [NativeTypeName("JPH_SubShapeID *")] uint* remainder);
+        public static extern uint JPH_CompoundShape_GetSubShapeIndexFromID([NativeTypeName("const JPH_CompoundShape *")] JPH_CompoundShape* shape, [NativeTypeName("JPH_SubShapeID")] SubShapeID id, [NativeTypeName("JPH_SubShapeID *")] SubShapeID* remainder);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create();
@@ -1113,7 +1098,7 @@ namespace Jolt
         public static extern void JPH_Shape_GetMassProperties([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape, [NativeTypeName("JPH_MassProperties *")] MassProperties* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_Shape_GetSurfaceNormal([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape, [NativeTypeName("JPH_SubShapeID")] uint subShapeID, [NativeTypeName("JPH_Vec3 *")] float3* localPosition, [NativeTypeName("JPH_Vec3 *")] float3* normal);
+        public static extern void JPH_Shape_GetSurfaceNormal([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape, [NativeTypeName("JPH_SubShapeID")] SubShapeID subShapeID, [NativeTypeName("JPH_Vec3 *")] float3* localPosition, [NativeTypeName("JPH_Vec3 *")] float3* normal);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern float JPH_Shape_GetVolume([NativeTypeName("const JPH_Shape *")] JPH_Shape* shape);
@@ -2035,7 +2020,7 @@ namespace Jolt
         public static extern void JPH_Body_GetWorldSpaceBounds([NativeTypeName("const JPH_Body *")] JPH_Body* body, [NativeTypeName("JPH_AABox *")] AABox* result);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_Body_GetWorldSpaceSurfaceNormal([NativeTypeName("const JPH_Body *")] JPH_Body* body, [NativeTypeName("JPH_SubShapeID")] uint subShapeID, [NativeTypeName("const JPH_RVec3 *")] rvec3* position, [NativeTypeName("JPH_Vec3 *")] float3* normal);
+        public static extern void JPH_Body_GetWorldSpaceSurfaceNormal([NativeTypeName("const JPH_Body *")] JPH_Body* body, [NativeTypeName("JPH_SubShapeID")] SubShapeID subShapeID, [NativeTypeName("const JPH_RVec3 *")] rvec3* position, [NativeTypeName("JPH_Vec3 *")] float3* normal);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern NativeBool JPH_Body_IsActive([NativeTypeName("const JPH_Body *")] JPH_Body* body);
@@ -2227,11 +2212,11 @@ namespace Jolt
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("JPH_SubShapeID")]
-        public static extern uint JPH_ContactManifold_GetSubShapeID1([NativeTypeName("const JPH_ContactManifold *")] JPH_ContactManifold* manifold);
+        public static extern SubShapeID JPH_ContactManifold_GetSubShapeID1([NativeTypeName("const JPH_ContactManifold *")] JPH_ContactManifold* manifold);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("JPH_SubShapeID")]
-        public static extern uint JPH_ContactManifold_GetSubShapeID2([NativeTypeName("const JPH_ContactManifold *")] JPH_ContactManifold* manifold);
+        public static extern SubShapeID JPH_ContactManifold_GetSubShapeID2([NativeTypeName("const JPH_ContactManifold *")] JPH_ContactManifold* manifold);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern uint JPH_ContactManifold_GetPointCount([NativeTypeName("const JPH_ContactManifold *")] JPH_ContactManifold* manifold);
@@ -2378,7 +2363,7 @@ namespace Jolt
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("JPH_SubShapeID")]
-        public static extern uint JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character);
+        public static extern SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("uint64_t")]

@@ -21,7 +21,7 @@ namespace Jolt
             return result;
         }
 
-        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, uint subShapeID, rvec3 position)
+        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, SubShapeID subShapeID, rvec3 position)
         {
             float3 result;
             UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID, &position, &result);

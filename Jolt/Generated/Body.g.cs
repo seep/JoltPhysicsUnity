@@ -32,7 +32,7 @@ namespace Jolt
         
         public AABox GetWorldSpaceBounds() => Bindings.JPH_Body_GetWorldSpaceBounds(Handle);
         
-        public float3 GetWorldSpaceSurfaceNormal(uint subShapeID, rvec3 position) => Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, position);
+        public float3 GetWorldSpaceSurfaceNormal(SubShapeID subShapeID, rvec3 position) => Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, position);
         
         public bool IsActive() => Bindings.JPH_Body_IsActive(Handle);
         
