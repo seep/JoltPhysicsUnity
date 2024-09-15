@@ -31,6 +31,7 @@ JPH_Quat
 JPH_RayCastResult
 JPH_RMatrix4x4
 JPH_RVec3
+JPH_ShapeCastResult
 JPH_ShapeType
 JPH_ShapeSubType
 JPH_SpringMode
@@ -73,6 +74,7 @@ JPH_Quat=quaternion
 JPH_RayCastResult=RayCastResult
 JPH_RMatrix4x4=rmatrix4x4
 JPH_RVec3=rvec3
+JPH_ShapeCastResult=ShapeCastResult
 JPH_ShapeType=ShapeType
 JPH_ShapeSubType=ShapeSubType
 JPH_SpringMode=SpringMode
