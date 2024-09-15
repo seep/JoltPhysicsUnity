@@ -6,6 +6,7 @@ compatible-codegen
 JPH_AABox
 JPH_Activation
 JPH_AllowedDOFs
+JPH_BackFaceMode
 JPH_BodyID
 JPH_BodyType
 JPH_ConstraintSpace
@@ -39,6 +40,7 @@ JPH_Vec4
 JPH_AABox=AABox
 JPH_Activation=Activation
 JPH_AllowedDOFs=AllowedDOFs
+JPH_BackFaceMode=BackFaceMode
 JPH_Bool32=NativeBool
 JPH_BodyID=BodyID
 JPH_BodyType=BodyType

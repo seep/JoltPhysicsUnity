@@ -4,14 +4,6 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    internal enum JPH_BackFaceMode
-    {
-        JPH_BackFaceMode_IgnoreBackFaces,
-        JPH_BackFaceMode_CollideWithBackFaces,
-        _JPH_BackFaceMode_Count,
-        _JPH_BackFaceMode_Force32 = 0x7FFFFFFF,
-    }
-
     internal partial struct JPH_SubShapeIDPair
     {
         [NativeTypeName("JPH_BodyID")]
@@ -2457,10 +2449,11 @@ namespace Jolt
         public static extern void JPH_CharacterVirtualSettings_SetShapeOffset(JPH_CharacterVirtualSettings* settings, [NativeTypeName("const JPH_Vec3 *")] float3* value);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_BackFaceMode JPH_CharacterVirtualSettings_GetBackFaceMode(JPH_CharacterVirtualSettings* settings);
+        [return: NativeTypeName("JPH_BackFaceMode")]
+        public static extern BackFaceMode JPH_CharacterVirtualSettings_GetBackFaceMode(JPH_CharacterVirtualSettings* settings);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void JPH_CharacterVirtualSettings_SetBackFaceMode(JPH_CharacterVirtualSettings* settings, JPH_BackFaceMode value);
+        public static extern void JPH_CharacterVirtualSettings_SetBackFaceMode(JPH_CharacterVirtualSettings* settings, [NativeTypeName("JPH_BackFaceMode")] BackFaceMode value);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern float JPH_CharacterVirtualSettings_GetPredictiveContactDistance(JPH_CharacterVirtualSettings* settings);
