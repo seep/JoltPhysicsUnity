@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using System;
+using Unity.Mathematics;
 
 namespace Jolt
 {
@@ -39,27 +40,26 @@ namespace Jolt
         public static float3 JPH_Shape_GetCenterOfMass(NativeHandle<JPH_Shape> shape)
         {
             float3 result;
-
             UnsafeBindings.JPH_Shape_GetCenterOfMass(shape, &result);
-
             return result;
         }
 
         public static AABox JPH_Shape_GetLocalBounds(NativeHandle<JPH_Shape> shape)
         {
             AABox result;
-
             UnsafeBindings.JPH_Shape_GetLocalBounds(shape, &result);
-
             return result;
+        }
+
+        public static uint JPH_Shape_GetSubShapeIDBitsRecursive(NativeHandle<JPH_Shape> shape)
+        {
+            return UnsafeBindings.JPH_Shape_GetSubShapeIDBitsRecursive(shape);
         }
 
         public static AABox JPH_Shape_GetWorldSpaceBounds(NativeHandle<JPH_Shape> shape, rmatrix4x4 centerOfMassTransform, float3 scale)
         {
             AABox result;
-
             UnsafeBindings.JPH_Shape_GetWorldSpaceBounds(shape, &centerOfMassTransform, &scale, &result);
-
             return result;
         }
 
@@ -71,24 +71,41 @@ namespace Jolt
         public static MassProperties JPH_Shape_GetMassProperties(NativeHandle<JPH_Shape> shape)
         {
             MassProperties result;
-
             UnsafeBindings.JPH_Shape_GetMassProperties(shape, &result);
-
             return result;
         }
+
+        // TODO JPH_Shape_GetLeafShape
+
+        // TODO JPH_Shape_GetMaterial
 
         public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, SubShapeID subShapeID, float3 localPosition)
         {
             float3 result;
-
             UnsafeBindings.JPH_Shape_GetSurfaceNormal(shape, subShapeID, &localPosition, &result);
-
             return result;
         }
 
         public static float JPH_Shape_GetVolume(NativeHandle<JPH_Shape> shape)
         {
             return UnsafeBindings.JPH_Shape_GetVolume(shape);
+        }
+
+        public static bool JPH_Shape_IsValidScale(NativeHandle<JPH_Shape> shape, float3 scale)
+        {
+            return UnsafeBindings.JPH_Shape_IsValidScale(shape, &scale);
+        }
+
+        public static float3 JPH_Shape_MakeScaleValid(NativeHandle<JPH_Shape> shape, float3 scale)
+        {
+            float3 result;
+            UnsafeBindings.JPH_Shape_MakeScaleValid(shape, &scale, &result);
+            return result;
+        }
+
+        public static NativeHandle<JPH_Shape> JPH_Shape_ScaleShape(NativeHandle<JPH_Shape> shape, float3 scale)
+        {
+            return CreateHandle(UnsafeBindings.JPH_Shape_ScaleShape(shape, &scale));
         }
 
         public static bool JPH_Shape_CastRay(NativeHandle<JPH_Shape> shape, float3 origin, float3 direction, out RayCastResult result)
@@ -101,9 +118,10 @@ namespace Jolt
             }
         }
 
-        public static bool JPH_Shape_CollidePoint(NativeHandle<JPH_Shape> shape, float3 point)
-        {
-            return UnsafeBindings.JPH_Shape_CollidePoint(shape, &point);
-        }
+        // TODO JPH_Shape_CastRay2
+
+        // TODO JPH_Shape_CollidePoint
+        
+        // TODO JPH_Shape_CollidePoint2
     }
 }
