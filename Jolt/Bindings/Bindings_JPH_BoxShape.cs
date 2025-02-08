@@ -18,11 +18,6 @@ namespace Jolt
             return result;
         }
 
-        public static float JPH_BoxShape_GetVolume(NativeHandle<JPH_BoxShape> shape)
-        {
-            return UnsafeBindings.JPH_BoxShape_GetVolume(shape);
-        }
-
         public static float JPH_BoxShape_GetConvexRadius(NativeHandle<JPH_BoxShape> shape)
         {
             return UnsafeBindings.JPH_BoxShape_GetConvexRadius(shape);
