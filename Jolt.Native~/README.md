@@ -20,7 +20,12 @@ or
 dotnet build -c Release
 ```
 
-Building the native project will automatically export new C# bindings into `Jolt/Bindings`.
+Building the native project will automatically export new C# bindings into `Jolt/Bindings`. To rebuild just the
+bindings (after changing `clangsharp.rsp` for example), use:
+
+```pwsh
+dotnet build -target:"Generate Jolt Bindings"
+```
 
 ### Include Files
 
