@@ -39,6 +39,7 @@ JPH_SpringSettings
 JPH_SixDOFConstraintAxis
 JPH_SubShapeID
 JPH_SubShapeIDPair
+JPH_SwingType
 JPH_Triangle
 JPH_ValidateResult
 JPH_Vec3
@@ -82,6 +83,7 @@ JPH_SpringSettings=SpringSettings
 JPH_SixDOFConstraintAxis=SixDOFConstraintAxis
 JPH_SubShapeID=SubShapeID
 JPH_SubShapeIDPair=SubShapeIDPair
+JPH_SwingType=SwingType
 JPH_Triangle=Triangle
 JPH_ValidateResult=ValidateResult
 JPH_Vec3=float3

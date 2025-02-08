@@ -39,14 +39,6 @@ namespace Jolt
         _JPH_CollisionCollectorType_Force32 = 0x7FFFFFFF,
     }
 
-    internal enum JPH_SwingType
-    {
-        JPH_SwingType_Cone,
-        JPH_SwingType_Pyramid,
-        _JPH_SwingType_Count,
-        _JPH_SwingType_Force32 = 0x7FFFFFFF,
-    }
-
     internal enum JPH_SoftBodyConstraintColor
     {
         JPH_SoftBodyConstraintColor_ConstraintType,
@@ -788,7 +780,8 @@ namespace Jolt
         [NativeTypeName("JPH_Vec3")]
         public float3 planeAxis2;
 
-        public JPH_SwingType swingType;
+        [NativeTypeName("JPH_SwingType")]
+        public SwingType swingType;
 
         public float normalHalfConeAngle;
 
@@ -835,7 +828,8 @@ namespace Jolt
         [NativeTypeName("float[6]")]
         public fixed float maxFriction[6];
 
-        public JPH_SwingType swingType;
+        [NativeTypeName("JPH_SwingType")]
+        public SwingType swingType;
 
         [NativeTypeName("float[6]")]
         public fixed float limitMin[6];
