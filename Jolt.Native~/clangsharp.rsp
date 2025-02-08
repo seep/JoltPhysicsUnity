@@ -46,6 +46,7 @@ JPH_Vec3
 JPH_Vec4
 --remap
 bool=NativeBool
+float[2]=float2*
 JPH_AABox=AABox
 JPH_Activation=Activation
 JPH_AllowedDOFs=AllowedDOFs
