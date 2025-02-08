@@ -80,13 +80,11 @@ pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
         jolt_dir ++ "Jolt/Physics/DeterminismLog.cpp",
         jolt_dir ++ "Jolt/Physics/IslandBuilder.cpp",
         jolt_dir ++ "Jolt/Physics/LargeIslandSplitter.cpp",
-        jolt_dir ++ "Jolt/Physics/PhysicsLock.cpp",
         jolt_dir ++ "Jolt/Physics/PhysicsScene.cpp",
         jolt_dir ++ "Jolt/Physics/PhysicsSystem.cpp",
         jolt_dir ++ "Jolt/Physics/PhysicsUpdateContext.cpp",
         jolt_dir ++ "Jolt/Physics/StateRecorderImpl.cpp",
         jolt_dir ++ "Jolt/Physics/Body/Body.cpp",
-        jolt_dir ++ "Jolt/Physics/Body/BodyAccess.cpp",
         jolt_dir ++ "Jolt/Physics/Body/BodyCreationSettings.cpp",
         jolt_dir ++ "Jolt/Physics/Body/BodyInterface.cpp",
         jolt_dir ++ "Jolt/Physics/Body/BodyManager.cpp",
@@ -121,6 +119,7 @@ pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
         jolt_dir ++ "Jolt/Physics/Collision/Shape/ConvexShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/CylinderShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/DecoratedShape.cpp",
+        jolt_dir ++ "Jolt/Physics/Collision/Shape/EmptyShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/HeightFieldShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/MeshShape.cpp",
         jolt_dir ++ "Jolt/Physics/Collision/Shape/MutableCompoundShape.cpp",
@@ -179,14 +178,9 @@ pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
         jolt_dir ++ "Jolt/Skeleton/Skeleton.cpp",
         jolt_dir ++ "Jolt/Skeleton/SkeletonMapper.cpp",
         jolt_dir ++ "Jolt/Skeleton/SkeletonPose.cpp",
-        jolt_dir ++ "Jolt/TriangleGrouper/TriangleGrouperClosestCentroid.cpp",
-        jolt_dir ++ "Jolt/TriangleGrouper/TriangleGrouperMorton.cpp",
         jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitter.cpp",
         jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitterBinning.cpp",
-        jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitterFixedLeafSize.cpp",
-        jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitterLongestAxis.cpp",
         jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitterMean.cpp",
-        jolt_dir ++ "Jolt/TriangleSplitter/TriangleSplitterMorton.cpp"
     }, flags);
 
     b.installArtifact(lib);
