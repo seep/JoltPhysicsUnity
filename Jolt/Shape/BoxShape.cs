@@ -11,11 +11,5 @@ namespace Jolt
         {
             return new BoxShape(JPH_BoxShape_Create(halfExtent, convexRadius));
         }
-
-        [OverrideBinding("JPH_Shape_GetVolume"), OverrideBinding("JPH_BoxShape_GetVolume")]
-        public float GetVolume()
-        {
-            return JPH_BoxShape_GetVolume(Handle); // defined in both JPH_Shape and JPH_BoxShape, explicitly use JPH_BoxShape impl
-        }
     }
 }
