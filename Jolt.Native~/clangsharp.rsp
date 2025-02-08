@@ -44,11 +44,11 @@ JPH_ValidateResult
 JPH_Vec3
 JPH_Vec4
 --remap
+bool=NativeBool
 JPH_AABox=AABox
 JPH_Activation=Activation
 JPH_AllowedDOFs=AllowedDOFs
 JPH_BackFaceMode=BackFaceMode
-JPH_Bool32=NativeBool
 JPH_BodyID=BodyID
 JPH_BodyType=BodyType
 JPH_BroadPhaseCastResult=BroadPhaseCastResult
