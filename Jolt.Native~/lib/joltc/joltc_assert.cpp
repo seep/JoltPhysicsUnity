@@ -7,27 +7,33 @@
 __pragma(warning(push, 0))
 #endif
 
-#include <Jolt/Jolt.h>
-#include <Jolt/RegisterTypes.h>
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Physics/Collision/CollideShape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/TriangleShape.h>
-#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
-#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
-#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
-#include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
-#include <Jolt/Physics/Collision/CastResult.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
-#include <Jolt/Physics/Body/AllowedDOFs.h>
-#include <Jolt/Physics/Constraints/SixDOFConstraint.h>
-#include <Jolt/Physics/Character/CharacterBase.h>
+#include "Jolt/Jolt.h"
+#include "Jolt/RegisterTypes.h"
+#include "Jolt/Core/Factory.h"
+#include "Jolt/Core/TempAllocator.h"
+#include "Jolt/Core/JobSystemThreadPool.h"
+#include "Jolt/Physics/PhysicsSettings.h"
+#include "Jolt/Physics/PhysicsSystem.h"
+#include "Jolt/Physics/Collision/CollideShape.h"
+#include "Jolt/Physics/Collision/Shape/BoxShape.h"
+#include "Jolt/Physics/Collision/Shape/SphereShape.h"
+#include "Jolt/Physics/Collision/Shape/TriangleShape.h"
+#include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
+#include "Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h"
+#include "Jolt/Physics/Collision/Shape/CylinderShape.h"
+#include "Jolt/Physics/Collision/Shape/ConvexHullShape.h"
+#include "Jolt/Physics/Collision/CastResult.h"
+#include "Jolt/Physics/Body/BodyCreationSettings.h"
+#include "Jolt/Physics/Body/BodyActivationListener.h"
+#include "Jolt/Physics/Body/AllowedDOFs.h"
+#include "Jolt/Physics/Constraints/SixDOFConstraint.h"
+#include "Jolt/Physics/Character/CharacterBase.h"
+#include "Jolt/Physics/Character/CharacterID.h"
+#include "Jolt/Physics/Collision/Shape/MeshShape.h"
+
+#ifdef JPH_DEBUG_RENDERER
+#include <Jolt/Renderer/DebugRendererSimple.h>
+#endif // JPH_DEBUG_RENDERER
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -41,6 +47,9 @@ static_assert(sizeof(JPH::ObjectLayer) == sizeof(JPH_ObjectLayer));
 static_assert(sizeof(JPH::BroadPhaseLayer) == sizeof(JPH_BroadPhaseLayer));
 static_assert(sizeof(JPH::BodyID) == sizeof(JPH_BodyID));
 static_assert(sizeof(JPH::SubShapeID) == sizeof(JPH_SubShapeID));
+static_assert(sizeof(JPH::CharacterID) == sizeof(JPH_CharacterID));
+static_assert(sizeof(JPH::CollisionGroup::GroupID) == sizeof(JPH_CollisionGroupID));
+static_assert(sizeof(JPH::CollisionGroup::SubGroupID) == sizeof(JPH_CollisionSubGroupID));
 
 // EPhysicsUpdateError
 static_assert(sizeof(JPH_PhysicsUpdateError) == sizeof(JPH::EPhysicsUpdateError));
@@ -132,7 +141,14 @@ static_assert(JPH_ConstraintSpace_WorldSpace == (int)JPH::EConstraintSpace::Worl
 static_assert(JPH_MotionQuality_Discrete == (int)JPH::EMotionQuality::Discrete);
 static_assert(JPH_MotionQuality_LinearCast == (int)JPH::EMotionQuality::LinearCast);
 
-// JPH_AllowedDOFs
+// EOverrideMassProperties
+static_assert(sizeof(JPH_OverrideMassProperties) == sizeof(uint32_t));
+static_assert(sizeof(JPH::EOverrideMassProperties) == sizeof(uint8_t));
+static_assert(JPH_OverrideMassProperties_CalculateMassAndInertia == (int)JPH::EOverrideMassProperties::CalculateMassAndInertia);
+static_assert(JPH_OverrideMassProperties_CalculateInertia == (int)JPH::EOverrideMassProperties::CalculateInertia);
+static_assert(JPH_OverrideMassProperties_MassAndInertiaProvided == (int)JPH::EOverrideMassProperties::MassAndInertiaProvided);
+
+// EAllowedDOFs
 static_assert(sizeof(JPH_AllowedDOFs) == sizeof(uint32_t));
 static_assert(JPH_AllowedDOFs_All == (int)JPH::EAllowedDOFs::All);
 static_assert(JPH_AllowedDOFs_TranslationX == (int)JPH::EAllowedDOFs::TranslationX);
@@ -148,6 +164,11 @@ static_assert(sizeof(JPH_MotorState) == sizeof(uint32_t));
 static_assert(JPH_MotorState_Off == (int)JPH::EMotorState::Off);
 static_assert(JPH_MotorState_Velocity == (int)JPH::EMotorState::Velocity);
 static_assert(JPH_MotorState_Position == (int)JPH::EMotorState::Position);
+
+// JPH_SwingType
+static_assert(sizeof(JPH_SwingType) == sizeof(uint32_t));
+static_assert(JPH_SwingType_Cone == (int)JPH::ESwingType::Cone);
+static_assert(JPH_SwingType_Pyramid == (int)JPH::ESwingType::Pyramid);
 
 // JPH_SixDOFConstraintAxis
 static_assert(sizeof(JPH_SixDOFConstraintAxis) == sizeof(uint32_t));
@@ -174,7 +195,42 @@ static_assert(JPH_GroundState_InAir == (int)JPH::CharacterBase::EGroundState::In
 static_assert(JPH_BackFaceMode_IgnoreBackFaces == (int)JPH::EBackFaceMode::IgnoreBackFaces);
 static_assert(JPH_BackFaceMode_CollideWithBackFaces == (int)JPH::EBackFaceMode::CollideWithBackFaces);
 
+// EActiveEdgeMode
+static_assert(JPH_ActiveEdgeMode_CollideOnlyWithActive == (int)JPH::EActiveEdgeMode::CollideOnlyWithActive);
+static_assert(JPH_ActiveEdgeMode_CollideWithAll == (int)JPH::EActiveEdgeMode::CollideWithAll);
+
+// ECollectFacesMode
+static_assert(JPH_CollectFacesMode_CollectFaces == (int)JPH::ECollectFacesMode::CollectFaces);
+static_assert(JPH_CollectFacesMode_NoFaces == (int)JPH::ECollectFacesMode::NoFaces);
+
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
 
-//static_assert(offsetof(JPH::MassProperties, mMass) == offsetof(JPH_MassProperties, mass));
+#ifdef JPH_DEBUG_RENDERER
+
+// ESoftBodyConstraintColor
+static_assert(JPH_SoftBodyConstraintColor_ConstraintType == (int)JPH::ESoftBodyConstraintColor::ConstraintType);
+static_assert(JPH_SoftBodyConstraintColor_ConstraintGroup == (int)JPH::ESoftBodyConstraintColor::ConstraintGroup);
+static_assert(JPH_SoftBodyConstraintColor_ConstraintOrder == (int)JPH::ESoftBodyConstraintColor::ConstraintOrder);
+
+// BodyManager::EShapeColor
+static_assert(JPH_BodyManager_ShapeColor_InstanceColor == (int)JPH::BodyManager::EShapeColor::InstanceColor);
+static_assert(JPH_BodyManager_ShapeColor_ShapeTypeColor == (int)JPH::BodyManager::EShapeColor::ShapeTypeColor);
+static_assert(JPH_BodyManager_ShapeColor_MotionTypeColor == (int)JPH::BodyManager::EShapeColor::MotionTypeColor);
+static_assert(JPH_BodyManager_ShapeColor_SleepColor == (int)JPH::BodyManager::EShapeColor::SleepColor);
+static_assert(JPH_BodyManager_ShapeColor_IslandColor == (int)JPH::BodyManager::EShapeColor::IslandColor);
+static_assert(JPH_BodyManager_ShapeColor_MaterialColor == (int)JPH::BodyManager::EShapeColor::MaterialColor);
+
+// DebugRenderer::ECastShadow
+static_assert(JPH_DebugRenderer_CastShadow_On == (int)JPH::DebugRenderer::ECastShadow::On);
+static_assert(JPH_DebugRenderer_CastShadow_Off == (int)JPH::DebugRenderer::ECastShadow::Off);
+
+// DebugRenderer::EDrawMode
+static_assert(JPH_DebugRenderer_DrawMode_Solid == (int)JPH::DebugRenderer::EDrawMode::Solid);
+static_assert(JPH_DebugRenderer_DrawMode_Wireframe == (int)JPH::DebugRenderer::EDrawMode::Wireframe);
+
+// MeshShapeSettings::EBuildQuality
+static_assert(JPH_Mesh_Shape_BuildQuality_FavorRuntimePerformance == (int)JPH::MeshShapeSettings::EBuildQuality::FavorRuntimePerformance);
+static_assert(JPH_Mesh_Shape_BuildQuality_FavorBuildSpeed == (int)JPH::MeshShapeSettings::EBuildQuality::FavorBuildSpeed);
+
+#endif
