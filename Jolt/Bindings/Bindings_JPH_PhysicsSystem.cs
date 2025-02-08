@@ -29,19 +29,21 @@ namespace Jolt
 
             system.Dispose();
         }
+        
+        // TODO JPH_PhysicsSystem_SetPhysicsSettings
+        
+        // TODO JPH_PhysicsSystem_GetPhysicsSettings
 
         public static void JPH_PhysicsSystem_OptimizeBroadPhase(NativeHandle<JPH_PhysicsSystem> system)
         {
             UnsafeBindings.JPH_PhysicsSystem_OptimizeBroadPhase(system);
         }
 
-        public static PhysicsUpdateError JPH_PhysicsSystem_Update(NativeHandle<JPH_PhysicsSystem> system, float deltaTime, int collisionSteps)
+        public static PhysicsUpdateError JPH_PhysicsSystem_Update(NativeHandle<JPH_PhysicsSystem> system, float deltaTime, int collisionSteps, NativeHandle<JPH_JobSystem> jobSystem)
         {
-            return UnsafeBindings.JPH_PhysicsSystem_Update(system, deltaTime, collisionSteps);
+            return UnsafeBindings.JPH_PhysicsSystem_Update(system, deltaTime, collisionSteps, jobSystem);
         }
         
-        // JPH_PhysicsSystem_Step excluded, does same thing as JPH_PhysicsSystem_Update
-
         public static NativeHandle<JPH_BodyInterface> JPH_PhysicsSystem_GetBodyInterface(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, UnsafeBindings.JPH_PhysicsSystem_GetBodyInterface(system));
@@ -114,10 +116,8 @@ namespace Jolt
 
         public static float3 JPH_PhysicsSystem_GetGravity(NativeHandle<JPH_PhysicsSystem> system)
         {
-            float3 gravity = default;
-
+            float3 gravity;
             UnsafeBindings.JPH_PhysicsSystem_GetGravity(system, &gravity);
-
             return gravity;
         }
 
@@ -131,24 +131,20 @@ namespace Jolt
             UnsafeBindings.JPH_PhysicsSystem_RemoveConstraint(system, constraint);
         }
 
-        public static void JPH_PhysicsSystem_AddConstraints(NativeHandle<JPH_PhysicsSystem> system)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void JPH_PhysicsSystem_RemoveConstraints(NativeHandle<JPH_PhysicsSystem> system)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void JPH_PhysicsSystem_GetBodies(NativeHandle<JPH_PhysicsSystem> system)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void JPH_PhysicsSystem_GetConstraints(NativeHandle<JPH_PhysicsSystem> system)
-        {
-            throw new NotImplementedException();
-        }
+        // TODO JPH_PhysicsSystem_AddConstraints
+        
+        // TODO JPH_PhysicsSystem_RemoveConstraints
+        
+        // TODO JPH_PhysicsSystem_GetBodies
+        
+        // TODO JPH_PhysicsSystem_GetConstraints
+        
+        // TODO JPH_PhysicsSystem_DrawBodies
+        
+        // TODO JPH_PhysicsSystem_DrawConstraints
+        
+        // TODO JPH_PhysicsSystem_DrawConstraintLimits
+        
+        // TODO JPH_PhysicsSystem_DrawConstraintReferenceFrame
     }
 }

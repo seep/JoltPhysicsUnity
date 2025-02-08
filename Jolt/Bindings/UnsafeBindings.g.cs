@@ -1105,31 +1105,6 @@ namespace Jolt
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate void JPH_QueueJobsCallback(void* context, [NativeTypeName("JPH_JobFunction *")] IntPtr job, void** args, uint count);
 
-    internal partial struct JobSystemThreadPoolConfig
-    {
-        public uint maxJobs;
-
-        public uint maxBarriers;
-
-        [NativeTypeName("int32_t")]
-        public int numThreads;
-    }
-
-    internal unsafe partial struct JPH_JobSystemConfig
-    {
-        public void* context;
-
-        [NativeTypeName("JPH_QueueJobCallback *")]
-        public IntPtr queueJob;
-
-        [NativeTypeName("JPH_QueueJobsCallback *")]
-        public IntPtr queueJobs;
-
-        public uint maxConcurrency;
-
-        public uint maxBarriers;
-    }
-
     internal partial struct JPH_JobSystem
     {
     }
@@ -1349,7 +1324,7 @@ namespace Jolt
         public static extern JPH_JobSystem* JPH_JobSystemThreadPool_Create([NativeTypeName("const JobSystemThreadPoolConfig *")] JobSystemThreadPoolConfig* config);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern JPH_JobSystem* JPH_JobSystemCallback_Create([NativeTypeName("const JPH_JobSystemConfig *")] JPH_JobSystemConfig* config);
+        public static extern JPH_JobSystem* JPH_JobSystemCallback_Create([NativeTypeName("const JPH_JobSystemConfig *")] JobSystemConfig* config);
 
         [DllImport("joltc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void JPH_JobSystem_Destroy(JPH_JobSystem* jobSystem);
