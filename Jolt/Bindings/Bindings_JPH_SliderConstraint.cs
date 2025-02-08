@@ -4,9 +4,20 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
-        public static NativeHandle<JPH_SliderConstraintSettings> JPH_SliderConstraint_GetSettings(NativeHandle<JPH_SliderConstraint> constraint)
+        public static NativeHandle<JPH_SliderConstraint> JPH_SliderConstraint_Create(ref SliderConstraintSettings settings, NativeHandle<JPH_Body> body1, NativeHandle<JPH_Body> body2)
         {
-            return CreateHandle(UnsafeBindings.JPH_SliderConstraint_GetSettings(constraint)); // TODO reuse existing safety handle
+            fixed (SliderConstraintSettings* ptr = &settings)
+            {
+                return CreateHandle(UnsafeBindings.JPH_SliderConstraint_Create((JPH_SliderConstraintSettings*)ptr, body1, body2));
+            }
+        }
+
+        public static void JPH_SliderConstraint_GetSettings(NativeHandle<JPH_SliderConstraint> constraint, ref SliderConstraintSettings settings)
+        {
+            fixed (SliderConstraintSettings* ptr = &settings)
+            {
+                UnsafeBindings.JPH_SliderConstraint_GetSettings(constraint, (JPH_SliderConstraintSettings*)ptr);
+            }
         }
 
         public static float JPH_SliderConstraint_GetCurrentPosition(NativeHandle<JPH_SliderConstraint> constraint) 
@@ -98,16 +109,11 @@ namespace Jolt
             UnsafeBindings.JPH_SliderConstraint_SetLimitsSpringSettings(constraint, &settings);
         }
 
-        public static void JPH_SliderConstraint_GetTotalLambdaPosition(NativeHandle<JPH_SliderConstraint> constraint, out float x, out float y)
+        public static float2 JPH_SliderConstraint_GetTotalLambdaPosition(NativeHandle<JPH_SliderConstraint> constraint)
         {
-            x = default;
-            y = default;
-
-            fixed (float* xptr = &x)
-            fixed (float* yptr = &y)
-            {
-                UnsafeBindings.JPH_SliderConstraint_GetTotalLambdaPosition(constraint, xptr, yptr);   
-            }
+            float2 result;
+            UnsafeBindings.JPH_SliderConstraint_GetTotalLambdaPosition(constraint, &result);
+            return result;
         }
 
         public static float JPH_SliderConstraint_GetTotalLambdaPositionLimits(NativeHandle<JPH_SliderConstraint> constraint)

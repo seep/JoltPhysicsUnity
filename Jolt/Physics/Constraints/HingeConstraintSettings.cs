@@ -1,12 +1,59 @@
-﻿namespace Jolt
+﻿using System.Runtime.InteropServices;
+using Unity.Mathematics;
+
+using static Jolt.Bindings;
+
+namespace Jolt
 {
-    [GenerateHandle("JPH_HingeConstraintSettings"), GenerateBindings("JPH_HingeConstraintSettings", "JPH_TwoBodyConstraintSettings", "JPH_ConstraintSettings")]
-    public readonly partial struct HingeConstraintSettings
+    [ExpectedStructSize(typeof(JPH_HingeConstraintSettings))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct HingeConstraintSettings
     {
-        [OverrideBinding("JPH_HingeConstraintSettings_Create")]
         public static HingeConstraintSettings Create()
         {
-            return new HingeConstraintSettings(Bindings.JPH_HingeConstraintSettings_Create());
+            var instance = new HingeConstraintSettings();
+            JPH_HingeConstraintSettings_Init(ref instance);
+            return instance;
         }
+
+        #region ConstraintSettings
+        
+        public NativeBool Enabled;
+
+        public uint ConstraintPriority;
+
+        public uint NumVelocityStepsOverride;
+
+        public uint NumPositionStepsOverride;
+
+        public float DrawConstraintSize;
+
+        public ulong UserData;
+
+        #endregion
+        
+        public ConstraintSpace Space;
+
+        public rvec3 Point1;
+        
+        public float3 HingeAxis1;
+
+        public float3 NormalAxis1;
+
+        public rvec3 Point2;
+
+        public float3 HingeAxis2;
+
+        public float3 NormalAxis2;
+
+        public float LimitsMin;
+
+        public float LimitsMax;
+
+        public SpringSettings LimitsSpringSettings;
+
+        public float MaxFrictionTorque;
+
+        public MotorSettings MotorSettings;
     }
 }

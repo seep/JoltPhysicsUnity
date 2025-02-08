@@ -2,6 +2,22 @@
 {
     internal static unsafe partial class Bindings
     {
+        public static NativeHandle<JPH_DistanceConstraint> JPH_DistanceConstraint_Create(ref DistanceConstraintSettings settings, NativeHandle<JPH_Body> body1, NativeHandle<JPH_Body> body2)
+        {
+            fixed (DistanceConstraintSettings* ptr = &settings)
+            {
+                return CreateHandle(UnsafeBindings.JPH_DistanceConstraint_Create((JPH_DistanceConstraintSettings*)ptr, body1, body2));
+            }
+        }
+
+        public static void JPH_DistanceConstraint_GetSettings(NativeHandle<JPH_DistanceConstraint> constraint, ref DistanceConstraintSettings settings)
+        {
+            fixed (DistanceConstraintSettings* ptr = &settings)
+            {
+                UnsafeBindings.JPH_DistanceConstraint_GetSettings(constraint, (JPH_DistanceConstraintSettings*)ptr);
+            }
+        }
+
         public static void JPH_DistanceConstraint_SetDistance(NativeHandle<JPH_DistanceConstraint> constraint, float minDistance, float maxDistance)
         {
             UnsafeBindings.JPH_DistanceConstraint_SetDistance(constraint, minDistance, maxDistance);

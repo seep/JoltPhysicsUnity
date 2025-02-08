@@ -1,12 +1,46 @@
-﻿namespace Jolt
+﻿using System.Runtime.InteropServices;
+
+using static Jolt.Bindings;
+
+namespace Jolt
 {
-    [GenerateHandle("JPH_DistanceConstraintSettings"),  GenerateBindings("JPH_DistanceConstraintSettings", "JPH_TwoBodyConstraintSettings", "JPH_ConstraintSettings")]
-    public readonly partial struct DistanceConstraintSettings
+    [ExpectedStructSize(typeof(JPH_DistanceConstraintSettings))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct DistanceConstraintSettings
     {
-        [OverrideBinding("JPH_DistanceConstraintSettings_Create")]
         public static DistanceConstraintSettings Create()
         {
-            return new DistanceConstraintSettings(Bindings.JPH_DistanceConstraintSettings_Create());
+            var instance = new DistanceConstraintSettings();
+            JPH_DistanceConstraintSettings_Init(ref instance);
+            return instance;
         }
+        
+        #region ConstraintSettings
+        
+        public NativeBool Enabled;
+
+        public uint ConstraintPriority;
+
+        public uint NumVelocityStepsOverride;
+
+        public uint NumPositionStepsOverride;
+
+        public float DrawConstraintSize;
+
+        public ulong UserData;
+
+        #endregion
+        
+        public ConstraintSpace Space;
+
+        public rvec3 Point1;
+        
+        public rvec3 Point2;
+
+        public float MinDistance;
+
+        public float MaxDistance;
+
+        public SpringSettings LimitsSpringSettings;
     }
 }

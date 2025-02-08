@@ -1,12 +1,40 @@
-﻿namespace Jolt
+﻿using System.Runtime.InteropServices;
+
+using static Jolt.Bindings;
+
+namespace Jolt
 {
-    [GenerateHandle("JPH_PointConstraintSettings"), GenerateBindings("JPH_PointConstraintSettings", "JPH_TwoBodyConstraintSettings", "JPH_ConstraintSettings")]
-    public readonly partial struct PointConstraintSettings
+    [ExpectedStructSize(typeof(JPH_PointConstraintSettings))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PointConstraintSettings
     {
-        [OverrideBinding("JPH_PointConstraintSettings_Create")]
         public static PointConstraintSettings Create()
         {
-            return new PointConstraintSettings(Bindings.JPH_PointConstraintSettings_Create());
+            var instance = new PointConstraintSettings();
+            JPH_PointConstraintSettings_Init(ref instance);
+            return instance;
         }
+
+        #region ConstraintSettings
+        
+        public NativeBool Enabled;
+
+        public uint ConstraintPriority;
+
+        public uint NumVelocityStepsOverride;
+
+        public uint NumPositionStepsOverride;
+
+        public float DrawConstraintSize;
+
+        public ulong UserData;
+
+        #endregion
+        
+        public ConstraintSpace Space;
+
+        public rvec3 Point1;
+        
+        public rvec3 Point2;
     }
 }

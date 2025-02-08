@@ -2,14 +2,12 @@
 {
     internal static unsafe partial class Bindings
     {
-        public static NativeHandle<JPH_SixDOFConstraintSettings> JPH_SixDOFConstraintSettings_Create()
+        public static void JPH_SixDOFConstraintSettings_Init(ref SixDOFConstraintSettings settings)
         {
-            return CreateHandle(UnsafeBindings.JPH_SixDOFConstraintSettings_Create());
-        }
-
-        public static NativeHandle<JPH_SixDOFConstraint> JPH_SixDOFConstraintSettings_CreateConstraint(NativeHandle<JPH_SixDOFConstraintSettings> settings, NativeHandle<JPH_Body> bodyA, NativeHandle<JPH_Body> bodyB)
-        {
-            return CreateHandle(UnsafeBindings.JPH_SixDOFConstraintSettings_CreateConstraint(settings, bodyA, bodyB));
+            fixed (SixDOFConstraintSettings* ptr = &settings)
+            {
+                UnsafeBindings.JPH_SixDOFConstraintSettings_Init((JPH_SixDOFConstraintSettings*)ptr);   
+            }
         }
     }
 }
