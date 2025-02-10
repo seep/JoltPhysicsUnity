@@ -12,12 +12,11 @@ namespace Jolt
             }
         }
 
-        public static void JPH_ConeConstraint_GetSettings(NativeHandle<JPH_ConeConstraint> constraint, ref ConeConstraintSettings result)
+        public static ConeConstraintSettings JPH_ConeConstraint_GetSettings(NativeHandle<JPH_ConeConstraint> constraint)
         {
-            fixed (ConeConstraintSettings* ptr = &result)
-            {
-                UnsafeBindings.JPH_ConeConstraint_GetSettings(constraint, (JPH_ConeConstraintSettings*)ptr);
-            }
+            ConeConstraintSettings result;
+            UnsafeBindings.JPH_ConeConstraint_GetSettings(constraint, (JPH_ConeConstraintSettings*)&result);
+            return result;
         }
         
         public static void JPH_ConeConstraint_SetHalfConeAngle(NativeHandle<JPH_ConeConstraint> constraint, float halfConeAngle)

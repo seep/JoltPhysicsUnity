@@ -6,7 +6,7 @@ namespace Jolt
     {
         public static NativeHandle<JPH_PhysicsMaterial> JPH_PhysicsMaterial_Create(string name, uint color)
         {
-            nint nameptr;
+            nint nameptr = default;
             
             try
             {

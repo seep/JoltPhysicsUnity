@@ -59,7 +59,9 @@ namespace Jolt.Samples
         /// <summary>
         /// The accumulated time of the physics system updates.
         /// </summary>
-        public float PhysicsTime { get; private set; } 
+        public float PhysicsTime { get; private set; }
+
+        public JobSystem JobSystem { get; private set; }
         
         private void Awake()
         {
@@ -83,7 +85,9 @@ namespace Jolt.Samples
             broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(ObjectLayers.Moving, BroadPhaseLayers.Moving);
 
             var objectVsBroadPhaseLayerFilter = ObjectVsBroadPhaseLayerFilterTable.Create(broadPhaseLayerInterface, BroadPhaseLayers.NumLayers, objectLayerPairFilter, ObjectLayers.NumLayers);
-
+            
+            JobSystem = JobSystem.Create(new JobSystemThreadPoolConfig()); // default uses max threads
+            
             var settings = new PhysicsSystemSettings
             {
                 MaxBodies = MaxBodies,
@@ -136,7 +140,7 @@ namespace Jolt.Samples
 
             var dt = Time.fixedDeltaTime;
             
-            if (system.Update(dt, CollisionSteps, out var error))
+            if (system.Update(dt, CollisionSteps, JobSystem, out var error))
             {
                 PhysicsTime += dt;
                 
@@ -174,6 +178,11 @@ namespace Jolt.Samples
 
         private void OnDestroy()
         {
+            foreach (var addon in addons)
+            {
+                addon.Dispose(system, ManagedPhysicsContext);
+            }
+
             system.Dispose();
         }
     }

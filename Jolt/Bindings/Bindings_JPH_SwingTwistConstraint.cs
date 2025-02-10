@@ -4,6 +4,14 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
+        public static NativeHandle<JPH_SwingTwistConstraint> JPH_SwingTwistConstraint_Create(ref SwingTwistConstraintSettings settings, NativeHandle<JPH_Body> body1, NativeHandle<JPH_Body> body2)
+        {
+            fixed (SwingTwistConstraintSettings* ptr = &settings)
+            {
+                return CreateHandle(UnsafeBindings.JPH_SwingTwistConstraint_Create((JPH_SwingTwistConstraintSettings*)ptr, body1, body2));
+            }
+        }
+
         public static float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(NativeHandle<JPH_SwingTwistConstraint> constraint)
         {
             return UnsafeBindings.JPH_SwingTwistConstraint_GetNormalHalfConeAngle(constraint);

@@ -48,19 +48,19 @@ namespace Jolt.Samples
             // Note, the native library has a way to define the hinge constraint in body local coordinates (similar to
             // the other constraints, see DistanceConstraintSettings#SetSpace) but it is not exposed by joltc.
             
-            settings.SetPoint1(HingePoint);
-            settings.SetPoint2(HingePoint);
+            settings.Point1 = HingePoint;
+            settings.Point2 = HingePoint;
             
-            settings.SetHingeAxis1(math.normalizesafe(HingeAxis));
-            settings.SetHingeAxis2(math.normalizesafe(HingeAxis));
+            settings.HingeAxis1 = math.normalizesafe(HingeAxis);
+            settings.HingeAxis2 = math.normalizesafe(HingeAxis);
             
-            settings.SetNormalAxis1(math.normalizesafe(NormalAxis));
-            settings.SetNormalAxis2(math.normalizesafe(NormalAxis));
+            settings.NormalAxis1 = math.normalizesafe(NormalAxis);
+            settings.NormalAxis2 = math.normalizesafe(NormalAxis);
             
             var ba = context.ManagedToNative[BodyA];
             var bb = context.ManagedToNative[BodyB];
 
-            var constraint = settings.CreateConstraint(ba, bb);
+            var constraint = HingeConstraint.Create(ref settings, ba, bb);
 
             var minRotationRadians = math.remap(0f, 1f, -math.PI, +math.PI, MinRotation);
             var maxRotationRadians = math.remap(0f, 1f, -math.PI, +math.PI, MaxRotation);

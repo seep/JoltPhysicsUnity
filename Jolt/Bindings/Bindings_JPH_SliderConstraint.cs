@@ -12,12 +12,11 @@ namespace Jolt
             }
         }
 
-        public static void JPH_SliderConstraint_GetSettings(NativeHandle<JPH_SliderConstraint> constraint, ref SliderConstraintSettings settings)
+        public static SliderConstraintSettings JPH_SliderConstraint_GetSettings(NativeHandle<JPH_SliderConstraint> constraint)
         {
-            fixed (SliderConstraintSettings* ptr = &settings)
-            {
-                UnsafeBindings.JPH_SliderConstraint_GetSettings(constraint, (JPH_SliderConstraintSettings*)ptr);
-            }
+            SliderConstraintSettings result;
+            UnsafeBindings.JPH_SliderConstraint_GetSettings(constraint, (JPH_SliderConstraintSettings*)&result);
+            return result;
         }
 
         public static float JPH_SliderConstraint_GetCurrentPosition(NativeHandle<JPH_SliderConstraint> constraint) 

@@ -8,10 +8,6 @@ namespace Jolt
     {
         internal readonly NativeHandle<JPH_PhysicsSystem> Handle;
 
-        internal readonly NativeHandle<JPH_ContactListener> ContactListenerHandle;
-
-        internal readonly NativeHandle<JPH_BodyActivationListener> BodyActivationListenerHandle;
-
         /// <summary>
         /// The ObjectLayerPairFilter of the system.
         /// </summary>
@@ -27,23 +23,13 @@ namespace Jolt
         /// </summary>
         public ObjectVsBroadPhaseLayerFilter ObjectVsBroadPhaseLayerFilter;
 
-        public PhysicsSystem(PhysicsSystemSettings settings, JobSystemThreadPoolConfig jobSystemSettings)
+        public PhysicsSystem(PhysicsSystemSettings settings)
         {
             Handle = JPH_PhysicsSystem_Create(settings);
 
             ObjectLayerPairFilter = settings.ObjectLayerPairFilter;
-
             BroadPhaseLayerInterface = settings.BroadPhaseLayerInterface;
-
             ObjectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter;
-
-            ContactListenerHandle = JPH_ContactListener_Create();
-
-            JPH_PhysicsSystem_SetContactListener(Handle, ContactListenerHandle);
-
-            BodyActivationListenerHandle = JPH_BodyActivationListener_Create();
-
-            JPH_PhysicsSystem_SetBodyActivationListener(Handle, BodyActivationListenerHandle);
         }
 
         public void OptimizeBroadPhase()
@@ -67,14 +53,14 @@ namespace Jolt
             return new BodyInterface(JPH_PhysicsSystem_GetBodyInterfaceNoLock(Handle));
         }
 
-        public void SetContactListener(IContactListener listener)
+        public void SetContactListener(ContactListener listener)
         {
-            JPH_ContactListener_SetProcs(ContactListenerHandle, listener);
+            JPH_PhysicsSystem_SetContactListener(Handle, listener.Handle);
         }
 
-        public void SetBodyActivationListener(IBodyActivationListener listener)
+        public void SetBodyActivationListener(BodyActivationListener listener)
         {
-            JPH_BodyActivationListener_SetProcs(BodyActivationListenerHandle, listener);
+            JPH_PhysicsSystem_SetBodyActivationListener(Handle, listener.Handle);
         }
 
         /// <summary>
@@ -145,10 +131,6 @@ namespace Jolt
         public void Dispose()
         {
             JPH_PhysicsSystem_Destroy(Handle);
-
-            JPH_ContactListener_Destroy(ContactListenerHandle);
-
-            JPH_BodyActivationListener_Destroy(BodyActivationListenerHandle);
         }
 
         #region IEquatable

@@ -26,8 +26,6 @@ namespace Jolt
         
         #region JPH_Constraint
         
-        public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle));
-        
         public new ConstraintType GetType() => Bindings.JPH_Constraint_GetType(Handle);
         
         public ConstraintSubType GetSubType() => Bindings.JPH_Constraint_GetSubType(Handle);

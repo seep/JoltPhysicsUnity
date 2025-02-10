@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !JOLT_DISABLE_SAFETY_CHECkS
+
+using System;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
@@ -6,11 +8,8 @@ using UnityEngine;
 [assembly: InternalsVisibleTo("Jolt.Unity")]
 [assembly: InternalsVisibleTo("Jolt.Editor")]
 
-
 namespace Jolt
 {
-    #if !JOLT_DISABLE_SAFETY_CHECkS
-
     /// <summary>
     /// A safety handle for detecting use-after-free access of native objects.
     /// </summary>
@@ -70,6 +69,6 @@ namespace Jolt
             }
         }
     }
-
-    #endif
 }
+
+#endif

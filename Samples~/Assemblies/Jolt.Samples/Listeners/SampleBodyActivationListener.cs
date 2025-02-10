@@ -4,9 +4,16 @@ namespace Jolt.Samples
 {
     public class SampleBodyActivationListener : PhysicsSampleAddon, IBodyActivationListener
     {
+        private BodyActivationListener listener;
+        
         public override void Initialize(PhysicsSystem system, ManagedPhysicsContext _)
         {
-            system.SetBodyActivationListener(this);
+            system.SetBodyActivationListener(listener = BodyActivationListener.Create(this));
+        }
+
+        public override void Dispose(PhysicsSystem system, ManagedPhysicsContext _)
+        {
+            listener.Destroy();
         }
 
         public void OnBodyActivated(BodyID bodyID, ulong bodyUserData)

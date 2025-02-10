@@ -26,7 +26,7 @@ namespace Jolt
         
         #region JPH_SliderConstraint
         
-        public SliderConstraintSettings GetSettings() => new SliderConstraintSettings(Bindings.JPH_SliderConstraint_GetSettings(Handle));
+        public SliderConstraintSettings GetSettings() => Bindings.JPH_SliderConstraint_GetSettings(Handle);
         
         public float GetCurrentPosition() => Bindings.JPH_SliderConstraint_GetCurrentPosition(Handle);
         
@@ -62,7 +62,7 @@ namespace Jolt
         
         public void SetLimitsSpringSettings(SpringSettings settings) => Bindings.JPH_SliderConstraint_SetLimitsSpringSettings(Handle, settings);
         
-        public void GetTotalLambdaPosition(out float x, out float y) => Bindings.JPH_SliderConstraint_GetTotalLambdaPosition(Handle, out x, out y);
+        public float2 GetTotalLambdaPosition() => Bindings.JPH_SliderConstraint_GetTotalLambdaPosition(Handle);
         
         public float GetTotalLambdaPositionLimits() => Bindings.JPH_SliderConstraint_GetTotalLambdaPositionLimits(Handle);
         
@@ -85,8 +85,6 @@ namespace Jolt
         #endregion
         
         #region JPH_Constraint
-        
-        public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle.Reinterpret<JPH_Constraint>()));
         
         public new ConstraintType GetType() => Bindings.JPH_Constraint_GetType(Handle.Reinterpret<JPH_Constraint>());
         

@@ -9,5 +9,7 @@ namespace Jolt.Samples
         public virtual void PrePhysicsStep(PhysicsSystem system, ManagedPhysicsContext context) { }
         
         public virtual void PostPhysicsStep(PhysicsSystem system, ManagedPhysicsContext context) { }
+        
+        public virtual void Dispose(PhysicsSystem system, ManagedPhysicsContext context) { }
     }
 }

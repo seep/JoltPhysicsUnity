@@ -16,19 +16,19 @@ namespace Jolt.Samples
         {
             var settings = SliderConstraintSettings.Create();
         
-            settings.SetPoint1(SliderPoint);
-            settings.SetPoint2(SliderPoint);
+            settings.Point1 = SliderPoint;
+            settings.Point2 = SliderPoint;
             
-            settings.SetSliderAxis1(math.normalizesafe(SliderAxis));
-            settings.SetSliderAxis2(math.normalizesafe(SliderAxis));
+            settings.SliderAxis1 = math.normalizesafe(SliderAxis);
+            settings.SliderAxis2 = math.normalizesafe(SliderAxis);
             
-            settings.SetNormalAxis1(SliderNormal);
-            settings.SetNormalAxis2(SliderNormal);
+            settings.NormalAxis1 = SliderNormal;
+            settings.NormalAxis2 = SliderNormal;
             
             var ba = context.ManagedToNative[BodyA];
             var bb = context.ManagedToNative[BodyB];
 
-            return settings.CreateConstraint(ba, bb);
+            return SliderConstraint.Create(ref settings, ba, bb);
         }
     }
 }

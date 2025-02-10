@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Jolt
 {
     internal unsafe struct NativeHandle<T> : IDisposable, IEquatable<NativeHandle<T>> where T : unmanaged
     {
-        #if !JOLT_DISABLE_SAFETY_CHECkS
         private NativeSafetyHandle safety;
-        #endif
 
         private T* ptr;
 
+        public nint RawValue => (nint)ptr;
+        
         public NativeHandle(T* ptr)
         {
             #if !JOLT_DISABLE_SAFETY_CHECkS

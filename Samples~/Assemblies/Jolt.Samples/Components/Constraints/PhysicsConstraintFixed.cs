@@ -9,12 +9,12 @@
         {
             var settings = FixedConstraintSettings.Create();
             
-            settings.SetAutoDetectPoint(true);
+            settings.AutoDetectPoint = true;
 
             var ba = context.ManagedToNative[BodyA];
             var bb = context.ManagedToNative[BodyB];
 
-            return settings.CreateConstraint(ba, bb);
+            return FixedConstraint.Create(ref settings, ba, bb);
         }
     }
 }

@@ -13,13 +13,13 @@ namespace Jolt.Samples
         {
             var settings = PointConstraintSettings.Create();
 
-            settings.SetPoint1(Point);
-            settings.SetPoint2(Point);
+            settings.Point1 = Point;
+            settings.Point2 = Point;
             
             var ba = context.ManagedToNative[BodyA];
             var bb = context.ManagedToNative[BodyB];
 
-            return settings.CreateConstraint(ba, bb);
+            return PointConstraint.Create(ref settings, ba, bb);
         }
     }
 }

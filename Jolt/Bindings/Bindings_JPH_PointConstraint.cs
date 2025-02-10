@@ -4,11 +4,11 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
-        public static void JPH_PointConstraint_Create(ref PointConstraintSettings settings, NativeHandle<JPH_Body> body1, NativeHandle<JPH_Body> body2)
+        public static NativeHandle<JPH_PointConstraint> JPH_PointConstraint_Create(ref PointConstraintSettings settings, NativeHandle<JPH_Body> body1, NativeHandle<JPH_Body> body2)
         {
             fixed (PointConstraintSettings* ptr = &settings)
             {
-                UnsafeBindings.JPH_PointConstraint_Create((JPH_PointConstraintSettings*) ptr, body1, body2);
+                return CreateHandle(UnsafeBindings.JPH_PointConstraint_Create((JPH_PointConstraintSettings*) ptr, body1, body2));
             }
         }
         

@@ -4,9 +4,16 @@ namespace Jolt.Samples
 {
     public class SampleContactListener : PhysicsSampleAddon, IContactListener
     {
+        private ContactListener listener;
+        
         public override void Initialize(PhysicsSystem system, ManagedPhysicsContext _)
         {
-            system.SetContactListener(this);
+            system.SetContactListener(listener = ContactListener.Create(this));
+        }
+
+        public override void Dispose(PhysicsSystem system, ManagedPhysicsContext _)
+        {
+            listener.Destroy();
         }
 
         public ValidateResult OnContactValidate()

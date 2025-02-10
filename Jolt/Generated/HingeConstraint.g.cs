@@ -26,7 +26,7 @@ namespace Jolt
         
         #region JPH_HingeConstraint
         
-        public HingeConstraintSettings GetSettings() => new HingeConstraintSettings(Bindings.JPH_HingeConstraint_GetSettings(Handle));
+        public HingeConstraintSettings GetSettings() => Bindings.JPH_HingeConstraint_GetSettings(Handle);
         
         public float GetCurrentAngle() => Bindings.JPH_HingeConstraint_GetCurrentAngle(Handle);
         
@@ -85,8 +85,6 @@ namespace Jolt
         #endregion
         
         #region JPH_Constraint
-        
-        public ConstraintSettings GetConstraintSettings() => new ConstraintSettings(Bindings.JPH_Constraint_GetConstraintSettings(Handle.Reinterpret<JPH_Constraint>()));
         
         public new ConstraintType GetType() => Bindings.JPH_Constraint_GetType(Handle.Reinterpret<JPH_Constraint>());
         

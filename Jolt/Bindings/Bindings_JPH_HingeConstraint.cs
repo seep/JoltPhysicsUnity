@@ -12,12 +12,11 @@ namespace Jolt
             }
         }
 
-        public static void JPH_HingeConstraint_GetSettings(NativeHandle<JPH_HingeConstraint> constraint, ref HingeConstraintSettings result)
+        public static HingeConstraintSettings JPH_HingeConstraint_GetSettings(NativeHandle<JPH_HingeConstraint> constraint)
         {
-            fixed (HingeConstraintSettings* ptr = &result)
-            {
-                UnsafeBindings.JPH_HingeConstraint_GetSettings(constraint, (JPH_HingeConstraintSettings*)ptr);
-            }
+            HingeConstraintSettings result;
+            UnsafeBindings.JPH_HingeConstraint_GetSettings(constraint, (JPH_HingeConstraintSettings*)&result);
+            return result;
         }
 
         public static float3 JPH_HingeConstraint_GetLocalSpacePoint1(NativeHandle<JPH_HingeConstraint> constraint)

@@ -12,6 +12,29 @@ Unity Jobs and Burst compiled code.
 The package is not currently published on any registries. You can [add it as a git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 or [embed it directly in your project](https://docs.unity3d.com/Manual/upm-embed.html).
 
+### Features
+
+###### Shapes
+
+###### Constraints  
+
+[x] Cone
+[x] Distance
+[x] Fixed
+[x] Hinge
+[x] Point
+[x] SixDOF
+[x] Slider
+[x] SwingTwist
+[x] Gear
+
+###### Listeners
+
+[x] Contact Listener Invocation
+[ ] Contact Listener Arg Forwarding 
+[x] Body Activation Listener Invocation
+[x] Body Activation Listener Arg Forwarding
+
 ### Acknowledgements
 
 This package relies on the `joltc` bindings written by [amerkoleci](https://github.com/amerkoleci)

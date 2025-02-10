@@ -9,14 +9,14 @@
         {
             var settings = DistanceConstraintSettings.Create();
             
-            settings.SetPoint1(default);
-            settings.SetPoint2(default);
-            settings.SetSpace(ConstraintSpace.LocalToBodyCOM);
+            settings.Point1 = default;
+            settings.Point2 = default;
+            settings.Space = ConstraintSpace.LocalToBodyCOM;
 
             var ba = context.ManagedToNative[BodyA];
             var bb = context.ManagedToNative[BodyB];
             
-            return settings.CreateConstraint(ba, bb);
+            return DistanceConstraint.Create(ref settings, ba, bb);
         }
 
     }
