@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct Body : IEquatable<Body>
+    public partial struct Body : IEquatable<Body>
     {
-        internal readonly NativeHandle<JPH_Body> Handle;
-        
-        internal Body(NativeHandle<JPH_Body> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(Body other) => Handle.Equals(other.Handle);
@@ -60,7 +56,7 @@ namespace Jolt
         
         public bool GetApplyGyroscopicForce() => Bindings.JPH_Body_GetApplyGyroscopicForce(Handle);
         
-        public MotionProperties GetMotionProperties() => new MotionProperties(Bindings.JPH_Body_GetMotionProperties(Handle));
+        public MotionProperties GetMotionProperties() => new MotionProperties { Handle = Bindings.JPH_Body_GetMotionProperties(Handle) };
         
         public MotionType GetMotionType() => Bindings.JPH_Body_GetMotionType(Handle);
         

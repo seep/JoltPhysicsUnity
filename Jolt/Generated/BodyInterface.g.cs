@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct BodyInterface : IEquatable<BodyInterface>
+    public partial struct BodyInterface : IEquatable<BodyInterface>
     {
-        internal readonly NativeHandle<JPH_BodyInterface> Handle;
-        
-        internal BodyInterface(NativeHandle<JPH_BodyInterface> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(BodyInterface other) => Handle.Equals(other.Handle);
@@ -30,11 +26,11 @@ namespace Jolt
         
         public BodyID CreateAndAddBody(BodyCreationSettings settings, Activation activation) => Bindings.JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activation);
         
-        public Body CreateBody(BodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateBody(Handle, settings.Handle));
+        public Body CreateBody(BodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateBody(Handle, settings.Handle) };
         
-        public Body CreateBodyWithID(BodyID bodyID, BodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle));
+        public Body CreateBodyWithID(BodyID bodyID, BodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle) };
         
-        public Body CreateBodyWithoutID(BodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle));
+        public Body CreateBodyWithoutID(BodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle) };
         
         public void DestroyBodyWithoutID(Body body) => Bindings.JPH_BodyInterface_DestroyBodyWithoutID(Handle, body.Handle);
         
@@ -42,13 +38,13 @@ namespace Jolt
         
         public bool AssignBodyID(Body body, BodyID bodyID) => Bindings.JPH_BodyInterface_AssignBodyID(Handle, body.Handle, bodyID);
         
-        public Body UnassignBodyID(BodyID bodyID) => new Body(Bindings.JPH_BodyInterface_UnassignBodyID(Handle, bodyID));
+        public Body UnassignBodyID(BodyID bodyID) => new Body { Handle = Bindings.JPH_BodyInterface_UnassignBodyID(Handle, bodyID) };
         
-        public Body CreateSoftBody(SoftBodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle));
+        public Body CreateSoftBody(SoftBodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle) };
         
-        public Body CreateSoftBodyWithID(BodyID bodyID, SoftBodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateSoftBodyWithID(Handle, bodyID, settings.Handle));
+        public Body CreateSoftBodyWithID(BodyID bodyID, SoftBodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateSoftBodyWithID(Handle, bodyID, settings.Handle) };
         
-        public Body CreateSoftBodyWithoutID(SoftBodyCreationSettings settings) => new Body(Bindings.JPH_BodyInterface_CreateSoftBodyWithoutID(Handle, settings.Handle));
+        public Body CreateSoftBodyWithoutID(SoftBodyCreationSettings settings) => new Body { Handle = Bindings.JPH_BodyInterface_CreateSoftBodyWithoutID(Handle, settings.Handle) };
         
         public BodyID CreateAndAddSoftBody(SoftBodyCreationSettings settings, Activation activation) => Bindings.JPH_BodyInterface_CreateAndAddSoftBody(Handle, settings.Handle, activation);
         
@@ -98,7 +94,7 @@ namespace Jolt
         
         public void SetPositionRotationAndVelocity(BodyID bodyID, rvec3 position, quaternion rotation, float3 linearVelocity, float3 angularVelocity) => Bindings.JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, position, rotation, linearVelocity, angularVelocity);
         
-        public Shape GetShape(BodyID bodyID) => new Shape(Bindings.JPH_BodyInterface_GetShape(Handle, bodyID));
+        public Shape GetShape(BodyID bodyID) => new Shape { Handle = Bindings.JPH_BodyInterface_GetShape(Handle, bodyID) };
         
         public void SetShape(BodyID bodyID, Shape shape, bool updateMassProperties, Activation activation) => Bindings.JPH_BodyInterface_SetShape(Handle, bodyID, shape.Handle, updateMassProperties, activation);
         

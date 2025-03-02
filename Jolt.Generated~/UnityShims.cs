@@ -23,6 +23,8 @@ namespace UnityEngine
 {
     public static class Debug
     {
+        public static void LogError(string _) { }
+        
         public static void LogWarning(string _) { }
 
         public static void LogException(System.Exception _) { }

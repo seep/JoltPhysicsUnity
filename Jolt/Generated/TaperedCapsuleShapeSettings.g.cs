@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct TaperedCapsuleShapeSettings : IEquatable<TaperedCapsuleShapeSettings>
+    public partial struct TaperedCapsuleShapeSettings : IEquatable<TaperedCapsuleShapeSettings>
     {
-        internal readonly NativeHandle<JPH_TaperedCapsuleShapeSettings> Handle;
-        
-        internal TaperedCapsuleShapeSettings(NativeHandle<JPH_TaperedCapsuleShapeSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(TaperedCapsuleShapeSettings other) => Handle.Equals(other.Handle);
@@ -26,7 +22,7 @@ namespace Jolt
         
         #region JPH_TaperedCapsuleShapeSettings
         
-        public TaperedCapsuleShape CreateShape() => new TaperedCapsuleShape(Bindings.JPH_TaperedCapsuleShapeSettings_CreateShape(Handle));
+        public TaperedCapsuleShape CreateShape() => new TaperedCapsuleShape { Handle = Bindings.JPH_TaperedCapsuleShapeSettings_CreateShape(Handle) };
         
         #endregion
         

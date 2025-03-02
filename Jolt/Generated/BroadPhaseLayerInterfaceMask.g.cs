@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct BroadPhaseLayerInterfaceMask : IEquatable<BroadPhaseLayerInterfaceMask>
+    public partial struct BroadPhaseLayerInterfaceMask : IEquatable<BroadPhaseLayerInterfaceMask>
     {
-        internal readonly NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
-        
-        internal BroadPhaseLayerInterfaceMask(NativeHandle<JPH_BroadPhaseLayerInterface> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(BroadPhaseLayerInterfaceMask other) => Handle.Equals(other.Handle);
@@ -26,7 +22,7 @@ namespace Jolt
         
         #region JPH_BroadPhaseLayerInterfaceMask
         
-        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude) => Bindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer, groupsToInclude, groupsToExclude);
+        public void ConfigureLayer(BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude) => Bindings.JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle.Reinterpret<JPH_BroadPhaseLayerInterface>(), broadPhaseLayer, groupsToInclude, groupsToExclude);
         
         #endregion
         

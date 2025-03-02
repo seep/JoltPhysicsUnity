@@ -19,10 +19,9 @@ namespace Jolt
             return CreateHandle(UnsafeBindings.JPH_BodyCreationSettings_Create3(shape, &position, &rotation, motion, layer));
         }
 
-        public static void JPH_BodyCreationSettings_Destroy(NativeHandle<JPH_BodyCreationSettings> settings)
+        public static void JPH_BodyCreationSettings_Destroy(ref NativeHandle<JPH_BodyCreationSettings> settings)
         {
             UnsafeBindings.JPH_BodyCreationSettings_Destroy(settings);
-
             settings.Dispose();
         }
 

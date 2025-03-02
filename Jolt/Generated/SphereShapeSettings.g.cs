@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct SphereShapeSettings : IEquatable<SphereShapeSettings>
+    public partial struct SphereShapeSettings : IEquatable<SphereShapeSettings>
     {
-        internal readonly NativeHandle<JPH_SphereShapeSettings> Handle;
-        
-        internal SphereShapeSettings(NativeHandle<JPH_SphereShapeSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(SphereShapeSettings other) => Handle.Equals(other.Handle);
@@ -26,7 +22,7 @@ namespace Jolt
         
         #region JPH_SphereShapeSettings
         
-        public SphereShape CreateShape() => new SphereShape(Bindings.JPH_SphereShapeSettings_CreateShape(Handle));
+        public SphereShape CreateShape() => new SphereShape { Handle = Bindings.JPH_SphereShapeSettings_CreateShape(Handle) };
         
         public float GetRadius() => Bindings.JPH_SphereShapeSettings_GetRadius(Handle);
         

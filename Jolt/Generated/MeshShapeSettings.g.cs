@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct MeshShapeSettings : IEquatable<MeshShapeSettings>
+    public partial struct MeshShapeSettings : IEquatable<MeshShapeSettings>
     {
-        internal readonly NativeHandle<JPH_MeshShapeSettings> Handle;
-        
-        internal MeshShapeSettings(NativeHandle<JPH_MeshShapeSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(MeshShapeSettings other) => Handle.Equals(other.Handle);
@@ -28,7 +24,7 @@ namespace Jolt
         
         public void Sanitize() => Bindings.JPH_MeshShapeSettings_Sanitize(Handle);
         
-        public MeshShape CreateShape() => new MeshShape(Bindings.JPH_MeshShapeSettings_CreateShape(Handle));
+        public MeshShape CreateShape() => new MeshShape { Handle = Bindings.JPH_MeshShapeSettings_CreateShape(Handle) };
         
         #endregion
         

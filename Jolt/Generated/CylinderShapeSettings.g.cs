@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct CylinderShapeSettings : IEquatable<CylinderShapeSettings>
+    public partial struct CylinderShapeSettings : IEquatable<CylinderShapeSettings>
     {
-        internal readonly NativeHandle<JPH_CylinderShapeSettings> Handle;
-        
-        internal CylinderShapeSettings(NativeHandle<JPH_CylinderShapeSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(CylinderShapeSettings other) => Handle.Equals(other.Handle);

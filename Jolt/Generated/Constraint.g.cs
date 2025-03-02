@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct Constraint : IEquatable<Constraint>
+    public partial struct Constraint : IEquatable<Constraint>
     {
-        internal readonly NativeHandle<JPH_Constraint> Handle;
-        
-        internal Constraint(NativeHandle<JPH_Constraint> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(Constraint other) => Handle.Equals(other.Handle);
@@ -26,13 +22,23 @@ namespace Jolt
         
         #region JPH_Constraint
         
-        public new ConstraintType GetType() => Bindings.JPH_Constraint_GetType(Handle);
+        public void Destroy() => Bindings.JPH_Constraint_Destroy(Handle);
+        
+        public ConstraintType GetShapeType() => Bindings.JPH_Constraint_GetType(Handle);
         
         public ConstraintSubType GetSubType() => Bindings.JPH_Constraint_GetSubType(Handle);
         
         public uint GetConstraintPriority() => Bindings.JPH_Constraint_GetConstraintPriority(Handle);
         
         public void SetConstraintPriority(uint priority) => Bindings.JPH_Constraint_SetConstraintPriority(Handle, priority);
+        
+        public uint GetNumVelocityStepsOverride() => Bindings.JPH_Constraint_GetNumVelocityStepsOverride(Handle);
+        
+        public void SetNumVelocityStepsOverride(uint value) => Bindings.JPH_Constraint_SetNumVelocityStepsOverride(Handle, value);
+        
+        public uint GetNumPositionStepsOverride() => Bindings.JPH_Constraint_GetNumPositionStepsOverride(Handle);
+        
+        public void SetNumPositionStepsOverride(uint value) => Bindings.JPH_Constraint_SetNumPositionStepsOverride(Handle, value);
         
         public bool GetEnabled() => Bindings.JPH_Constraint_GetEnabled(Handle);
         
@@ -44,7 +50,17 @@ namespace Jolt
         
         public void NotifyShapeChanged(BodyID bodyID, float3 deltaCOM) => Bindings.JPH_Constraint_NotifyShapeChanged(Handle, bodyID, deltaCOM);
         
-        public void Destroy() => Bindings.JPH_Constraint_Destroy(Handle);
+        public void ResetWarmStart() => Bindings.JPH_Constraint_ResetWarmStart(Handle);
+        
+        public bool IsActive() => Bindings.JPH_Constraint_IsActive(Handle);
+        
+        public void SetupVelocityConstraint(float deltaTime) => Bindings.JPH_Constraint_SetupVelocityConstraint(Handle, deltaTime);
+        
+        public void WarmStartVelocityConstraint(float warmStartImpulseRatio) => Bindings.JPH_Constraint_WarmStartVelocityConstraint(Handle, warmStartImpulseRatio);
+        
+        public bool SolveVelocityConstraint(float deltaTime) => Bindings.JPH_Constraint_SolveVelocityConstraint(Handle, deltaTime);
+        
+        public bool SolvePositionConstraint(float deltaTime, float baumgarte) => Bindings.JPH_Constraint_SolvePositionConstraint(Handle, deltaTime, baumgarte);
         
         #endregion
         

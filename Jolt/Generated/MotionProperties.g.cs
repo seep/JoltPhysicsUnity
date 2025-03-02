@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct MotionProperties : IEquatable<MotionProperties>
+    public partial struct MotionProperties : IEquatable<MotionProperties>
     {
-        internal readonly NativeHandle<JPH_MotionProperties> Handle;
-        
-        internal MotionProperties(NativeHandle<JPH_MotionProperties> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(MotionProperties other) => Handle.Equals(other.Handle);

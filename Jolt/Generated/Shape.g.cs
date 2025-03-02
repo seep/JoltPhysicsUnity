@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct Shape : IEquatable<Shape>
+    public partial struct Shape : IEquatable<Shape>
     {
-        internal readonly NativeHandle<JPH_Shape> Handle;
-        
-        internal Shape(NativeHandle<JPH_Shape> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(Shape other) => Handle.Equals(other.Handle);
@@ -28,7 +24,7 @@ namespace Jolt
         
         public void Destroy() => Bindings.JPH_Shape_Destroy(Handle);
         
-        public new ShapeType GetType() => Bindings.JPH_Shape_GetType(Handle);
+        public ShapeType GetShapeType() => Bindings.JPH_Shape_GetType(Handle);
         
         public ShapeSubType GetSubType() => Bindings.JPH_Shape_GetSubType(Handle);
         
@@ -42,6 +38,8 @@ namespace Jolt
         
         public AABox GetLocalBounds() => Bindings.JPH_Shape_GetLocalBounds(Handle);
         
+        public uint GetSubShapeIDBitsRecursive() => Bindings.JPH_Shape_GetSubShapeIDBitsRecursive(Handle);
+        
         public AABox GetWorldSpaceBounds(rmatrix4x4 centerOfMassTransform, float3 scale) => Bindings.JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransform, scale);
         
         public float GetInnerRadius() => Bindings.JPH_Shape_GetInnerRadius(Handle);
@@ -51,6 +49,12 @@ namespace Jolt
         public float3 GetSurfaceNormal(SubShapeID subShapeID, float3 localPosition) => Bindings.JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPosition);
         
         public float GetVolume() => Bindings.JPH_Shape_GetVolume(Handle);
+        
+        public bool IsValidScale(float3 scale) => Bindings.JPH_Shape_IsValidScale(Handle, scale);
+        
+        public float3 MakeScaleValid(float3 scale) => Bindings.JPH_Shape_MakeScaleValid(Handle, scale);
+        
+        public Shape ScaleShape(float3 scale) => new Shape { Handle = Bindings.JPH_Shape_ScaleShape(Handle, scale) };
         
         public bool CastRay(float3 origin, float3 direction, out RayCastResult result) => Bindings.JPH_Shape_CastRay(Handle, origin, direction, out result);
         

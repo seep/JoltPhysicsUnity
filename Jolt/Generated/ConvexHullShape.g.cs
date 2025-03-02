@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct ConvexHullShape : IEquatable<ConvexHullShape>
+    public partial struct ConvexHullShape : IEquatable<ConvexHullShape>
     {
-        internal readonly NativeHandle<JPH_ConvexHullShape> Handle;
-        
-        internal ConvexHullShape(NativeHandle<JPH_ConvexHullShape> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(ConvexHullShape other) => Handle.Equals(other.Handle);
@@ -21,6 +17,10 @@ namespace Jolt
         public static bool operator ==(ConvexHullShape lhs, ConvexHullShape rhs) => lhs.Equals(rhs);
         
         public static bool operator !=(ConvexHullShape lhs, ConvexHullShape rhs) => !lhs.Equals(rhs);
+        
+        #endregion
+        
+        #region JPH_ConvexHullShape
         
         #endregion
         
@@ -36,7 +36,7 @@ namespace Jolt
         
         public void Destroy() => Bindings.JPH_Shape_Destroy(Handle.Reinterpret<JPH_Shape>());
         
-        public new ShapeType GetType() => Bindings.JPH_Shape_GetType(Handle.Reinterpret<JPH_Shape>());
+        public ShapeType GetShapeType() => Bindings.JPH_Shape_GetType(Handle.Reinterpret<JPH_Shape>());
         
         public ShapeSubType GetSubType() => Bindings.JPH_Shape_GetSubType(Handle.Reinterpret<JPH_Shape>());
         
@@ -50,6 +50,8 @@ namespace Jolt
         
         public AABox GetLocalBounds() => Bindings.JPH_Shape_GetLocalBounds(Handle.Reinterpret<JPH_Shape>());
         
+        public uint GetSubShapeIDBitsRecursive() => Bindings.JPH_Shape_GetSubShapeIDBitsRecursive(Handle.Reinterpret<JPH_Shape>());
+        
         public AABox GetWorldSpaceBounds(rmatrix4x4 centerOfMassTransform, float3 scale) => Bindings.JPH_Shape_GetWorldSpaceBounds(Handle.Reinterpret<JPH_Shape>(), centerOfMassTransform, scale);
         
         public float GetInnerRadius() => Bindings.JPH_Shape_GetInnerRadius(Handle.Reinterpret<JPH_Shape>());
@@ -59,6 +61,12 @@ namespace Jolt
         public float3 GetSurfaceNormal(SubShapeID subShapeID, float3 localPosition) => Bindings.JPH_Shape_GetSurfaceNormal(Handle.Reinterpret<JPH_Shape>(), subShapeID, localPosition);
         
         public float GetVolume() => Bindings.JPH_Shape_GetVolume(Handle.Reinterpret<JPH_Shape>());
+        
+        public bool IsValidScale(float3 scale) => Bindings.JPH_Shape_IsValidScale(Handle.Reinterpret<JPH_Shape>(), scale);
+        
+        public float3 MakeScaleValid(float3 scale) => Bindings.JPH_Shape_MakeScaleValid(Handle.Reinterpret<JPH_Shape>(), scale);
+        
+        public Shape ScaleShape(float3 scale) => new Shape { Handle = Bindings.JPH_Shape_ScaleShape(Handle.Reinterpret<JPH_Shape>(), scale) };
         
         public bool CastRay(float3 origin, float3 direction, out RayCastResult result) => Bindings.JPH_Shape_CastRay(Handle.Reinterpret<JPH_Shape>(), origin, direction, out result);
         

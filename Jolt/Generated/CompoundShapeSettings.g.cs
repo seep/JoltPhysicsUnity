@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct CompoundShapeSettings : IEquatable<CompoundShapeSettings>
+    public partial struct CompoundShapeSettings : IEquatable<CompoundShapeSettings>
     {
-        internal readonly NativeHandle<JPH_CompoundShapeSettings> Handle;
-        
-        internal CompoundShapeSettings(NativeHandle<JPH_CompoundShapeSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(CompoundShapeSettings other) => Handle.Equals(other.Handle);

@@ -4,12 +4,8 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    public readonly partial struct BodyCreationSettings : IEquatable<BodyCreationSettings>
+    public partial struct BodyCreationSettings : IEquatable<BodyCreationSettings>
     {
-        internal readonly NativeHandle<JPH_BodyCreationSettings> Handle;
-        
-        internal BodyCreationSettings(NativeHandle<JPH_BodyCreationSettings> handle) => Handle = handle;
-        
         #region IEquatable
         
         public bool Equals(BodyCreationSettings other) => Handle.Equals(other.Handle);
@@ -26,7 +22,7 @@ namespace Jolt
         
         #region JPH_BodyCreationSettings
         
-        public void Destroy() => Bindings.JPH_BodyCreationSettings_Destroy(Handle);
+        public void Destroy() => Bindings.JPH_BodyCreationSettings_Destroy(ref Handle);
         
         public rvec3 GetPosition() => Bindings.JPH_BodyCreationSettings_GetPosition(Handle);
         

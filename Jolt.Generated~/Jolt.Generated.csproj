@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jolt.SourceGenerators~\Jolt.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\Jolt.SourceGenerator~\Jolt.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Jolt\**\*.cs"/>
-    <Compile Remove="..\Jolt\Generated\**\*.cs"/>
+    <Compile Remove="..\Jolt\Generated\*.cs"/>
   </ItemGroup>
 
   <ItemGroup>
