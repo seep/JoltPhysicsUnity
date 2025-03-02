@@ -181,12 +181,14 @@ internal class JoltSourceGenerator : ISourceGenerator
     {
         if (bindings.BindingsByNativeType.TryGetValue(prefix, out var bindingsWithPrefix))
         {
+            WritePaddedLine(writer, $"#region {prefix}");
+            
             foreach (var binding in bindingsWithPrefix)
             {
-                WritePaddedLine(writer, $"#region {prefix}");
                 GenerateBindings(writer, target, binding);
-                WritePaddedLine(writer, "#endregion");
             }
+            
+            WritePaddedLine(writer, "#endregion");
         }
     }
 
