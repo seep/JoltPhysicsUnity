@@ -3,15 +3,13 @@
 namespace Jolt
 {
     [GenerateBindings("JPH_PointConstraint", "JPH_TwoBodyConstraint", "JPH_Constraint")]
-    public readonly partial struct PointConstraint
+    public partial struct PointConstraint
     {
-        internal readonly NativeHandle<JPH_PointConstraint> Handle;
-
-        internal PointConstraint(NativeHandle<JPH_PointConstraint> handle) => Handle = handle;
+        internal NativeHandle<JPH_PointConstraint> Handle;
 
         public static PointConstraint Create(ref PointConstraintSettings settings, Body bodyA, Body bodyB)
         {
-            return new PointConstraint(JPH_PointConstraint_Create(ref settings, bodyA.Handle, bodyB.Handle));
+            return new PointConstraint { Handle = JPH_PointConstraint_Create(ref settings, bodyA.Handle, bodyB.Handle) };
         }
     }
 }

@@ -183,7 +183,7 @@ namespace Jolt.Samples
                 addon.Dispose(system, ManagedPhysicsContext);
             }
 
-            system.Dispose();
+            system.Destroy();
         }
     }
 }

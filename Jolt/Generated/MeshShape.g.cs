@@ -20,10 +20,6 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_MeshShape
-        
-        #endregion
-        
         #region JPH_Shape
         
         public void Destroy() => Bindings.JPH_Shape_Destroy(Handle.Reinterpret<JPH_Shape>());

@@ -20,10 +20,6 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_ConvexHullShape
-        
-        #endregion
-        
         #region JPH_ConvexShape
         
         public float GetDensity() => Bindings.JPH_ConvexShape_GetDensity(Handle.Reinterpret<JPH_ConvexShape>());

@@ -20,9 +20,5 @@ namespace Jolt
         
         #endregion
         
-        #region JPH_SoftBodyCreationSettings
-        
-        #endregion
-        
     }
 }
