@@ -15,15 +15,15 @@ namespace Jolt
         public float y;
         public float z;
 
-	    public static unsafe implicit operator float3(rvec3 vec)
-	    {
-		    return *((float3*) &vec);
-	    }
+        public static unsafe implicit operator float3(rvec3 vec)
+        {
+            return *((float3*) &vec);
+        }
 
-	    public static unsafe implicit operator rvec3(float3 vec)
-	    {
-		    return *((rvec3*) &vec);
-	    }
+        public static unsafe implicit operator rvec3(float3 vec)
+        {
+            return *((rvec3*) &vec);
+        }
 
 #else
 
@@ -32,14 +32,14 @@ namespace Jolt
         public double z;
 
         public static unsafe implicit operator double3(rvec3 vec)
-	    {
-			return *((double3*) &vec);
-		}
+        {
+            return *((double3*) &vec);
+        }
 
         public static unsafe implicit operator rvec3(double3 vec)
-	    {
-			return *((rvec3*) &vec);
-		}
+        {
+            return *((rvec3*) &vec);
+        }
 
 #endif
     }
