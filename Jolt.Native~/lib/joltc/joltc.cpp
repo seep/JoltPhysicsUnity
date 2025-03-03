@@ -26,6 +26,7 @@ JPH_SUPPRESS_WARNINGS
 #include "Jolt/Physics/Collision/CollideShape.h"
 #include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 #include <Jolt/Physics/Collision/CollisionDispatch.h>
+#include <Jolt/Physics/Collision/EstimateCollisionResponse.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 #include "Jolt/Physics/Collision/Shape/PlaneShape.h"
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
@@ -101,6 +102,7 @@ using namespace JPH;
     }
 
 //DEF_MAP_DECL(Quat, JPH_Quat)
+DEF_MAP_DECL(ContactManifold, JPH_ContactManifold)
 DEF_MAP_DECL(BodyCreationSettings, JPH_BodyCreationSettings)
 DEF_MAP_DECL(SoftBodyCreationSettings, JPH_SoftBodyCreationSettings)
 DEF_MAP_DECL(Body, JPH_Body)
@@ -120,6 +122,8 @@ DEF_MAP_DECL(MutableCompoundShape, JPH_MutableCompoundShape)
 DEF_MAP_DECL(MutableCompoundShapeSettings, JPH_MutableCompoundShapeSettings)
 DEF_MAP_DECL(MeshShape, JPH_MeshShape)
 DEF_MAP_DECL(MeshShapeSettings, JPH_MeshShapeSettings)
+DEF_MAP_DECL(HeightFieldShape, JPH_HeightFieldShape)
+DEF_MAP_DECL(HeightFieldShapeSettings, JPH_HeightFieldShapeSettings)
 DEF_MAP_DECL(Constraint, JPH_Constraint)
 DEF_MAP_DECL(TwoBodyConstraint, JPH_TwoBodyConstraint)
 DEF_MAP_DECL(FixedConstraint, JPH_FixedConstraint)
@@ -305,11 +309,6 @@ static inline void FromJolt(const MotorSettings& jolt, JPH_MotorSettings* result
 	result->maxTorqueLimit = jolt.mMaxTorqueLimit;
 }
 
-static inline void FromJolt(const SubShapeID& jolt, JPH_SubShapeID* result)
-{
-	*result = jolt.GetValue();
-}
-
 static inline const JPH_PhysicsMaterial* FromJolt(const JPH::PhysicsMaterial* joltMaterial)
 {
 	return joltMaterial != nullptr ? ToPhysicsMaterial(joltMaterial) : nullptr;
@@ -342,6 +341,40 @@ static inline void FromJolt(const Skeleton::Joint& jolt, JPH_SkeletonJoint* resu
 	result->name = jolt.mName.c_str();
 	result->parentName = jolt.mParentName.c_str();
 	result->parentJointIndex = jolt.mParentJointIndex;
+}
+
+static inline JPH_CollideShapeResult FromJolt(const JPH::CollideShapeResult& jolt)
+{
+	JPH_CollideShapeResult result{};
+	FromJolt(jolt.mContactPointOn1, &result.contactPointOn1);
+	FromJolt(jolt.mContactPointOn2, &result.contactPointOn2);
+	FromJolt(jolt.mPenetrationAxis, &result.penetrationAxis);
+	result.penetrationDepth = jolt.mPenetrationDepth;
+	result.subShapeID1 = jolt.mSubShapeID1.GetValue();
+	result.subShapeID2 = jolt.mSubShapeID2.GetValue();
+	result.bodyID2 = jolt.mBodyID2.GetIndexAndSequenceNumber();
+
+	if (!jolt.mShape1Face.empty())
+	{
+		result.shape1FaceCount = static_cast<uint32_t>(jolt.mShape1Face.size());
+		result.shape1Faces = (JPH_Vec3*)malloc(sizeof(JPH_Vec3) * result.shape1FaceCount);
+		for (uint32_t i = 0; i < result.shape1FaceCount; i++)
+		{
+			FromJolt(jolt.mShape1Face[i], &result.shape1Faces[i]);
+		}
+	}
+
+	if (!jolt.mShape2Face.empty())
+	{
+		result.shape2FaceCount = static_cast<uint32_t>(jolt.mShape2Face.size());
+		result.shape2Faces = (JPH_Vec3*)malloc(sizeof(JPH_Vec3) * result.shape2FaceCount);
+		for (uint32_t i = 0; i < result.shape2FaceCount; i++)
+		{
+			FromJolt(jolt.mShape2Face[i], &result.shape2Faces[i]);
+		}
+	}
+
+	return result;
 }
 
 // To Jolt conversion methods
@@ -632,6 +665,28 @@ void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler)
 #endif
 }
 
+/* JPH_CollideShapeResult */
+JPH_CAPI void JPH_CollideShapeResult_FreeMembers(JPH_CollideShapeResult* result)
+{
+	if (result->shape1FaceCount) 
+	{
+		free(result->shape1Faces);
+	}
+
+	if (result->shape2FaceCount)
+	{
+		free(result->shape2Faces);
+	}
+}
+
+void JPH_CollisionEstimationResult_FreeMembers(JPH_CollisionEstimationResult* result)
+{
+	if (result->impulseCount)
+	{
+		free(result->impulses);
+	}
+}
+
 /* JPH_BroadPhaseLayerInterface */
 JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceMask_Create(uint32_t numBroadPhaseLayers)
 {
@@ -920,7 +975,7 @@ public:
 
 	bool ShouldCollide(BroadPhaseLayer inLayer) const override
 	{
-		if (procs != nullptr 
+		if (procs != nullptr
 			&& procs->ShouldCollide)
 		{
 			return procs->ShouldCollide(userData, static_cast<JPH_BroadPhaseLayer>(inLayer)) == 1;
@@ -968,7 +1023,7 @@ public:
 
 	bool ShouldCollide(ObjectLayer inLayer) const override
 	{
-		if (procs != nullptr 
+		if (procs != nullptr
 			&& procs->ShouldCollide)
 		{
 			return procs->ShouldCollide(userData, static_cast<JPH_ObjectLayer>(inLayer)) == 1;
@@ -1016,7 +1071,7 @@ public:
 
 	bool ShouldCollide(const BodyID& bodyID) const override
 	{
-		if (procs != nullptr 
+		if (procs != nullptr
 			&& procs->ShouldCollide)
 		{
 			return procs->ShouldCollide(userData, (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
@@ -1213,103 +1268,109 @@ float JPH_Quat_GetRotationAngle(const JPH_Quat* quat, const JPH_Vec3* axis)
 
 void JPH_Quat_Multiply(const JPH_Quat* q1, const JPH_Quat* q2, JPH_Quat* result)
 {
-    JPH_ASSERT(q1 && q2 && result);
-    auto joltQ1 = ToJolt(q1);
-    auto joltQ2 = ToJolt(q2);
-    FromJolt(joltQ1 * joltQ2, result);
+	JPH_ASSERT(q1 && q2 && result);
+	auto joltQ1 = ToJolt(q1);
+	auto joltQ2 = ToJolt(q2);
+	FromJolt(joltQ1 * joltQ2, result);
 }
 
 void JPH_Quat_MultiplyScalar(const JPH_Quat* q, float scalar, JPH_Quat* result)
 {
-    JPH_ASSERT(q && result);
-    auto joltQ = ToJolt(q);
-    FromJolt(joltQ * scalar, result);
+	JPH_ASSERT(q && result);
+	auto joltQ = ToJolt(q);
+	FromJolt(joltQ * scalar, result);
 }
 
 void JPH_Quat_Add(const JPH_Quat* q1, const JPH_Quat* q2, JPH_Quat* result)
 {
-    JPH_ASSERT(q1 && q2 && result);
-    auto joltQ1 = ToJolt(q1);
-    auto joltQ2 = ToJolt(q2);
-    FromJolt(joltQ1 + joltQ2, result);
+	JPH_ASSERT(q1 && q2 && result);
+	auto joltQ1 = ToJolt(q1);
+	auto joltQ2 = ToJolt(q2);
+	FromJolt(joltQ1 + joltQ2, result);
 }
 
 void JPH_Quat_Subtract(const JPH_Quat* q1, const JPH_Quat* q2, JPH_Quat* result)
 {
-    JPH_ASSERT(q1 && q2 && result);
-    auto joltQ1 = ToJolt(q1);
-    auto joltQ2 = ToJolt(q2);
-    FromJolt(joltQ1 - joltQ2, result);
+	JPH_ASSERT(q1 && q2 && result);
+	auto joltQ1 = ToJolt(q1);
+	auto joltQ2 = ToJolt(q2);
+	FromJolt(joltQ1 - joltQ2, result);
 }
 
 void JPH_Quat_DivideScalar(const JPH_Quat* q, float scalar, JPH_Quat* result)
 {
-    JPH_ASSERT(q && result);
-    JPH_ASSERT(scalar != 0.0f);
-    auto joltQ = ToJolt(q);
-    FromJolt(joltQ / scalar, result);
+	JPH_ASSERT(q && result);
+	JPH_ASSERT(scalar != 0.0f);
+	auto joltQ = ToJolt(q);
+	FromJolt(joltQ / scalar, result);
 }
 
-void JPH_Quat_Dot(const JPH_Quat* q1, const JPH_Quat* q2, float* result)  
+void JPH_Quat_Dot(const JPH_Quat* q1, const JPH_Quat* q2, float* result)
 {
-    JPH_ASSERT(q1 && q2 && result);
-    auto joltQ1 = ToJolt(q1);
-    auto joltQ2 = ToJolt(q2);
-    *result = joltQ1.Dot(joltQ2);
+	JPH_ASSERT(q1 && q2 && result);
+	auto joltQ1 = ToJolt(q1);
+	auto joltQ2 = ToJolt(q2);
+	*result = joltQ1.Dot(joltQ2);
 }
 
 void JPH_Quat_Conjugated(const JPH_Quat* quat, JPH_Quat* result)
 {
-    JPH_ASSERT(quat && result);
-    auto joltQuat = ToJolt(quat);
-    FromJolt(joltQuat.Conjugated(), result);
+	JPH_ASSERT(quat && result);
+	auto joltQuat = ToJolt(quat);
+	FromJolt(joltQuat.Conjugated(), result);
 }
 
 void JPH_Quat_GetTwist(const JPH_Quat* quat, const JPH_Vec3* axis, JPH_Quat* result)
 {
-    JPH_ASSERT(quat && axis && result);
-    auto joltQuat = ToJolt(quat);
-    FromJolt(joltQuat.GetTwist(ToJolt(axis)), result);
+	JPH_ASSERT(quat && axis && result);
+	auto joltQuat = ToJolt(quat);
+	FromJolt(joltQuat.GetTwist(ToJolt(axis)), result);
 }
 
 void JPH_Quat_GetSwingTwist(const JPH_Quat* quat, JPH_Quat* outSwing, JPH_Quat* outTwist)
 {
-    JPH_ASSERT(quat && outSwing && outTwist);
-    auto joltQuat = ToJolt(quat);
-    JPH::Quat swing, twist;
-    joltQuat.GetSwingTwist(swing, twist);
-    FromJolt(swing, outSwing);
-    FromJolt(twist, outTwist);
+	JPH_ASSERT(quat && outSwing && outTwist);
+	auto joltQuat = ToJolt(quat);
+	JPH::Quat swing, twist;
+	joltQuat.GetSwingTwist(swing, twist);
+	FromJolt(swing, outSwing);
+	FromJolt(twist, outTwist);
 }
 
 void JPH_Quat_LERP(const JPH_Quat* from, const JPH_Quat* to, float fraction, JPH_Quat* result)
 {
-    JPH_ASSERT(from && to && result);
-    auto joltFrom = ToJolt(from);
-    auto joltTo = ToJolt(to);
-    FromJolt(joltFrom.LERP(joltTo, fraction), result);
+	JPH_ASSERT(from && to && result);
+	auto joltFrom = ToJolt(from);
+	auto joltTo = ToJolt(to);
+	FromJolt(joltFrom.LERP(joltTo, fraction), result);
 }
 
 void JPH_Quat_SLERP(const JPH_Quat* from, const JPH_Quat* to, float fraction, JPH_Quat* result)
 {
-    JPH_ASSERT(from && to && result);
-    auto joltFrom = ToJolt(from);
-    auto joltTo = ToJolt(to);
-    FromJolt(joltFrom.SLERP(joltTo, fraction), result);
+	JPH_ASSERT(from && to && result);
+	auto joltFrom = ToJolt(from);
+	auto joltTo = ToJolt(to);
+	FromJolt(joltFrom.SLERP(joltTo, fraction), result);
 }
 
 void JPH_Quat_Rotate(const JPH_Quat* quat, const JPH_Vec3* vec, JPH_Vec3* result)
 {
-    JPH_ASSERT(quat && vec && result);
-    auto joltQuat = ToJolt(quat);
-    FromJolt(joltQuat * ToJolt(vec), result);
+	JPH_ASSERT(quat && vec && result);
+	auto joltQuat = ToJolt(quat);
+	FromJolt(joltQuat * ToJolt(vec), result);
 }
 
 void JPH_Quat_InverseRotate(const JPH_Quat* quat, const JPH_Vec3* vec, JPH_Vec3* result)
 {
-    JPH_ASSERT(quat && vec && result);
-    auto joltQuat = ToJolt(quat);
-    FromJolt(joltQuat.InverseRotate(ToJolt(vec)), result);
+	JPH_ASSERT(quat && vec && result);
+	auto joltQuat = ToJolt(quat);
+	FromJolt(joltQuat.InverseRotate(ToJolt(vec)), result);
+}
+
+void JPH_Quat_FromEulerAngles(const JPH_Vec3* angles, JPH_Quat* result)
+{
+    JPH_ASSERT(angles && result);
+    FromJolt(JPH::Quat::sEulerAngles(ToJolt(angles)), result);
 }
 
 JPH_CAPI bool JPH_Vec3_IsClose(const JPH_Vec3* v1, const JPH_Vec3* v2, float maxDistSq)
@@ -1416,18 +1477,18 @@ void JPH_Vec3_MultiplyScalar(const JPH_Vec3* v, float scalar, JPH_Vec3* result)
 
 void JPH_Vec3_Divide(const JPH_Vec3* v1, const JPH_Vec3* v2, JPH_Vec3* result)
 {
-    JPH_ASSERT(v1 && v2 && result);
-    JPH::Vec3 joltVec1 = ToJolt(v1);
-    JPH::Vec3 joltVec2 = ToJolt(v2);
-    FromJolt(joltVec1 / joltVec2, result);
+	JPH_ASSERT(v1 && v2 && result);
+	JPH::Vec3 joltVec1 = ToJolt(v1);
+	JPH::Vec3 joltVec2 = ToJolt(v2);
+	FromJolt(joltVec1 / joltVec2, result);
 }
 
 void JPH_Vec3_DivideScalar(const JPH_Vec3* v, float scalar, JPH_Vec3* result)
 {
-    JPH_ASSERT(v && result);
-    JPH_ASSERT(scalar != 0.0f);
-    JPH::Vec3 joltVec = ToJolt(v);
-    FromJolt(joltVec / scalar, result);
+	JPH_ASSERT(v && result);
+	JPH_ASSERT(scalar != 0.0f);
+	JPH::Vec3 joltVec = ToJolt(v);
+	FromJolt(joltVec / scalar, result);
 }
 
 void JPH_Vec3_DotProduct(const JPH_Vec3* v1, const JPH_Vec3* v2, float* result)
@@ -1463,33 +1524,33 @@ void JPH_Vec3_Subtract(const JPH_Vec3* v1, const JPH_Vec3* v2, JPH_Vec3* result)
 
 void JPH_Matrix4x4_Add(const JPH_Matrix4x4* m1, const JPH_Matrix4x4* m2, JPH_Matrix4x4* result)
 {
-    JPH_ASSERT(m1 && m2 && result);
-    auto joltM1 = ToJolt(m1);
-    auto joltM2 = ToJolt(m2);
-    FromJolt(joltM1 + joltM2, result);
+	JPH_ASSERT(m1 && m2 && result);
+	auto joltM1 = ToJolt(m1);
+	auto joltM2 = ToJolt(m2);
+	FromJolt(joltM1 + joltM2, result);
 }
 
 void JPH_Matrix4x4_Subtract(const JPH_Matrix4x4* m1, const JPH_Matrix4x4* m2, JPH_Matrix4x4* result)
 {
-    JPH_ASSERT(m1 && m2 && result);
-    auto joltM1 = ToJolt(m1);
-    auto joltM2 = ToJolt(m2);
-    FromJolt(joltM1 - joltM2, result);
+	JPH_ASSERT(m1 && m2 && result);
+	auto joltM1 = ToJolt(m1);
+	auto joltM2 = ToJolt(m2);
+	FromJolt(joltM1 - joltM2, result);
 }
 
 void JPH_Matrix4x4_Multiply(const JPH_Matrix4x4* m1, const JPH_Matrix4x4* m2, JPH_Matrix4x4* result)
 {
-    JPH_ASSERT(m1 && m2 && result);
-    auto joltM1 = ToJolt(m1);
-    auto joltM2 = ToJolt(m2);
-    FromJolt(joltM1 * joltM2, result);
+	JPH_ASSERT(m1 && m2 && result);
+	auto joltM1 = ToJolt(m1);
+	auto joltM2 = ToJolt(m2);
+	FromJolt(joltM1 * joltM2, result);
 }
 
 void JPH_Matrix4x4_MultiplyScalar(const JPH_Matrix4x4* m, float scalar, JPH_Matrix4x4* result)
 {
-    JPH_ASSERT(m && result);
-    auto joltM = ToJolt(m);
-    FromJolt(joltM * scalar, result);
+	JPH_ASSERT(m && result);
+	auto joltM = ToJolt(m);
+	FromJolt(joltM * scalar, result);
 }
 
 void JPH_Matrix4x4_Zero(JPH_Matrix4x4* result) {
@@ -2421,13 +2482,16 @@ JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* s
 	auto settings = new JPH::HeightFieldShapeSettings(samples, ToJolt(offset), ToJolt(scale), sampleCount);
 	settings->AddRef();
 
-	return reinterpret_cast<JPH_HeightFieldShapeSettings*>(settings);
+	return ToHeightFieldShapeSettings(settings);
 }
 
 JPH_HeightFieldShape* JPH_HeightFieldShapeSettings_CreateShape(JPH_HeightFieldShapeSettings* settings)
 {
-	const JPH::HeightFieldShapeSettings* joltSettings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
-	auto shapeResult = joltSettings->Create();
+	auto shapeResult = AsHeightFieldShapeSettings(settings)->Create();
+	if (!shapeResult.IsValid())
+	{
+		return nullptr;
+	}
 
 	auto shape = shapeResult.Get().GetPtr();
 	shape->AddRef();
@@ -2437,9 +2501,8 @@ JPH_HeightFieldShape* JPH_HeightFieldShapeSettings_CreateShape(JPH_HeightFieldSh
 
 void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale)
 {
-	auto joltSettings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
 	float outMinValue, outMaxValue, outQuantizationScale;
-	joltSettings->DetermineMinAndMaxSample(outMinValue, outMaxValue, outQuantizationScale);
+	AsHeightFieldShapeSettings(settings)->DetermineMinAndMaxSample(outMinValue, outMaxValue, outQuantizationScale);
 	if (pOutMinValue)
 		*pOutMinValue = outMinValue;
 	if (pOutMaxValue)
@@ -2450,34 +2513,32 @@ void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(const JPH_HeightField
 
 uint32_t JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError)
 {
-	JPH_ASSERT(settings != nullptr);
-
-	return reinterpret_cast<const HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
+	return AsHeightFieldShapeSettings(settings)->CalculateBitsPerSampleForError(maxError);
 }
 
 uint32_t JPH_HeightFieldShape_GetSampleCount(const JPH_HeightFieldShape* shape)
 {
-	return reinterpret_cast<const HeightFieldShape*>(shape)->GetSampleCount();
+	return AsHeightFieldShape(shape)->GetSampleCount();
 }
 
 uint32_t JPH_HeightFieldShape_GetBlockSize(const JPH_HeightFieldShape* shape)
 {
-	return reinterpret_cast<const HeightFieldShape*>(shape)->GetBlockSize();
+	return AsHeightFieldShape(shape)->GetBlockSize();
 }
 
 const JPH_PhysicsMaterial* JPH_HeightFieldShape_GetMaterial(const JPH_HeightFieldShape* shape, uint32_t x, uint32_t y)
 {
-	return FromJolt(reinterpret_cast<const HeightFieldShape*>(shape)->GetMaterial(x, y));
+	return FromJolt(AsHeightFieldShape(shape)->GetMaterial(x, y));
 }
 
 void JPH_HeightFieldShape_GetPosition(const JPH_HeightFieldShape* shape, uint32_t x, uint32_t y, JPH_Vec3* result)
 {
-	return FromJolt(reinterpret_cast<const HeightFieldShape*>(shape)->GetPosition(x, y), result);
+	return FromJolt(AsHeightFieldShape(shape)->GetPosition(x, y), result);
 }
 
 bool JPH_HeightFieldShape_IsNoCollision(const JPH_HeightFieldShape* shape, uint32_t x, uint32_t y)
 {
-	return reinterpret_cast<const JPH::HeightFieldShape*>(shape)->IsNoCollision(x, y);
+	return AsHeightFieldShape(shape)->IsNoCollision(x, y);
 }
 
 bool JPH_HeightFieldShape_ProjectOntoSurface(const JPH_HeightFieldShape* shape, const JPH_Vec3* localPosition, JPH_Vec3* outSurfacePosition, JPH_SubShapeID* outSubShapeID)
@@ -2488,20 +2549,20 @@ bool JPH_HeightFieldShape_ProjectOntoSurface(const JPH_HeightFieldShape* shape, 
 	Vec3 surfacePosition;
 	SubShapeID subShapeID;
 
-	bool result = reinterpret_cast<const JPH::HeightFieldShape*>(shape)->ProjectOntoSurface(ToJolt(localPosition), surfacePosition, subShapeID);
+	bool result = AsHeightFieldShape(shape)->ProjectOntoSurface(ToJolt(localPosition), surfacePosition, subShapeID);
 	FromJolt(surfacePosition, outSurfacePosition);
-	FromJolt(subShapeID, outSubShapeID);
+	*outSubShapeID = subShapeID.GetValue();
 	return result;
 }
 
 float JPH_HeightFieldShape_GetMinHeightValue(const JPH_HeightFieldShape* shape)
 {
-	return reinterpret_cast<const JPH::HeightFieldShape*>(shape)->GetMinHeightValue();
+	return AsHeightFieldShape(shape)->GetMinHeightValue();
 }
 
 float JPH_HeightFieldShape_GetMaxHeightValue(const JPH_HeightFieldShape* shape)
 {
-	return reinterpret_cast<const JPH::HeightFieldShape*>(shape)->GetMaxHeightValue();
+	return AsHeightFieldShape(shape)->GetMaxHeightValue();
 }
 
 /* TaperedCapsuleShapeSettings */
@@ -2544,7 +2605,7 @@ void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, con
 {
 	AsCompoundShapeSettings(settings)->AddShape(
 		ToJolt(position),
-		ToJolt(rotation), 
+		ToJolt(rotation),
 		AsShapeSettings(shapeSettings),
 		userData);
 }
@@ -2552,8 +2613,8 @@ void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, con
 void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData)
 {
 	AsCompoundShapeSettings(settings)->AddShape(
-		ToJolt(position), 
-		ToJolt(rotation), 
+		ToJolt(position),
+		ToJolt(rotation),
 		AsShape(shape),
 		userData);
 }
@@ -5613,14 +5674,7 @@ public:
 
 	void AddHit(const CollideShapeResult& result) override
 	{
-		JPH_CollideShapeResult hit{};
-		FromJolt(result.mContactPointOn1, &hit.contactPointOn1);
-		FromJolt(result.mContactPointOn2, &hit.contactPointOn2);
-		FromJolt(result.mPenetrationAxis, &hit.penetrationAxis);
-		hit.penetrationDepth = result.mPenetrationDepth;
-		hit.subShapeID1 = result.mSubShapeID1.GetValue();
-		hit.subShapeID2 = result.mSubShapeID2.GetValue();
-		hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
+		JPH_CollideShapeResult hit = FromJolt(result);
 
 		float fraction = proc(userData, &hit);
 		UpdateEarlyOutFraction(fraction);
@@ -6021,13 +6075,7 @@ bool JPH_NarrowPhaseQuery_CollideShape2(const JPH_NarrowPhaseQuery* query,
 
 				for (auto& hit : collector.mHits)
 				{
-					FromJolt(hit.mContactPointOn1, &result.contactPointOn1);
-					FromJolt(hit.mContactPointOn2, &result.contactPointOn2);
-					FromJolt(hit.mPenetrationAxis, &result.penetrationAxis);
-					result.penetrationDepth = hit.mPenetrationDepth;
-					result.subShapeID1 = hit.mSubShapeID1.GetValue();
-					result.subShapeID2 = hit.mSubShapeID2.GetValue();
-					result.bodyID2 = hit.mBodyID2.GetIndexAndSequenceNumber();
+					result = FromJolt(hit);
 					callback(userData, &result);
 				}
 			}
@@ -6052,13 +6100,7 @@ bool JPH_NarrowPhaseQuery_CollideShape2(const JPH_NarrowPhaseQuery* query,
 
 			if (collector.HadHit())
 			{
-				FromJolt(collector.mHit.mContactPointOn1, &result.contactPointOn1);
-				FromJolt(collector.mHit.mContactPointOn2, &result.contactPointOn2);
-				FromJolt(collector.mHit.mPenetrationAxis, &result.penetrationAxis);
-				result.penetrationDepth = collector.mHit.mPenetrationDepth;
-				result.subShapeID1 = collector.mHit.mSubShapeID1.GetValue();
-				result.subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
-				result.bodyID2 = collector.mHit.mBodyID2.GetIndexAndSequenceNumber();
+				result = FromJolt(collector.mHit);
 				callback(userData, &result);
 			}
 
@@ -6083,13 +6125,7 @@ bool JPH_NarrowPhaseQuery_CollideShape2(const JPH_NarrowPhaseQuery* query,
 
 			if (collector.HadHit())
 			{
-				FromJolt(collector.mHit.mContactPointOn1, &result.contactPointOn1);
-				FromJolt(collector.mHit.mContactPointOn2, &result.contactPointOn2);
-				FromJolt(collector.mHit.mPenetrationAxis, &result.penetrationAxis);
-				result.penetrationDepth = collector.mHit.mPenetrationDepth;
-				result.subShapeID1 = collector.mHit.mSubShapeID1.GetValue();
-				result.subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
-				result.bodyID2 = collector.mHit.mBodyID2.GetIndexAndSequenceNumber();
+				result = FromJolt(collector.mHit);
 				callback(userData, &result);
 			}
 
@@ -6651,12 +6687,14 @@ public:
 		if (procs != nullptr
 			&& procs->OnContactValidate)
 		{
+			JPH_CollideShapeResult collideShapeResult = FromJolt(inCollisionResult);
+
 			JPH_ValidateResult result = procs->OnContactValidate(
 				userData,
 				reinterpret_cast<const JPH_Body*>(&inBody1),
 				reinterpret_cast<const JPH_Body*>(&inBody2),
 				&baseOffset,
-				nullptr
+				&collideShapeResult
 			);
 
 			return (JPH::ValidateResult)result;
@@ -6677,7 +6715,7 @@ public:
 				userData,
 				reinterpret_cast<const JPH_Body*>(&inBody1),
 				reinterpret_cast<const JPH_Body*>(&inBody2),
-				reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+				ToContactManifold(&inManifold),
 				reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
 			);
 		}
@@ -6695,7 +6733,7 @@ public:
 				userData,
 				reinterpret_cast<const JPH_Body*>(&inBody1),
 				reinterpret_cast<const JPH_Body*>(&inBody2),
-				reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+				ToContactManifold(&inManifold),
 				reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
 			);
 		}
@@ -6784,37 +6822,37 @@ void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener)
 /* ContactManifold */
 void JPH_ContactManifold_GetWorldSpaceNormal(const JPH_ContactManifold* manifold, JPH_Vec3* result)
 {
-	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->mWorldSpaceNormal, result);
+	FromJolt(AsContactManifold(manifold)->mWorldSpaceNormal, result);
 }
 
 float JPH_ContactManifold_GetPenetrationDepth(const JPH_ContactManifold* manifold)
 {
-	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mPenetrationDepth;
+	return AsContactManifold(manifold)->mPenetrationDepth;
 }
 
 JPH_SubShapeID JPH_ContactManifold_GetSubShapeID1(const JPH_ContactManifold* manifold)
 {
-	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID1.GetValue();
+	return AsContactManifold(manifold)->mSubShapeID1.GetValue();
 }
 
 JPH_SubShapeID JPH_ContactManifold_GetSubShapeID2(const JPH_ContactManifold* manifold)
 {
-	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID2.GetValue();
+	return AsContactManifold(manifold)->mSubShapeID2.GetValue();
 }
 
 uint32_t JPH_ContactManifold_GetPointCount(const JPH_ContactManifold* manifold)
 {
-	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mRelativeContactPointsOn1.size();
+	return AsContactManifold(manifold)->mRelativeContactPointsOn1.size();
 }
 
 void JPH_ContactManifold_GetWorldSpaceContactPointOn1(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
 {
-	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn1(index), result);
+	FromJolt(AsContactManifold(manifold)->GetWorldSpaceContactPointOn1(index), result);
 }
 
 void JPH_ContactManifold_GetWorldSpaceContactPointOn2(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
 {
-	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn2(index), result);
+	FromJolt(AsContactManifold(manifold)->GetWorldSpaceContactPointOn2(index), result);
 }
 
 /* ContactSettings */
@@ -8396,6 +8434,41 @@ bool JPH_Ragdoll_IsActive(const JPH_Ragdoll* ragdoll, bool lockBodies /* = true 
 void JPH_Ragdoll_ResetWarmStart(JPH_Ragdoll* ragdoll)
 {
 	AsRagdoll(ragdoll)->ResetWarmStart();
+}
+
+/* CollisionEstimationResult */
+
+void JPH_EstimateCollisionResponse(const JPH_Body* body1, const JPH_Body* body2, const JPH_ContactManifold* manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, uint32_t numIterations, JPH_CollisionEstimationResult* result)
+{
+	JPH_ASSERT(result);
+
+	JPH::CollisionEstimationResult joltResult;
+
+	JPH::EstimateCollisionResponse(*AsBody(body1), *AsBody(body2), 
+		*AsContactManifold(manifold), joltResult, 
+		combinedFriction,
+		combinedRestitution, 
+		minVelocityForRestitution, 
+		numIterations);
+
+	FromJolt(joltResult.mLinearVelocity1, &result->linearVelocity1);
+	FromJolt(joltResult.mAngularVelocity1, &result->angularVelocity1);
+	FromJolt(joltResult.mLinearVelocity2, &result->linearVelocity2);
+	FromJolt(joltResult.mAngularVelocity2, &result->angularVelocity2);
+	FromJolt(joltResult.mTangent1, &result->tangent1);
+	FromJolt(joltResult.mTangent2, &result->tangent2);
+
+	if (!joltResult.mImpulses.empty())
+	{
+		result->impulseCount = static_cast<uint32_t>(joltResult.mImpulses.size());
+		result->impulses = (JPH_CollisionEstimationResultImpulse*)malloc(sizeof(JPH_CollisionEstimationResultImpulse) * joltResult.mImpulses.size());
+		for (uint32_t i = 0; i < result->impulseCount; i++)
+		{
+			result->impulses[i].contactImpulse = joltResult.mImpulses[i].mContactImpulse;
+			result->impulses[i].frictionImpulse1 = joltResult.mImpulses[i].mFrictionImpulse1;
+			result->impulses[i].frictionImpulse2 = joltResult.mImpulses[i].mFrictionImpulse2;
+		}
+	}
 }
 
 JPH_SUPPRESS_WARNING_POP

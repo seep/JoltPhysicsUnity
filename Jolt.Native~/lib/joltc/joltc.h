@@ -35,8 +35,7 @@
 #   define JPH_API_CALL
 #endif
 
-// JoltPhysicsUnity: override _JPH_EXPORT for zig compatability
-#define JPH_CAPI _JPH_EXTERN __declspec(dllexport)
+#define JPH_CAPI _JPH_EXTERN _JPH_EXPORT
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -519,19 +518,21 @@ typedef struct JPH_CollidePointResult {
 	JPH_SubShapeID subShapeID2;
 } JPH_CollidePointResult;
 
-typedef struct JPH_CollideShapeResult
-{
-	JPH_Vec3           contactPointOn1;
-	JPH_Vec3           contactPointOn2;
-	JPH_Vec3           penetrationAxis;
-	float              penetrationDepth;
-	JPH_SubShapeID     subShapeID1;
-	JPH_SubShapeID     subShapeID2;
-	JPH_BodyID         bodyID2;
+typedef struct JPH_CollideShapeResult {
+	JPH_Vec3		contactPointOn1;
+	JPH_Vec3		contactPointOn2;
+	JPH_Vec3		penetrationAxis;
+	float			penetrationDepth;
+	JPH_SubShapeID	subShapeID1;
+	JPH_SubShapeID	subShapeID2;
+	JPH_BodyID		bodyID2;
+	uint32_t		shape1FaceCount;
+	JPH_Vec3*		shape1Faces;
+	uint32_t		shape2FaceCount;
+	JPH_Vec3*		shape2Faces;
 } JPH_CollideShapeResult;
 
-typedef struct JPH_ShapeCastResult
-{
+typedef struct JPH_ShapeCastResult {
 	JPH_Vec3           contactPointOn1;
 	JPH_Vec3           contactPointOn2;
 	JPH_Vec3           penetrationAxis;
@@ -543,28 +544,27 @@ typedef struct JPH_ShapeCastResult
 	bool			   isBackFaceHit;
 } JPH_ShapeCastResult;
 
-typedef struct JPH_DrawSettings
-{
-	bool					drawGetSupportFunction;				///< Draw the GetSupport() function, used for convex collision detection
-	bool					drawSupportDirection;				///< When drawing the support function, also draw which direction mapped to a specific support point
-	bool					drawGetSupportingFace;				///< Draw the faces that were found colliding during collision detection
-	bool					drawShape;							///< Draw the shapes of all bodies
-	bool					drawShapeWireframe;					///< When mDrawShape is true and this is true, the shapes will be drawn in wireframe instead of solid.
+typedef struct JPH_DrawSettings {
+	bool						drawGetSupportFunction;				///< Draw the GetSupport() function, used for convex collision detection
+	bool						drawSupportDirection;				///< When drawing the support function, also draw which direction mapped to a specific support point
+	bool						drawGetSupportingFace;				///< Draw the faces that were found colliding during collision detection
+	bool						drawShape;							///< Draw the shapes of all bodies
+	bool						drawShapeWireframe;					///< When mDrawShape is true and this is true, the shapes will be drawn in wireframe instead of solid.
 	JPH_BodyManager_ShapeColor	drawShapeColor;                     ///< Coloring scheme to use for shapes
-	bool					drawBoundingBox;					///< Draw a bounding box per body
-	bool					drawCenterOfMassTransform;			///< Draw the center of mass for each body
-	bool					drawWorldTransform;					///< Draw the world transform (which can be different than the center of mass) for each body
-	bool					drawVelocity;						///< Draw the velocity vector for each body
-	bool					drawMassAndInertia;					///< Draw the mass and inertia (as the box equivalent) for each body
-	bool					drawSleepStats;						///< Draw stats regarding the sleeping algorithm of each body
-	bool					drawSoftBodyVertices;				///< Draw the vertices of soft bodies
-	bool					drawSoftBodyVertexVelocities;		///< Draw the velocities of the vertices of soft bodies
-	bool					drawSoftBodyEdgeConstraints;		///< Draw the edge constraints of soft bodies
-	bool					drawSoftBodyBendConstraints;		///< Draw the bend constraints of soft bodies
-	bool					drawSoftBodyVolumeConstraints;		///< Draw the volume constraints of soft bodies
-	bool					drawSoftBodySkinConstraints;		///< Draw the skin constraints of soft bodies
-	bool					drawSoftBodyLRAConstraints;	        ///< Draw the LRA constraints of soft bodies
-	bool					drawSoftBodyPredictedBounds;		///< Draw the predicted bounds of soft bodies
+	bool						drawBoundingBox;					///< Draw a bounding box per body
+	bool						drawCenterOfMassTransform;			///< Draw the center of mass for each body
+	bool						drawWorldTransform;					///< Draw the world transform (which can be different than the center of mass) for each body
+	bool						drawVelocity;						///< Draw the velocity vector for each body
+	bool						drawMassAndInertia;					///< Draw the mass and inertia (as the box equivalent) for each body
+	bool						drawSleepStats;						///< Draw stats regarding the sleeping algorithm of each body
+	bool						drawSoftBodyVertices;				///< Draw the vertices of soft bodies
+	bool						drawSoftBodyVertexVelocities;		///< Draw the velocities of the vertices of soft bodies
+	bool						drawSoftBodyEdgeConstraints;		///< Draw the edge constraints of soft bodies
+	bool						drawSoftBodyBendConstraints;		///< Draw the bend constraints of soft bodies
+	bool						drawSoftBodyVolumeConstraints;		///< Draw the volume constraints of soft bodies
+	bool						drawSoftBodySkinConstraints;		///< Draw the skin constraints of soft bodies
+	bool						drawSoftBodyLRAConstraints;	        ///< Draw the LRA constraints of soft bodies
+	bool						drawSoftBodyPredictedBounds;		///< Draw the predicted bounds of soft bodies
 	JPH_SoftBodyConstraintColor	drawSoftBodyConstraintColor;        ///< Coloring scheme to use for soft body constraints
 } JPH_DrawSettings;
 
@@ -654,6 +654,25 @@ typedef struct JPH_CollideShapeResult               JPH_CollideShapeResult;
 typedef struct JPH_ContactListener                  JPH_ContactListener;
 typedef struct JPH_ContactManifold                  JPH_ContactManifold;
 typedef struct JPH_ContactSettings                  JPH_ContactSettings;
+
+typedef struct JPH_CollisionEstimationResultImpulse {
+	float	contactImpulse;
+	float	frictionImpulse1;
+	float	frictionImpulse2;
+} JPH_CollisionEstimationResultImpulse;
+
+typedef struct JPH_CollisionEstimationResult {
+	JPH_Vec3								linearVelocity1;
+	JPH_Vec3								angularVelocity1;
+	JPH_Vec3								linearVelocity2;
+	JPH_Vec3								angularVelocity2;
+
+	JPH_Vec3								tangent1;
+	JPH_Vec3								tangent2;
+
+	uint32_t								impulseCount;
+	JPH_CollisionEstimationResultImpulse*	impulses;
+} JPH_CollisionEstimationResult;
 
 typedef struct JPH_BodyActivationListener           JPH_BodyActivationListener;
 typedef struct JPH_BodyDrawFilter                   JPH_BodyDrawFilter;
@@ -944,6 +963,10 @@ JPH_CAPI void JPH_Shutdown(void);
 JPH_CAPI void JPH_SetTraceHandler(JPH_TraceFunc handler);
 JPH_CAPI void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler);
 
+/* Structs free members */
+JPH_CAPI void JPH_CollideShapeResult_FreeMembers(JPH_CollideShapeResult* result);
+JPH_CAPI void JPH_CollisionEstimationResult_FreeMembers(JPH_CollisionEstimationResult* result);
+
 /* JPH_BroadPhaseLayerInterface */
 JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceMask_Create(uint32_t numBroadPhaseLayers);
 JPH_CAPI void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(JPH_BroadPhaseLayerInterface* bpInterface, JPH_BroadPhaseLayer broadPhaseLayer, uint32_t groupsToInclude, uint32_t groupsToExclude);
@@ -1069,6 +1092,7 @@ JPH_CAPI void JPH_Quat_RotateAxisZ(const JPH_Quat* quat, JPH_Vec3* result);
 JPH_CAPI void JPH_Quat_Inversed(const JPH_Quat* quat, JPH_Quat* result);
 JPH_CAPI void JPH_Quat_GetPerpendicular(const JPH_Quat* quat, JPH_Quat* result);
 JPH_CAPI float JPH_Quat_GetRotationAngle(const JPH_Quat* quat, const JPH_Vec3* axis);
+JPH_CAPI void JPH_Quat_FromEulerAngles(const JPH_Vec3* angles, JPH_Quat* result);
 
 JPH_CAPI void JPH_Quat_Add(const JPH_Quat* q1, const JPH_Quat* q2, JPH_Quat* result);
 JPH_CAPI void JPH_Quat_Subtract(const JPH_Quat* q1, const JPH_Quat* q2, JPH_Quat* result);
@@ -2391,5 +2415,8 @@ JPH_CAPI void JPH_Ragdoll_RemoveFromPhysicsSystem(JPH_Ragdoll* ragdoll, bool loc
 JPH_CAPI void JPH_Ragdoll_Activate(JPH_Ragdoll* ragdoll, bool lockBodies /* = true */);
 JPH_CAPI bool JPH_Ragdoll_IsActive(const JPH_Ragdoll* ragdoll, bool lockBodies /* = true */);
 JPH_CAPI void JPH_Ragdoll_ResetWarmStart(JPH_Ragdoll* ragdoll);
+
+/* JPH_EstimateCollisionResponse */
+JPH_CAPI void JPH_EstimateCollisionResponse(const JPH_Body* body1, const JPH_Body* body2, const JPH_ContactManifold* manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, uint32_t numIterations, JPH_CollisionEstimationResult* result);
 
 #endif /* JOLT_C_H_ */
