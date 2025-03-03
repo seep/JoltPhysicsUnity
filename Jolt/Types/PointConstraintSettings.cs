@@ -5,7 +5,7 @@ using static Jolt.Bindings;
 namespace Jolt
 {
     [ExpectedStructSize(typeof(JPH_PointConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct PointConstraintSettings
     {
         public static PointConstraintSettings Create()

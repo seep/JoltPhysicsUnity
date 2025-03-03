@@ -1,0 +1,14 @@
+{
+    "name": "Jolt.Tests",
+    "references": [
+        "Jolt",
+        "Unity.Collections"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

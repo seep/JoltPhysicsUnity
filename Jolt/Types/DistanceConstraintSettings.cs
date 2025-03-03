@@ -5,7 +5,7 @@ using static Jolt.Bindings;
 namespace Jolt
 {
     [ExpectedStructSize(typeof(JPH_DistanceConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct DistanceConstraintSettings
     {
         public static DistanceConstraintSettings Create()

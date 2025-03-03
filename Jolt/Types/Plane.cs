@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct Plane : IEquatable<Plane>
     {
         public float3 Normal;

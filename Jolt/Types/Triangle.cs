@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public readonly struct Triangle : IEquatable<Triangle>
     {
         public readonly float3 V1;

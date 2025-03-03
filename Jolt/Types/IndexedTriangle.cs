@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public readonly struct IndexedTriangle : IEquatable<IndexedTriangle>
     {
         public readonly uint I1;

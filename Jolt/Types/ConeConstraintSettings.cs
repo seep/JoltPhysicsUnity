@@ -6,7 +6,7 @@ using static Jolt.Bindings;
 namespace Jolt
 {
     [ExpectedStructSize(typeof(JPH_ConeConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ConeConstraintSettings
     {
         public static ConeConstraintSettings Create()

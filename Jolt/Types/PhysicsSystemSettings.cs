@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct PhysicsSystemSettings
     {
         public uint MaxBodies;
