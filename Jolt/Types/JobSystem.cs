@@ -4,7 +4,8 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    public struct JobSystem : IDisposable, IEquatable<JobSystem>
+    [GenerateBindings("JPH_JobSystem")]
+    public struct JobSystem : IDisposable
     {
         internal NativeHandle<JPH_JobSystem> Handle;
 
@@ -24,42 +25,9 @@ namespace Jolt
             return new JobSystem { Handle = JPH_JobSystemCallback_Create(config) };
         }
 
-        #region IEquatable;
-        
-        public bool Equals(JobSystem other)
-        {
-            return Handle.Equals(other.Handle);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is JobSystem other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
-
-        public static bool operator ==(JobSystem left, JobSystem right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(JobSystem left, JobSystem right)
-        {
-            return !left.Equals(right);
-        }
-        
-        #endregion
-        
-        #region IDisposable
-
         public void Dispose()
         {
             Handle.Dispose();
         }
-
-        #endregion
     }
 }

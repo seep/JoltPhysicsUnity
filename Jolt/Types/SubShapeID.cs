@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Jolt
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SubShapeID : IEquatable<SubShapeID>
     {
         public uint Value;
