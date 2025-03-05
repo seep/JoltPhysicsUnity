@@ -1,17 +1,63 @@
-﻿namespace Jolt
+﻿using System.Runtime.InteropServices;
+
+namespace Jolt
 {
-    public class PhysicsSettings
+    [ExpectedStructSize(typeof(JPH_PhysicsSettings))]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PhysicsSettings
     {
         public const float DefaultConvexRadius = 0.05f;
 
-        public const float DefaultCollisionTolerance = 1.0e-4f;
+        public int MaxInFlightBodyPairs;
 
-        public const float DefaultPenetrationTolerance = 1.0e-4f; ///< Stop when there's less than 1% change
+        public int StepListenersBatchSize;
 
-        public const float CapsuleProjectionSlop = 0.02f;
+        public int StepListenerBatchesPerJob;
 
-        public const int MaxPhysicsJobs = 2048;
+        public float Baumgarte;
 
-        public const int MaxPhysicsBarriers = 8;
+        public float SpeculativeContactDistance;
+
+        public float PenetrationSlop;
+
+        public float LinearCastThreshold;
+
+        public float LinearCastMaxPenetration;
+
+        public float ManifoldTolerance;
+
+        public float MaxPenetrationDistance;
+
+        public float BodyPairCacheMaxDeltaPositionSq;
+
+        public float BodyPairCacheCosMaxDeltaRotationDiv2;
+
+        public float ContactNormalCosMaxDeltaRotation;
+
+        public float ContactPointPreserveLambdaMaxDistSq;
+
+        public uint NumVelocitySteps;
+
+        public uint NumPositionSteps;
+
+        public float MinVelocityForRestitution;
+
+        public float TimeBeforeSleep;
+
+        public float PointVelocitySleepThreshold;
+
+        public NativeBool DeterministicSimulation;
+
+        public NativeBool ConstraintWarmStart;
+
+        public NativeBool UseBodyPairContactCache;
+
+        public NativeBool UseManifoldReduction;
+
+        public NativeBool UseLargeIslandSplitter;
+
+        public NativeBool AllowSleeping;
+
+        public NativeBool CheckActiveEdges;
     }
 }

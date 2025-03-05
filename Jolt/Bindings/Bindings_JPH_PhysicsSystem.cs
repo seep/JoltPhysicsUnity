@@ -26,14 +26,25 @@ namespace Jolt
         public static void JPH_PhysicsSystem_Destroy(NativeHandle<JPH_PhysicsSystem> system)
         {
             UnsafeBindings.JPH_PhysicsSystem_Destroy(system);
-
             system.Dispose();
         }
-        
-        // TODO JPH_PhysicsSystem_SetPhysicsSettings
-        
-        // TODO JPH_PhysicsSystem_GetPhysicsSettings
 
+        public static void JPH_PhysicsSystem_SetPhysicsSettings(NativeHandle<JPH_PhysicsSystem> system, ref PhysicsSettings settings)
+        {
+            fixed (PhysicsSettings* ptr = &settings)
+            {
+                UnsafeBindings.JPH_PhysicsSystem_SetPhysicsSettings(system, (JPH_PhysicsSettings*)ptr);
+            }
+        }
+
+        public static void JPH_PhysicsSystem_GetPhysicsSettings(NativeHandle<JPH_PhysicsSystem> system, ref PhysicsSettings settings)
+        {
+            fixed (PhysicsSettings* ptr = &settings)
+            {
+                UnsafeBindings.JPH_PhysicsSystem_GetPhysicsSettings(system, (JPH_PhysicsSettings*)ptr);
+            }
+        }
+        
         public static void JPH_PhysicsSystem_OptimizeBroadPhase(NativeHandle<JPH_PhysicsSystem> system)
         {
             UnsafeBindings.JPH_PhysicsSystem_OptimizeBroadPhase(system);
@@ -62,6 +73,11 @@ namespace Jolt
         public static NativeHandle<JPH_BodyLockInterface> JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(NativeHandle<JPH_PhysicsSystem> system)
         {
             return CreateOwnedHandle(system, UnsafeBindings.JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(system));
+        }
+
+        public static NativeHandle<JPH_BroadPhaseQuery> JPH_PhysicsSystem_GetBroadPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)
+        {
+            return CreateOwnedHandle(system, UnsafeBindings.JPH_PhysicsSystem_GetBroadPhaseQuery(system));
         }
 
         public static NativeHandle<JPH_NarrowPhaseQuery> JPH_PhysicsSystem_GetNarrowPhaseQuery(NativeHandle<JPH_PhysicsSystem> system)

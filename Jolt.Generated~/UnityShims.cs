@@ -29,8 +29,24 @@ namespace UnityEngine
 
         public static void LogException(System.Exception _) { }
     }
-
+    
     public class RuntimeInitializeOnLoadMethodAttribute : System.Attribute { }
+
+    public struct Color32
+    {
+        public byte r;
+        public byte g;
+        public byte b;
+        public byte a;
+
+        public Color32(byte r, byte g, byte b, byte a)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
 }
 
 namespace Unity.Collections
@@ -51,5 +67,17 @@ namespace Unity.Collections
     public enum Allocator
     {
         Temp, Persistent,
+    }
+
+    namespace LowLevel.Unsafe
+    {
+        public static unsafe class UnsafeUtility
+        {
+            public static ref T AsRef<T>(void* ptr)
+            {
+                T result = default;
+                return ref result;
+            }
+        }
     }
 }

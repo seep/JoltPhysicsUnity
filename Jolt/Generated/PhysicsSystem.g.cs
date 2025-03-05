@@ -24,6 +24,10 @@ namespace Jolt
         
         public void Destroy() => Bindings.JPH_PhysicsSystem_Destroy(Handle);
         
+        public void SetPhysicsSettings(ref PhysicsSettings settings) => Bindings.JPH_PhysicsSystem_SetPhysicsSettings(Handle, ref settings);
+        
+        public void GetPhysicsSettings(ref PhysicsSettings settings) => Bindings.JPH_PhysicsSystem_GetPhysicsSettings(Handle, ref settings);
+        
         public void OptimizeBroadPhase() => Bindings.JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
         
         public BodyInterface GetBodyInterface() => new BodyInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyInterface(Handle) };
@@ -33,6 +37,8 @@ namespace Jolt
         public BodyLockInterface GetBodyLockInterface() => new BodyLockInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyLockInterface(Handle) };
         
         public BodyLockInterface GetBodyLockInterfaceNoLock() => new BodyLockInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(Handle) };
+        
+        public BroadPhaseQuery GetBroadPhaseQuery() => new BroadPhaseQuery { Handle = Bindings.JPH_PhysicsSystem_GetBroadPhaseQuery(Handle) };
         
         public NarrowPhaseQuery GetNarrowPhaseQuery() => new NarrowPhaseQuery { Handle = Bindings.JPH_PhysicsSystem_GetNarrowPhaseQuery(Handle) };
         

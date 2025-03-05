@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -63,8 +62,6 @@ namespace Jolt
         /// </summary>
         private static void UnsafeBodyActivatedCallback(IntPtr udata, BodyID bodyID, ulong bodyUserData)
         {
-           
-
             try
             {
                 ManagedReference.Deref<IBodyActivationListener>(udata).OnBodyActivated(bodyID, bodyUserData);
