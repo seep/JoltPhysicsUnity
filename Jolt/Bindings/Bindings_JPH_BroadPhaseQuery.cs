@@ -25,8 +25,8 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay(
                 query, &origin, &direction,
-                callback: BroadPhaseQueryHandlers.UnsafeCastRayCallbackPointer,
-                userData: (void*)Marshal.GetFunctionPointerForDelegate(callback),
+                callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
+                userData: GetDelegatePointer(callback),
                 broadPhaseLayerFilter, objectLayerFilter
             );
         }
@@ -35,8 +35,8 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay2(
                 query, &origin, &direction, collisionCollectorType,
-                callback: BroadPhaseQueryHandlers.UnsafeCastRayCallbackPointer,
-                userData: (void*)Marshal.GetFunctionPointerForDelegate(callback),
+                callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
+                userData: GetDelegatePointer(callback),
                 broadPhaseLayerFilter, objectLayerFilter
             );
         }
@@ -48,9 +48,9 @@ namespace Jolt
         )
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CollideAABox(
-                query, &box,
-                callback: BroadPhaseQueryHandlers.UnsafeCollideCallbackPointer,
-                userData: (void*)Marshal.GetFunctionPointerForDelegate(callback),
+                query, (JPH_AABox*)&box,
+                callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
+                userData: GetDelegatePointer(callback),
                 broadPhaseLayerFilter, objectLayerFilter
             );
         }
@@ -59,8 +59,8 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CollideSphere(
                 query, &center, radius,
-                callback: BroadPhaseQueryHandlers.UnsafeCollideCallbackPointer,
-                userData: (void*)Marshal.GetFunctionPointerForDelegate(callback),
+                callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
+                userData: GetDelegatePointer(callback),
                 broadPhaseLayerFilter, objectLayerFilter
             );
         }
@@ -69,8 +69,8 @@ namespace Jolt
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CollidePoint(
                 query, &point,
-                callback: BroadPhaseQueryHandlers.UnsafeCollideCallbackPointer,
-                userData: (void*)Marshal.GetFunctionPointerForDelegate(callback),
+                callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
+                userData: GetDelegatePointer(callback),
                 broadPhaseLayerFilter, objectLayerFilter
             );
         }
@@ -79,24 +79,18 @@ namespace Jolt
     /// <summary>
     /// Static function pointers for JPH_BroadPhaseQuery queries; the individual callback pointers are passed via the user data.
     /// </summary>
-    internal static unsafe class BroadPhaseQueryHandlers
+    internal static unsafe class UnsafeBroadPhaseQueryCallbacks
     {
         private delegate void UnsafeCastRayDelegate(nint udata, BroadPhaseCastResult* result);
         private delegate void UnsafeCollideDelegate(nint udata, BodyID result);
 
-        public static nint UnsafeCastRayCallbackPointer;
-        public static nint UnsafeCollideCallbackPointer;
+        public static nint UnsafeCastRayCallbackPointer = Marshal.GetFunctionPointerForDelegate(
+            (UnsafeCastRayDelegate)UnsafeCastRayCallback
+        );
         
-        static BroadPhaseQueryHandlers()
-        {
-            UnsafeCastRayCallbackPointer = Marshal.GetFunctionPointerForDelegate(
-                (UnsafeCastRayDelegate)UnsafeCastRayCallback
-            );
-            
-            UnsafeCollideCallbackPointer = Marshal.GetFunctionPointerForDelegate(
-                (UnsafeCollideDelegate)UnsafeCollideCallback
-            );
-        }
+        public static nint UnsafeCollideCallbackPointer = Marshal.GetFunctionPointerForDelegate(
+            (UnsafeCollideDelegate)UnsafeCollideCallback
+        );
         
         private static void UnsafeCastRayCallback(nint udata, BroadPhaseCastResult* result)
         {

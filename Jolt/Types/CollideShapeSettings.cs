@@ -1,11 +1,23 @@
 ﻿using System.Runtime.InteropServices;
 using Unity.Mathematics;
 
+using static Jolt.Bindings;
+
 namespace Jolt
 {
     [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_CollideShapeSettings))]
     public struct CollideShapeSettings
     {
+        /// <summary>
+        /// Create a new instance initialized with the default values.
+        /// </summary>
+        public static CollideShapeSettings Create()
+        {
+            CollideShapeSettings result = default;
+            JPH_CollideShapeSettings_Init(ref result);
+            return result;
+        }
+
         private CollideSettings @base;
 
         public ActiveEdgeMode ActiveEdgeMode

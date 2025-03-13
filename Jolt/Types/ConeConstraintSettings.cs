@@ -5,10 +5,12 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [ExpectedStructSize(typeof(JPH_ConeConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_ConeConstraintSettings))]
     public struct ConeConstraintSettings
     {
+        /// <summary>
+        /// Create a new instance initialized with the default values.
+        /// </summary>
         public static ConeConstraintSettings Create()
         {
             var result = new ConeConstraintSettings();
@@ -16,21 +18,43 @@ namespace Jolt
             return result;
         }
 
-        #region ConstraintSettings
+        private ConstraintSettings @base;
         
-        public NativeBool Enabled;
+        public NativeBool Enabled
+        {
+            get => @base.Enabled;
+            set => @base.Enabled = value;
+        }
 
-        public uint ConstraintPriority;
+        public uint ConstraintPriority 
+        {
+            get => @base.ConstraintPriority;
+            set => @base.ConstraintPriority = value;
+        }
 
-        public uint NumVelocityStepsOverride;
+        public uint NumVelocityStepsOverride 
+        {
+            get => @base.NumVelocityStepsOverride;
+            set => @base.NumVelocityStepsOverride = value;
+        }
 
-        public uint NumPositionStepsOverride;
+        public uint NumPositionStepsOverride 
+        {
+            get => @base.NumPositionStepsOverride;
+            set => @base.NumPositionStepsOverride = value;
+        }
 
-        public float DrawConstraintSize;
+        public float DrawConstraintSize 
+        {
+            get => @base.DrawConstraintSize;
+            set => @base.DrawConstraintSize = value;
+        }
 
-        public ulong UserData;
-
-        #endregion
+        public ulong UserData 
+        {
+            get => @base.UserData;
+            set => @base.UserData = value;
+        }
         
         public ConstraintSpace Space;
 

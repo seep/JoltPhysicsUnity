@@ -47,7 +47,7 @@ namespace Jolt
         public static AABox JPH_Shape_GetLocalBounds(NativeHandle<JPH_Shape> shape)
         {
             AABox result;
-            UnsafeBindings.JPH_Shape_GetLocalBounds(shape, &result);
+            UnsafeBindings.JPH_Shape_GetLocalBounds(shape, (JPH_AABox*)&result);
             return result;
         }
 
@@ -59,7 +59,7 @@ namespace Jolt
         public static AABox JPH_Shape_GetWorldSpaceBounds(NativeHandle<JPH_Shape> shape, rmatrix4x4 centerOfMassTransform, float3 scale)
         {
             AABox result;
-            UnsafeBindings.JPH_Shape_GetWorldSpaceBounds(shape, &centerOfMassTransform, &scale, &result);
+            UnsafeBindings.JPH_Shape_GetWorldSpaceBounds(shape, &centerOfMassTransform, &scale, (JPH_AABox*)&result);
             return result;
         }
 
@@ -71,7 +71,7 @@ namespace Jolt
         public static MassProperties JPH_Shape_GetMassProperties(NativeHandle<JPH_Shape> shape)
         {
             MassProperties result;
-            UnsafeBindings.JPH_Shape_GetMassProperties(shape, &result);
+            UnsafeBindings.JPH_Shape_GetMassProperties(shape, (JPH_MassProperties*)&result);
             return result;
         }
 
@@ -82,7 +82,7 @@ namespace Jolt
         public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, SubShapeID subShapeID, float3 localPosition)
         {
             float3 result;
-            UnsafeBindings.JPH_Shape_GetSurfaceNormal(shape, subShapeID, &localPosition, &result);
+            UnsafeBindings.JPH_Shape_GetSurfaceNormal(shape, subShapeID.Value, &localPosition, &result);
             return result;
         }
 
@@ -114,7 +114,7 @@ namespace Jolt
             
             fixed (RayCastResult* resultptr = &result)
             {
-                return UnsafeBindings.JPH_Shape_CastRay(shape, &origin, &direction, resultptr);
+                return UnsafeBindings.JPH_Shape_CastRay(shape, &origin, &direction, (JPH_RayCastResult*)resultptr);
             }
         }
 

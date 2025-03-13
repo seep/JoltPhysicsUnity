@@ -12,9 +12,7 @@ namespace Jolt
         public static float3 JPH_BoxShape_GetHalfExtent(NativeHandle<JPH_BoxShape> shape)
         {
             float3 result = default;
-
             UnsafeBindings.JPH_BoxShape_GetHalfExtent(shape, &result);
-
             return result;
         }
 

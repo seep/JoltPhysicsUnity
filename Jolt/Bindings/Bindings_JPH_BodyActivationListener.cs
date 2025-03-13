@@ -14,7 +14,7 @@ namespace Jolt
             {
                 var gch = GCHandle.Alloc(listener);
 
-                var gchptr = (void*)GCHandle.ToIntPtr(gch);
+                var gchptr = GCHandle.ToIntPtr(gch);
                 var handle = CreateHandle(UnsafeBindings.JPH_BodyActivationListener_Create(procsptr, gchptr));
                 
                 ManagedReference.Add(handle, gch);
@@ -43,8 +43,8 @@ namespace Jolt
         /// Static procs for marshalling; the lookup from static to instance context happens in each method.
         /// </summary>
         private static readonly JPH_BodyActivationListener_Procs UnsafeBodyActivationListenerProcs = new () {
-            OnBodyActivated   = Marshal.GetFunctionPointerForDelegate((UnsafeBodyActivated) UnsafeBodyActivatedCallback),
-            OnBodyDeactivated = Marshal.GetFunctionPointerForDelegate((UnsafeBodyDeactivated) UnsafeBodyDeactivatedCallback),
+            OnBodyActivated   = GetDelegatePointer((UnsafeBodyActivated) UnsafeBodyActivatedCallback),
+            OnBodyDeactivated = GetDelegatePointer((UnsafeBodyDeactivated) UnsafeBodyDeactivatedCallback),
         };
 
         /// <summary>

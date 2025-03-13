@@ -4,7 +4,7 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_MassProperties))]
     public struct MassProperties
     {
         /// <summary>
@@ -19,7 +19,7 @@ namespace Jolt
 
         public void DecomposePrincipalMomentsOfInertia(out float4x4 rotation, out float3 diagonal)
         {
-            JPH_MassProperties_DecomposePrincipalMomentsOfInertia(this, out rotation, out diagonal);
+            JPH_MassProperties_DecomposePrincipalMomentsOfInertia(ref this, out rotation, out diagonal);
         }
         
         public void ScaleToMass(float mass)

@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct BroadPhaseLayer : IEquatable<BroadPhaseLayer>
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(byte))]
+    public readonly struct BroadPhaseLayer : IEquatable<BroadPhaseLayer>
     {
         // A distinct type wrapper around a byte. See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h
 

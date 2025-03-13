@@ -4,7 +4,7 @@
     {
         public static NativeHandle<JPH_JobSystem> JPH_JobSystemThreadPool_Create(JobSystemThreadPoolConfig config)
         {
-            return CreateHandle(UnsafeBindings.JPH_JobSystemThreadPool_Create(&config));
+            return CreateHandle(UnsafeBindings.JPH_JobSystemThreadPool_Create((JPH_JobSystemThreadPoolConfig*)&config));
         }
     }
 }

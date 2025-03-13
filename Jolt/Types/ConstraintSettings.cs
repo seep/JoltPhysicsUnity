@@ -2,8 +2,7 @@
 
 namespace Jolt
 {
-    [ExpectedStructSize(typeof(JPH_ConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_ConstraintSettings))]
     public struct ConstraintSettings
     {
         public NativeBool Enabled;

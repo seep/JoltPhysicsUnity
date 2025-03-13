@@ -5,33 +5,57 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [ExpectedStructSize(typeof(JPH_SixDOFConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_SixDOFConstraintSettings))]
     public struct SixDOFConstraintSettings
     {
+        /// <summary>
+        /// Create a new instance initialized with the default values.
+        /// </summary>
         public static SixDOFConstraintSettings Create()
         {
-            var instance = new SixDOFConstraintSettings();
-            JPH_SixDOFConstraintSettings_Init(ref instance);
-            return instance;
+            var result = new SixDOFConstraintSettings();
+            JPH_SixDOFConstraintSettings_Init(ref result);
+            return result;
         }
 
-        #region ConstraintSettings
+        private ConstraintSettings @base;
         
-        public NativeBool Enabled;
+        public NativeBool Enabled
+        {
+            get => @base.Enabled;
+            set => @base.Enabled = value;
+        }
 
-        public uint ConstraintPriority;
+        public uint ConstraintPriority 
+        {
+            get => @base.ConstraintPriority;
+            set => @base.ConstraintPriority = value;
+        }
 
-        public uint NumVelocityStepsOverride;
+        public uint NumVelocityStepsOverride 
+        {
+            get => @base.NumVelocityStepsOverride;
+            set => @base.NumVelocityStepsOverride = value;
+        }
 
-        public uint NumPositionStepsOverride;
+        public uint NumPositionStepsOverride 
+        {
+            get => @base.NumPositionStepsOverride;
+            set => @base.NumPositionStepsOverride = value;
+        }
 
-        public float DrawConstraintSize;
+        public float DrawConstraintSize 
+        {
+            get => @base.DrawConstraintSize;
+            set => @base.DrawConstraintSize = value;
+        }
 
-        public ulong UserData;
+        public ulong UserData 
+        {
+            get => @base.UserData;
+            set => @base.UserData = value;
+        }
 
-        #endregion
-        
         public ConstraintSpace Space;
 
         public rvec3 Position1;
@@ -61,6 +85,7 @@ namespace Jolt
         /// <summary>
         /// Specialized fixed size buffer for SixDOFConstraintSettings LimitsSpringSettings.
         /// </summary>
+        [ExpectedStructSize(typeof(JPH_SixDOFConstraintSettings._limitsSpringSettings_e__FixedBuffer))]
         public struct SpringSettingsFixedBuffer
         {
             private SpringSettings e0;
@@ -82,6 +107,7 @@ namespace Jolt
         /// <summary>
         /// Specialized fixed size buffer for SixDOFConstraintSettings MotorSettings.
         /// </summary>
+        [ExpectedStructSize(typeof(JPH_SixDOFConstraintSettings._motorSettings_e__FixedBuffer))]
         public struct MotorSettingsFixedBuffer
         {
             private MotorSettings e0;

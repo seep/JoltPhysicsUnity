@@ -5,7 +5,7 @@ using static Jolt.Bindings;
 namespace Jolt
 {
     [GenerateBindings("JPH_JobSystem")]
-    public struct JobSystem : IDisposable
+    public partial struct JobSystem : IDisposable
     {
         internal NativeHandle<JPH_JobSystem> Handle;
 

@@ -35,14 +35,14 @@
 
         public static SpringSettings JPH_DistanceConstraint_GetLimitsSpringSettings(NativeHandle<JPH_DistanceConstraint> constraint)
         {
-            SpringSettings result;
-            UnsafeBindings.JPH_DistanceConstraint_GetLimitsSpringSettings(constraint, &result);
-            return result;
+            SpringSettings settings;
+            UnsafeBindings.JPH_DistanceConstraint_GetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&settings);
+            return settings;
         }
 
         public static void JPH_DistanceConstraint_SetLimitsSpringSettings(NativeHandle<JPH_DistanceConstraint> constraint, SpringSettings settings)
         {
-            UnsafeBindings.JPH_DistanceConstraint_SetLimitsSpringSettings(constraint, &settings);
+            UnsafeBindings.JPH_DistanceConstraint_SetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&settings);
         }
 
         public static float JPH_DistanceConstraint_GetTotalLambdaPosition(NativeHandle<JPH_DistanceConstraint> constraint)

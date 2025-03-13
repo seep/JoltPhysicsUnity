@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_RayCastResult))]
     public struct RayCastResult
     {
         public BodyID BodyID;

@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_ShapeCastResult))]
     public struct ShapeCastResult
     {
         public float3 ContactPointOn1;
@@ -22,8 +22,6 @@ namespace Jolt
 
         public float Fraction;
         
-        private NativeBool isBackFaceHit; // proxied by bool getter to avoid leaking NativeBool
-
-        public bool IsBackFaceHit => isBackFaceHit;
+        public NativeBool IsBackFaceHit;
     }
 }

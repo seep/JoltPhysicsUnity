@@ -1,20 +1,19 @@
 ﻿using System.Runtime.InteropServices;
 using Unity.Mathematics;
-
 using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_SliderConstraintSettings))]
-    public struct SliderConstraintSettings
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_GearConstraintSettings))]
+    public struct GearConstraintSettings
     {
         /// <summary>
         /// Create a new instance initialized with the default values.
         /// </summary>
-        public static SliderConstraintSettings Create()
+        public static GearConstraintSettings Create()
         {
-            var result = new SliderConstraintSettings();
-            JPH_SliderConstraintSettings_Init(ref result);
+            var result = new GearConstraintSettings();
+            JPH_GearConstraintSettings_Init(ref result);
             return result;
         }
 
@@ -58,33 +57,10 @@ namespace Jolt
 
         public ConstraintSpace Space;
 
-        public NativeBool AutoDetectPoint;
-        
-        public rvec3 Point1;
-        
-        public float3 SliderAxis1;
+        public float3 HingeAxis1;
 
-        public float3 NormalAxis1;
+        public float3 HingeAxis2;
 
-        public rvec3 Point2;
-
-        public float3 SliderAxis2;
-
-        public float3 NormalAxis2;
-
-        public float LimitsMin;
-
-        public float LimitsMax;
-
-        public SpringSettings LimitsSpringSettings;
-
-        public float MaxFrictionForce;
-
-        public MotorSettings MotorSettings;
-
-        public void SetSliderAxis(float3 axis)
-        {
-            JPH_SliderConstraintSettings_SetSliderAxis(ref this, axis);
-        }
+        public float Ratio;
     }
 }

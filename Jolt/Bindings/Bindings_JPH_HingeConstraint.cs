@@ -78,14 +78,14 @@ namespace Jolt
 
         public static void JPH_HingeConstraint_SetMotorSettings(NativeHandle<JPH_HingeConstraint> constraint, MotorSettings settings)
         {
-            UnsafeBindings.JPH_HingeConstraint_SetMotorSettings(constraint, &settings);
+            UnsafeBindings.JPH_HingeConstraint_SetMotorSettings(constraint, (JPH_MotorSettings*)&settings);
         }
 
         public static MotorSettings JPH_HingeConstraint_GetMotorSettings(NativeHandle<JPH_HingeConstraint> constraint)
         {
-            MotorSettings result;
-            UnsafeBindings.JPH_HingeConstraint_GetMotorSettings(constraint, &result);
-            return result;
+            MotorSettings settings;
+            UnsafeBindings.JPH_HingeConstraint_GetMotorSettings(constraint, (JPH_MotorSettings*)&settings);
+            return settings;
         }
 
         public static void JPH_HingeConstraint_SetMotorState(NativeHandle<JPH_HingeConstraint> constraint, MotorState state)
@@ -140,14 +140,14 @@ namespace Jolt
 
         public static SpringSettings JPH_HingeConstraint_GetLimitsSpringSettings(NativeHandle<JPH_HingeConstraint> constraint)
         {
-            SpringSettings result;
-            UnsafeBindings.JPH_HingeConstraint_GetLimitsSpringSettings(constraint, &result);
-            return result;
+            SpringSettings settings;
+            UnsafeBindings.JPH_HingeConstraint_GetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&settings);
+            return settings;
         }
 
         public static void JPH_HingeConstraint_SetLimitsSpringSettings(NativeHandle<JPH_HingeConstraint> constraint, SpringSettings settings)
         {
-            UnsafeBindings.JPH_HingeConstraint_SetLimitsSpringSettings(constraint, &settings);
+            UnsafeBindings.JPH_HingeConstraint_SetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&settings);
         }
 
         public static float3 JPH_HingeConstraint_GetTotalLambdaPosition(NativeHandle<JPH_HingeConstraint> constraint)

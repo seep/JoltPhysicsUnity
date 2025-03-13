@@ -3,11 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(uint))]
     public struct SubShapeID : IEquatable<SubShapeID>
     {
         public uint Value;
 
+        internal SubShapeID(uint value)
+        {
+            Value = value;
+        }
+        
         #region IEquatable
 
         public bool Equals(SubShapeID other)

@@ -8,7 +8,7 @@ namespace Jolt
         {
             // TODO include JPH_PhysicsMaterial argument
             
-            return CreateHandle(UnsafeBindings.JPH_PlaneShapeSettings_Create(&plane, default, halfExtent));
+            return CreateHandle(UnsafeBindings.JPH_PlaneShapeSettings_Create((JPH_Plane*)&plane, default, halfExtent));
         }
 
         public static NativeHandle<JPH_PlaneShape> JPH_PlaneShapeSettings_CreateShape(NativeHandle<JPH_PlaneShapeSettings> settings)

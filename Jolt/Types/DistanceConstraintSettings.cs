@@ -4,33 +4,57 @@ using static Jolt.Bindings;
 
 namespace Jolt
 {
-    [ExpectedStructSize(typeof(JPH_DistanceConstraintSettings))]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_DistanceConstraintSettings))]
     public struct DistanceConstraintSettings
     {
+        /// <summary>
+        /// Create a new instance initialized with the default values.
+        /// </summary>
         public static DistanceConstraintSettings Create()
         {
-            var instance = new DistanceConstraintSettings();
-            JPH_DistanceConstraintSettings_Init(ref instance);
-            return instance;
+            var result = new DistanceConstraintSettings();
+            JPH_DistanceConstraintSettings_Init(ref result);
+            return result;
         }
+
+        private ConstraintSettings @base;
         
-        #region ConstraintSettings
-        
-        public NativeBool Enabled;
+        public NativeBool Enabled
+        {
+            get => @base.Enabled;
+            set => @base.Enabled = value;
+        }
 
-        public uint ConstraintPriority;
+        public uint ConstraintPriority 
+        {
+            get => @base.ConstraintPriority;
+            set => @base.ConstraintPriority = value;
+        }
 
-        public uint NumVelocityStepsOverride;
+        public uint NumVelocityStepsOverride 
+        {
+            get => @base.NumVelocityStepsOverride;
+            set => @base.NumVelocityStepsOverride = value;
+        }
 
-        public uint NumPositionStepsOverride;
+        public uint NumPositionStepsOverride 
+        {
+            get => @base.NumPositionStepsOverride;
+            set => @base.NumPositionStepsOverride = value;
+        }
 
-        public float DrawConstraintSize;
+        public float DrawConstraintSize 
+        {
+            get => @base.DrawConstraintSize;
+            set => @base.DrawConstraintSize = value;
+        }
 
-        public ulong UserData;
+        public ulong UserData 
+        {
+            get => @base.UserData;
+            set => @base.UserData = value;
+        }
 
-        #endregion
-        
         public ConstraintSpace Space;
 
         public rvec3 Point1;

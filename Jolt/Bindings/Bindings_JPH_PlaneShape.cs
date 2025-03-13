@@ -10,7 +10,7 @@
         {
             // TODO include JPH_PhysicsMaterial argument
             
-            return CreateHandle(UnsafeBindings.JPH_PlaneShape_Create(&plane, default, halfExtent));
+            return CreateHandle(UnsafeBindings.JPH_PlaneShape_Create((JPH_Plane*)&plane, default, halfExtent));
         }
 
         /// <summary>
@@ -19,9 +19,7 @@
         public static Plane JPH_PlaneShape_GetPlane(NativeHandle<JPH_PlaneShape> shape)
         {
             Plane result = default;
-
-            UnsafeBindings.JPH_PlaneShape_GetPlane(shape, &result);
-
+            UnsafeBindings.JPH_PlaneShape_GetPlane(shape, (JPH_Plane*)&result);
             return result;
         }
 

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_IndexedTriangleNoMaterial))]
     public struct IndexedTriangleNoMaterial : IEquatable<IndexedTriangleNoMaterial>
     {
         public readonly uint I1;

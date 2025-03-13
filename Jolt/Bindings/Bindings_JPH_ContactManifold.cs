@@ -18,12 +18,12 @@ namespace Jolt
         
         public static SubShapeID JPH_ContactManifold_GetSubShapeID1(NativeHandle<JPH_ContactManifold> manifold)
         {
-            return UnsafeBindings.JPH_ContactManifold_GetSubShapeID1(manifold);
+            return new SubShapeID(UnsafeBindings.JPH_ContactManifold_GetSubShapeID1(manifold));
         }
 
         public static SubShapeID JPH_ContactManifold_GetSubShapeID2(NativeHandle<JPH_ContactManifold> manifold) 
         {
-            return UnsafeBindings.JPH_ContactManifold_GetSubShapeID2(manifold);
+            return new SubShapeID(UnsafeBindings.JPH_ContactManifold_GetSubShapeID2(manifold));
         }
 
         public static uint JPH_ContactManifold_GetPointCount(NativeHandle<JPH_ContactManifold> manifold) 

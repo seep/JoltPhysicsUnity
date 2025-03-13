@@ -9,7 +9,7 @@ namespace Jolt
         {
             fixed (Triangle* trianglesPtr = triangles)
             {
-                return CreateHandle(UnsafeBindings.JPH_MeshShapeSettings_Create(trianglesPtr, (uint)triangles.Length));
+                return CreateHandle(UnsafeBindings.JPH_MeshShapeSettings_Create((JPH_Triangle*)trianglesPtr, (uint)triangles.Length));
             }
         }
 
@@ -18,7 +18,7 @@ namespace Jolt
             fixed (float3* verticesPtr = vertices)
             fixed (IndexedTriangle* trianglesPtr = triangles)
             {
-                return CreateHandle(UnsafeBindings.JPH_MeshShapeSettings_Create2(verticesPtr, (uint)vertices.Length, trianglesPtr, (uint)triangles.Length));
+                return CreateHandle(UnsafeBindings.JPH_MeshShapeSettings_Create2(verticesPtr, (uint)vertices.Length, (JPH_IndexedTriangle*)trianglesPtr, (uint)triangles.Length));
             }
         }
 

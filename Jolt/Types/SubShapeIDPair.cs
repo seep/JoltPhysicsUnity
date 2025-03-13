@@ -2,7 +2,7 @@
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_SubShapeIDPair))]
     public struct SubShapeIDPair
     {
         public BodyID Body1;

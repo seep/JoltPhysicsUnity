@@ -36,13 +36,13 @@ namespace Jolt
 
         public static void JPH_SliderConstraint_SetMotorSettings(NativeHandle<JPH_SliderConstraint> constraint, MotorSettings settings)
         {
-            UnsafeBindings.JPH_SliderConstraint_SetMotorSettings(constraint, &settings);
+            UnsafeBindings.JPH_SliderConstraint_SetMotorSettings(constraint, (JPH_MotorSettings*)&settings);
         }
 
         public static MotorSettings JPH_SliderConstraint_GetMotorSettings(NativeHandle<JPH_SliderConstraint> constraint)
         {
             MotorSettings result;
-            UnsafeBindings.JPH_SliderConstraint_GetMotorSettings(constraint, &result);
+            UnsafeBindings.JPH_SliderConstraint_GetMotorSettings(constraint, (JPH_MotorSettings*)&result);
             return result;
         }
 
@@ -99,13 +99,13 @@ namespace Jolt
         public static SpringSettings JPH_SliderConstraint_GetLimitsSpringSettings(NativeHandle<JPH_SliderConstraint> constraint)
         {
             SpringSettings result;
-            UnsafeBindings.JPH_SliderConstraint_GetLimitsSpringSettings(constraint, &result);
+            UnsafeBindings.JPH_SliderConstraint_GetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&result);
             return result;
         }
 
         public static void JPH_SliderConstraint_SetLimitsSpringSettings(NativeHandle<JPH_SliderConstraint> constraint, SpringSettings settings)
         {
-            UnsafeBindings.JPH_SliderConstraint_SetLimitsSpringSettings(constraint, &settings);
+            UnsafeBindings.JPH_SliderConstraint_SetLimitsSpringSettings(constraint, (JPH_SpringSettings*)&settings);
         }
 
         public static float2 JPH_SliderConstraint_GetTotalLambdaPosition(NativeHandle<JPH_SliderConstraint> constraint)

@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Jolt
 {
@@ -14,6 +16,12 @@ namespace Jolt
         private static NativeHandle<U> CreateOwnedHandle<T, U>(NativeHandle<T> owner, U* ptr) where T : unmanaged where U : unmanaged
         {
             return owner.CreateOwnedHandle(ptr);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nint GetDelegatePointer(Delegate @delegate)
+        {
+            return Marshal.GetFunctionPointerForDelegate(@delegate);
         }
     }
 }

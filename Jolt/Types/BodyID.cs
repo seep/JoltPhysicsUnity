@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(uint))]
     public struct BodyID : IEquatable<BodyID>
     {
         public uint Value;

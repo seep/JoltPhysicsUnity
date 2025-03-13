@@ -31,7 +31,7 @@ namespace Jolt
 
         public static void JPH_MotionProperties_SetMassProperties(NativeHandle<JPH_MotionProperties> properties, AllowedDOFs allowedDOFs, MassProperties massProperties)
         {
-            UnsafeBindings.JPH_MotionProperties_SetMassProperties(properties, allowedDOFs, &massProperties);
+            UnsafeBindings.JPH_MotionProperties_SetMassProperties(properties, allowedDOFs, (JPH_MassProperties*)&massProperties);
         }
 
         public static float JPH_MotionProperties_GetInverseMassUnchecked(NativeHandle<JPH_MotionProperties> properties)

@@ -24,7 +24,7 @@ namespace Jolt
             {
                 var gch = GCHandle.Alloc(listener);
 
-                var gchptr = (void*)GCHandle.ToIntPtr(gch);
+                var gchptr = GCHandle.ToIntPtr(gch);
                 var handle = CreateHandle(UnsafeBindings.JPH_ContactListener_Create(procsptr, gchptr));
                 
                 ManagedReference.Add(handle, gch);
@@ -53,10 +53,10 @@ namespace Jolt
         /// Static procs for marshalling; the lookup from static to instance listener happens in each method.
         /// </summary>
         private static readonly JPH_ContactListener_Procs UnsafeContactListenerProcs = new JPH_ContactListener_Procs {
-            OnContactValidate  = Marshal.GetFunctionPointerForDelegate((UnsafeContactValidate) UnsafeContactValidateCallback),
-            OnContactAdded     = Marshal.GetFunctionPointerForDelegate((UnsafeContactAdded) UnsafeContactAddedCallback),
-            OnContactRemoved   = Marshal.GetFunctionPointerForDelegate((UnsafeContactRemoved) UnsafeContactRemovedCallback),
-            OnContactPersisted = Marshal.GetFunctionPointerForDelegate((UnsafeContactPersisted) UnsafeContactPersistedCallback),
+            OnContactValidate  = GetDelegatePointer((UnsafeContactValidate) UnsafeContactValidateCallback),
+            OnContactAdded     = GetDelegatePointer((UnsafeContactAdded) UnsafeContactAddedCallback),
+            OnContactRemoved   = GetDelegatePointer((UnsafeContactRemoved) UnsafeContactRemovedCallback),
+            OnContactPersisted = GetDelegatePointer((UnsafeContactPersisted) UnsafeContactPersistedCallback),
         };
         
         /// <summary>

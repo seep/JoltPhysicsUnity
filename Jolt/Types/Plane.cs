@@ -4,10 +4,11 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_Plane))]
     public struct Plane : IEquatable<Plane>
     {
         public float3 Normal;
+        
         public float Distance;
 
         #region IEquatable

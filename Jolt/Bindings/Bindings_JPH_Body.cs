@@ -17,14 +17,14 @@ namespace Jolt
         public static AABox JPH_Body_GetWorldSpaceBounds(NativeHandle<JPH_Body> body)
         {
             AABox result;
-            UnsafeBindings.JPH_Body_GetWorldSpaceBounds(body, &result);
+            UnsafeBindings.JPH_Body_GetWorldSpaceBounds(body, (JPH_AABox*)&result);
             return result;
         }
 
         public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, SubShapeID subShapeID, rvec3 position)
         {
             float3 result;
-            UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID, &position, &result);
+            UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID.Value, &position, &result);
             return result;
         }
 

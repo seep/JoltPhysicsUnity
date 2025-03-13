@@ -2,8 +2,7 @@
 
 namespace Jolt
 {
-    [ExpectedStructSize(typeof(JPH_PhysicsSettings))]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_PhysicsSettings))]
     public struct PhysicsSettings
     {
         public const float DefaultConvexRadius = 0.05f;

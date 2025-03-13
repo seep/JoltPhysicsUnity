@@ -1,4 +1,6 @@
-﻿namespace Jolt
+﻿using System.Runtime.InteropServices;
+
+namespace Jolt
 {
     public enum MotorState : uint
     {
@@ -7,6 +9,7 @@
         Position = 2,
     }
 
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_MotorSettings))]
     public struct MotorSettings
     {
         public SpringSettings SpringSettings;

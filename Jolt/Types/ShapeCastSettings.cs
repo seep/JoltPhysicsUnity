@@ -1,11 +1,23 @@
 ﻿using System.Runtime.InteropServices;
 using Unity.Mathematics;
 
+using static Jolt.Bindings;
+
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_CollideShapeSettings))]
-    public struct ShapeCastSetttings
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_ShapeCastSettings))]
+    public struct ShapeCastSettings
     {
+        /// <summary>
+        /// Create a new instance initialized with the default values.
+        /// </summary>
+        public static ShapeCastSettings Create()
+        {
+            ShapeCastSettings result = default;
+            JPH_ShapeCastSettings_Init(ref result);
+            return result;
+        }
+
         private CollideSettings @base;
 
         public ActiveEdgeMode ActiveEdgeMode

@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace Jolt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(JPH_AABox))]
     public struct AABox : IEquatable<AABox>
     {
         public float3 Min;

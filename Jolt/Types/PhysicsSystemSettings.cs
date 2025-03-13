@@ -6,8 +6,11 @@ namespace Jolt
     public struct PhysicsSystemSettings
     {
         public uint MaxBodies;
+        
         public uint NumBodyMutexes;
+        
         public uint MaxBodyPairs;
+        
         public uint MaxContactConstraints;
 
         public ObjectLayerPairFilter ObjectLayerPairFilter;
