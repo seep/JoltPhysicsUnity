@@ -35,7 +35,8 @@
 #   define JPH_API_CALL
 #endif
 
-#define JPH_CAPI _JPH_EXTERN _JPH_EXPORT
+// JoltPhysicsUnity: override _JPH_EXPORT for zig compatability
+#define JPH_CAPI _JPH_EXTERN __declspec(dllexport)
 
 #include <stdbool.h>
 #include <stdint.h>
