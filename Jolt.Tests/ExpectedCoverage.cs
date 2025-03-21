@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace Jolt.Tests
@@ -31,7 +31,7 @@ namespace Jolt.Tests
                     continue;
                 }
                 
-                methods.Add(method.Name);
+                methods.Add(Regex.Replace(method.Name, "[0-9]", "")); // combine numbered variants like Create, Create2, Create3
             }
 
             foreach (var method in typeof(Bindings).GetMethods())

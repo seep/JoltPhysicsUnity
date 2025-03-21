@@ -8,7 +8,6 @@ namespace Jolt.Samples
         public PhysicsBody BodyB;
 
         public float3 SliderPoint;
-        
         public float3 SliderAxis;
         public float3 SliderNormal;
         

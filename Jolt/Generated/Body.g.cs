@@ -1,5 +1,6 @@
 ﻿using System;
 using Jolt;
+using Unity.Collections;
 using Unity.Mathematics;
 
 namespace Jolt
@@ -26,9 +27,9 @@ namespace Jolt
         
         public BodyType GetBodyType() => Bindings.JPH_Body_GetBodyType(Handle);
         
-        public AABox GetWorldSpaceBounds() => Bindings.JPH_Body_GetWorldSpaceBounds(Handle);
+        public bool IsRigidBody() => Bindings.JPH_Body_IsRigidBody(Handle);
         
-        public float3 GetWorldSpaceSurfaceNormal(SubShapeID subShapeID, rvec3 position) => Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, position);
+        public bool IsSoftBody() => Bindings.JPH_Body_IsSoftBody(Handle);
         
         public bool IsActive() => Bindings.JPH_Body_IsActive(Handle);
         
@@ -104,11 +105,17 @@ namespace Jolt
         
         public quaternion GetRotation() => Bindings.JPH_Body_GetRotation(Handle);
         
-        public rvec3 GetCenterOfMassPosition() => Bindings.JPH_Body_GetCenterOfMassPosition(Handle);
-        
         public rmatrix4x4 GetWorldTransform() => Bindings.JPH_Body_GetWorldTransform(Handle);
         
+        public rvec3 GetCenterOfMassPosition() => Bindings.JPH_Body_GetCenterOfMassPosition(Handle);
+        
         public rmatrix4x4 GetCenterOfMassTransform() => Bindings.JPH_Body_GetCenterOfMassTransform(Handle);
+        
+        public rmatrix4x4 GetInverseCenterOfMassTransform() => Bindings.JPH_Body_GetInverseCenterOfMassTransform(Handle);
+        
+        public AABox GetWorldSpaceBounds() => Bindings.JPH_Body_GetWorldSpaceBounds(Handle);
+        
+        public float3 GetWorldSpaceSurfaceNormal(SubShapeID subShapeID, rvec3 position) => Bindings.JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, position);
         
         public void SetUserData(ulong userData) => Bindings.JPH_Body_SetUserData(Handle, userData);
         

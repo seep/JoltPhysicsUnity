@@ -18,6 +18,5 @@
             
             return DistanceConstraint.Create(ref settings, ba, bb);
         }
-
     }
 }

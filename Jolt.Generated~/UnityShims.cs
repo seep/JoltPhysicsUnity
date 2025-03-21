@@ -64,6 +64,13 @@ namespace Unity.Collections
         public void Dispose() { }
     }
 
+    public unsafe struct NativeArray<T>
+    {
+        public int Length;
+        
+        public void* GetUnsafePtr() => null;
+    }
+    
     public enum Allocator
     {
         Temp, Persistent,

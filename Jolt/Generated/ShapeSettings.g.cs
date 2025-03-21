@@ -1,5 +1,6 @@
 ﻿using System;
 using Jolt;
+using Unity.Collections;
 using Unity.Mathematics;
 
 namespace Jolt
@@ -23,6 +24,10 @@ namespace Jolt
         #region JPH_ShapeSettings
         
         public void Destroy() => Bindings.JPH_ShapeSettings_Destroy(Handle);
+        
+        public ulong GetUserData() => Bindings.JPH_ShapeSettings_GetUserData(Handle);
+        
+        public void SetUserData(ulong data) => Bindings.JPH_ShapeSettings_SetUserData(Handle, data);
         
         #endregion
         

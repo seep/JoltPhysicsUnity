@@ -1,5 +1,6 @@
 ﻿using System;
 using Jolt;
+using Unity.Collections;
 using Unity.Mathematics;
 
 namespace Jolt
@@ -17,6 +18,20 @@ namespace Jolt
         public static bool operator ==(ConvexHullShape lhs, ConvexHullShape rhs) => lhs.Equals(rhs);
         
         public static bool operator !=(ConvexHullShape lhs, ConvexHullShape rhs) => !lhs.Equals(rhs);
+        
+        #endregion
+        
+        #region JPH_ConvexHullShape
+        
+        public uint GetNumPoints() => Bindings.JPH_ConvexHullShape_GetNumPoints(Handle);
+        
+        public float3 GetPoint(uint index) => Bindings.JPH_ConvexHullShape_GetPoint(Handle, index);
+        
+        public uint GetNumFaces() => Bindings.JPH_ConvexHullShape_GetNumFaces(Handle);
+        
+        public uint GetNumVerticesInFace(uint faceIndex) => Bindings.JPH_ConvexHullShape_GetNumVerticesInFace(Handle, faceIndex);
+        
+        public uint GetFaceVertices(uint faceIndex, NativeArray<uint> vertices) => Bindings.JPH_ConvexHullShape_GetFaceVertices(Handle, faceIndex, vertices);
         
         #endregion
         

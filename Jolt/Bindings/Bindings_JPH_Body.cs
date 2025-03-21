@@ -14,18 +14,14 @@ namespace Jolt
             return UnsafeBindings.JPH_Body_GetBodyType(body);
         }
 
-        public static AABox JPH_Body_GetWorldSpaceBounds(NativeHandle<JPH_Body> body)
+        public static bool JPH_Body_IsRigidBody(NativeHandle<JPH_Body> body)
         {
-            AABox result;
-            UnsafeBindings.JPH_Body_GetWorldSpaceBounds(body, (JPH_AABox*)&result);
-            return result;
+            return UnsafeBindings.JPH_Body_IsRigidBody(body);
         }
 
-        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, SubShapeID subShapeID, rvec3 position)
+        public static bool JPH_Body_IsSoftBody(NativeHandle<JPH_Body> body)
         {
-            float3 result;
-            UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID.Value, &position, &result);
-            return result;
+            return UnsafeBindings.JPH_Body_IsSoftBody(body);
         }
 
         public static bool JPH_Body_IsActive(NativeHandle<JPH_Body> body)
@@ -225,13 +221,6 @@ namespace Jolt
             return result;
         }
 
-        public static rvec3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
-        {
-            rvec3 result;
-            UnsafeBindings.JPH_Body_GetCenterOfMassPosition(body, &result);
-            return result;
-        }
-
         public static rmatrix4x4 JPH_Body_GetWorldTransform(NativeHandle<JPH_Body> body)
         {
             rmatrix4x4 result;
@@ -239,10 +228,38 @@ namespace Jolt
             return result;
         }
 
+        public static rvec3 JPH_Body_GetCenterOfMassPosition(NativeHandle<JPH_Body> body)
+        {
+            rvec3 result;
+            UnsafeBindings.JPH_Body_GetCenterOfMassPosition(body, &result);
+            return result;
+        }
+
         public static rmatrix4x4 JPH_Body_GetCenterOfMassTransform(NativeHandle<JPH_Body> body)
         {
             rmatrix4x4 result;
             UnsafeBindings.JPH_Body_GetCenterOfMassTransform(body, &result);
+            return result;
+        }
+
+        public static rmatrix4x4 JPH_Body_GetInverseCenterOfMassTransform(NativeHandle<JPH_Body> body)
+        {
+            rmatrix4x4 result;
+            UnsafeBindings.JPH_Body_GetInverseCenterOfMassTransform(body, &result);
+            return result;
+        }
+
+        public static AABox JPH_Body_GetWorldSpaceBounds(NativeHandle<JPH_Body> body)
+        {
+            AABox result;
+            UnsafeBindings.JPH_Body_GetWorldSpaceBounds(body, (JPH_AABox*)&result);
+            return result;
+        }
+
+        public static float3 JPH_Body_GetWorldSpaceSurfaceNormal(NativeHandle<JPH_Body> body, SubShapeID subShapeID, rvec3 position)
+        {
+            float3 result;
+            UnsafeBindings.JPH_Body_GetWorldSpaceSurfaceNormal(body, subShapeID.Value, &position, &result);
             return result;
         }
 

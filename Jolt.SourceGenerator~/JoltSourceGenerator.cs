@@ -139,6 +139,7 @@ internal class JoltSourceGenerator : ISourceGenerator
 
         writer.WriteLine("using System;");
         writer.WriteLine("using Jolt;");
+        writer.WriteLine("using Unity.Collections;");
         writer.WriteLine("using Unity.Mathematics;");
         writer.WriteLine();
 

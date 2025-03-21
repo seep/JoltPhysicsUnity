@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Jolt.Samples
+﻿namespace Jolt.Samples
 {
     public class PhysicsShapeTaperedCapsule : PhysicsShapeBase
     {

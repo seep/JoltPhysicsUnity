@@ -70,7 +70,7 @@ namespace Jolt
         public static bool JPH_NarrowPhaseQuery_CastRay(
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
-            rvec3 origin, float3 direction, NativeHandle<JPH_RayCastSettings> settings, CollisionCollectorType collector,
+            rvec3 origin, float3 direction, RayCastSettings settings, CollisionCollectorType collector,
             // callback
             NarrowPhaseQuery.CastRayCallback callback,
             // optional filters
