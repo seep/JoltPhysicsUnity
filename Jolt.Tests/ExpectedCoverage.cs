@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -7,40 +7,39 @@ namespace Jolt.Tests
 {
     public class ExpectedCoverageTests
     {
-        [Test]
-        public void TestStructLayout()
+        /// <summary>
+        /// Method name prefixes to ignore in the coverage test for whatever reason. Ideally these wouldn't be
+        /// generated at all but clangsharppinvokegenerator doesn't support excluding methods by name.
+        /// </summary>
+        private static HashSet<string> ignoreMethodNamePrefix = new()
         {
-            Type safeBindingsType = typeof(Bindings);
-            Type unsafeBindingsType = typeof(UnsafeBindings);
-
-            var expect = new HashSet<string>();
+            "JPH_Matrix4x4",
+            "JPH_RMatrix4x4",
+            "JPH_Quat",
+            "JPH_Vec3",
+        };
+        
+        [Test]
+        public void TestCoverage()
+        {
+            var methods = new HashSet<string>();
             
-            foreach (var unsafeBindingsMethod in unsafeBindingsType.GetMethods())
+            foreach (var method in typeof(UnsafeBindings).GetMethods())
             {
-                if (unsafeBindingsMethod.Name.StartsWith("JPH_"))
+                if (ignoreMethodNamePrefix.Any(s => method.Name.StartsWith(s)))
                 {
-                    expect.Add(unsafeBindingsMethod.Name);
+                    continue;
                 }
+                
+                methods.Add(method.Name);
             }
 
-            var actual = new HashSet<string>();
-
-            foreach (var safeBindingsMethod in safeBindingsType.GetMethods())
+            foreach (var method in typeof(Bindings).GetMethods())
             {
-                actual.Add(safeBindingsMethod.Name);
-            }
-
-            var missingMethodNames = new StringBuilder();
-            
-            foreach (var expectMethodName in expect)
-            {
-                if (!actual.Contains(expectMethodName))
-                {
-                    missingMethodNames.AppendLine(expectMethodName);
-                }
+                methods.Remove(method.Name);
             }
             
-            Assert.IsEmpty(missingMethodNames.ToString());
+            Assert.IsEmpty(string.Join("\n", methods));
         }
     }
 }

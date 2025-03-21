@@ -1,8 +1,5 @@
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
-
-[assembly: InternalsVisibleTo("Jolt.Tests")]
 
 namespace Jolt
 {
