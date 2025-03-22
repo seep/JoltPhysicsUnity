@@ -19,7 +19,7 @@ namespace Jolt
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static nint GetDelegatePointer(Delegate @delegate)
+        internal static nint GetDelegatePointer(Delegate @delegate)
         {
             return Marshal.GetFunctionPointerForDelegate(@delegate);
         }

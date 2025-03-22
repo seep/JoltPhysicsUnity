@@ -11,26 +11,21 @@ namespace Jolt
         {
             // Getting the listeners to work requires a lot of indirection, because the listeners are represented as 
             // heap objects in the native plugin with their own lifetimes. The joltc constructor for the listener takes
-            // a "user data" pointer parameter that lets us provide context to the callbacks when they are invoked.
+            // a "user data" parameter that lets us provide context to the callbacks when they are invoked.
             //
-            // When we construct a new native listener, we also create a GCHandle for the associated managed listener.
-            // These are tracked in the ManagedReference static class. Instead of marshaling the exact managed listener
-            // function pointers, we marshal static function pointers and the GCHandle of the managed listener.
-            // 
-            // When Jolt invokes the native listener, it invokes our static listeners with the GCHandle, which we then
-            // dereference to obtain the managed listener.
+            // During initialization, we provide static callbacks to joltc. When we construct a new native listener, we
+            // also create a GCHandle for the associated managed listener. These are tracked in the ManagedReference
+            // static class. When Jolt invokes the native listener, it invokes the joltc static listener, which invokes
+            // our own static listeners with the GCHandle parameter, which we dereference to obtain the user listener.
             
-            fixed (JPH_ContactListener_Procs* procsptr = &UnsafeContactListenerProcs)
-            {
-                var gch = GCHandle.Alloc(listener);
+            var gch = GCHandle.Alloc(listener);
+            var ptr = GCHandle.ToIntPtr(gch);
+            
+            var handle = CreateHandle(UnsafeBindings.JPH_ContactListener_Create(ptr));
+            
+            ManagedReference.Add(handle, gch);
 
-                var gchptr = GCHandle.ToIntPtr(gch);
-                var handle = CreateHandle(UnsafeBindings.JPH_ContactListener_Create(procsptr, gchptr));
-                
-                ManagedReference.Add(handle, gch);
-
-                return handle;
-            }
+            return handle;
         }
 
         public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
@@ -47,6 +42,17 @@ namespace Jolt
             UnsafeBindings.JPH_ContactListener_Destroy(listener);
             
             listener.Dispose();
+        }
+        
+        /// <summary>
+        /// Set the static callback pointers for JPH_ContactListener.
+        /// </summary>
+        private static void InitializeContactListeners()
+        {
+            fixed (JPH_ContactListener_Procs* ptr = &UnsafeContactListenerProcs)
+            {
+                UnsafeBindings.JPH_ContactListener_SetProcs(ptr);
+            }
         }
         
         /// <summary>
