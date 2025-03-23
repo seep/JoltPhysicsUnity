@@ -12,16 +12,16 @@ namespace Jolt
         /// Callback signature for CastRay.
         /// </summary>
         public delegate void CastRayCallback(ref BroadPhaseCastResult result);
-        
+
         /// <summary>
         /// Callback signature for CollideAABox, CollideSphere, and CollidePoint.
         /// </summary>
         public delegate void CollideCallback(BodyID result);
     }
-    
+
     internal static unsafe partial class Bindings
     {
-        public static NativeBool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
+        public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay(
                 query, &origin, &direction,
@@ -31,7 +31,7 @@ namespace Jolt
             );
         }
 
-        public static NativeBool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
+        public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay2(
                 query, &origin, &direction, collisionCollectorType,
@@ -41,7 +41,7 @@ namespace Jolt
             );
         }
 
-        public static NativeBool JPH_BroadPhaseQuery_CollideAABox(
+        public static bool JPH_BroadPhaseQuery_CollideAABox(
             NativeHandle<JPH_BroadPhaseQuery> query, AABox box, BroadPhaseQuery.CollideCallback callback,
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter
@@ -55,7 +55,7 @@ namespace Jolt
             );
         }
 
-        public static NativeBool JPH_BroadPhaseQuery_CollideSphere(NativeHandle<JPH_BroadPhaseQuery> query, float3 center, float radius, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter) 
+        public static bool JPH_BroadPhaseQuery_CollideSphere(NativeHandle<JPH_BroadPhaseQuery> query, float3 center, float radius, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CollideSphere(
                 query, &center, radius,
@@ -65,7 +65,7 @@ namespace Jolt
             );
         }
 
-        public static NativeBool JPH_BroadPhaseQuery_CollidePoint(NativeHandle<JPH_BroadPhaseQuery> query, float3 point, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter) 
+        public static bool JPH_BroadPhaseQuery_CollidePoint(NativeHandle<JPH_BroadPhaseQuery> query, float3 point, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
         {
             return UnsafeBindings.JPH_BroadPhaseQuery_CollidePoint(
                 query, &point,
@@ -87,11 +87,11 @@ namespace Jolt
         public static nint UnsafeCastRayCallbackPointer = Marshal.GetFunctionPointerForDelegate(
             (UnsafeCastRayDelegate)UnsafeCastRayCallback
         );
-        
+
         public static nint UnsafeCollideCallbackPointer = Marshal.GetFunctionPointerForDelegate(
             (UnsafeCollideDelegate)UnsafeCollideCallback
         );
-        
+
         private static void UnsafeCastRayCallback(nint udata, BroadPhaseCastResult* result)
         {
             try

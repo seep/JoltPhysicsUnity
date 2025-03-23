@@ -190,6 +190,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2f768cfb5e172b44b1fbda881f8d26e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &332679609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 332679611}
+  - component: {fileID: 332679610}
+  m_Layer: 0
+  m_Name: Jolt Sample Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &332679610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332679609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57d09e608244e0b90ddd71d5818f979, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &332679611
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332679609}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259319934
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,9 +412,8 @@ GameObject:
   - component: {fileID: 2845077380517079332}
   - component: {fileID: 3346551176964779712}
   - component: {fileID: 6679748557057520527}
-  - component: {fileID: 6679748557057520528}
   m_Layer: 0
-  m_Name: Jolt Slider Rail
+  m_Name: Jolt Rail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -435,18 +478,6 @@ MonoBehaviour:
     y: 0.25
     z: 4
   ConvexRadius: 0.05
---- !u!114 &6679748557057520528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4124134194237291672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90f0d041683269246afb40dbad9d92e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8465043505375935244
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +500,7 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 332679611}
   - {fileID: 1766366449}
   - {fileID: 166082043}
   - {fileID: 2845077380517079332}

@@ -15,9 +15,9 @@ namespace Jolt.Samples
 
             settings.Point1 = Point;
             settings.Point2 = Point;
-            
-            var ba = context.ManagedToNative[BodyA];
-            var bb = context.ManagedToNative[BodyB];
+
+            var ba = BodyA.NativeBody!.Value;
+            var bb = BodyB.NativeBody!.Value;
 
             return PointConstraint.Create(ref settings, ba, bb);
         }
