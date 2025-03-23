@@ -19,36 +19,6 @@ namespace Unity.Mathematics
     public struct quaternion { }
 }
 
-namespace UnityEngine
-{
-    public static class Debug
-    {
-        public static void LogError(string _) { }
-        
-        public static void LogWarning(string _) { }
-
-        public static void LogException(System.Exception _) { }
-    }
-    
-    public class RuntimeInitializeOnLoadMethodAttribute : System.Attribute { }
-
-    public struct Color32
-    {
-        public byte r;
-        public byte g;
-        public byte b;
-        public byte a;
-
-        public Color32(byte r, byte g, byte b, byte a)
-        {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
-        }
-    }
-}
-
 namespace Unity.Collections
 {
     public struct NativeHashSet<T> : System.IDisposable
@@ -67,10 +37,10 @@ namespace Unity.Collections
     public unsafe struct NativeArray<T>
     {
         public int Length;
-        
+
         public void* GetUnsafePtr() => null;
     }
-    
+
     public enum Allocator
     {
         Temp, Persistent,
