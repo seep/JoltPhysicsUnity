@@ -1,6 +1,6 @@
-﻿# JoltPhysicsUnity 
+﻿# JoltPhysicsUnity
 
-This package provides __work-in-progress__ bindings for [Jolt Physics](https://github.com/jrouwe/JoltPhysics)
+This package provides __work-in-progress__ bindings for [Jolt Physics v5.3.0](https://github.com/jrouwe/JoltPhysics)
 specifically for Unity. It uses the Unity.Mathematics package for all numerics and Unity.Collections
 package for unmanaged collections.
 
@@ -11,29 +11,6 @@ Unity Jobs and Burst compiled code.
 
 The package is not currently published on any registries. You can [add it as a git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 or [embed it directly in your project](https://docs.unity3d.com/Manual/upm-embed.html).
-
-### Features
-
-###### Shapes
-
-###### Constraints  
-
-[x] Cone
-[x] Distance
-[x] Fixed
-[x] Hinge
-[x] Point
-[x] SixDOF
-[x] Slider
-[x] SwingTwist
-[x] Gear
-
-###### Listeners
-
-[x] Contact Listener Invocation
-[ ] Contact Listener Arg Forwarding 
-[x] Body Activation Listener Invocation
-[x] Body Activation Listener Arg Forwarding
 
 ### Acknowledgements
 
