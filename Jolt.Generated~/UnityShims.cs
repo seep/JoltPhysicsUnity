@@ -5,10 +5,7 @@ namespace Unity.Mathematics
 {
     public struct double3 { }
 
-    public struct float2
-    {
-        public float2(float x, float y) { } // used by Bindings_JPH_HingeConstraint
-    }
+    public struct float2 { }
 
     public struct float3 { }
 
@@ -32,29 +29,5 @@ namespace Unity.Collections
         public bool Contains(T _) => true;
 
         public void Dispose() { }
-    }
-
-    public unsafe struct NativeArray<T>
-    {
-        public int Length;
-
-        public void* GetUnsafePtr() => null;
-    }
-
-    public enum Allocator
-    {
-        Temp, Persistent,
-    }
-
-    namespace LowLevel.Unsafe
-    {
-        public static unsafe class UnsafeUtility
-        {
-            public static ref T AsRef<T>(void* ptr)
-            {
-                T result = default;
-                return ref result;
-            }
-        }
     }
 }
