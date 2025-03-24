@@ -5,52 +5,74 @@ namespace Jolt.Samples
 {
     public class QuerySample : Sample
     {
-        private void Update()
+        public PhysicsBody BroadPhaseBody;
+        public GameObject BroadPhasePoint;
+
+        public PhysicsBody NarrowPhaseBody;
+        public GameObject NarrowPhasePoint;
+
+        protected override void FixedUpdate()
         {
             // This sample demonstrates broad phase and narrow phase ray casting. Broad phase queries only sample
             // the root AABBs of shapes, while narrow phase queries sample into subshapes and faces of the root shape.
 
-            // TODO use a drawing lib that can draw lines in the game view so gizmos dont have to be turned on
+            SampleHelpers.Tumble(Context, BroadPhaseBody);
+            SampleHelpers.Tumble(Context, NarrowPhaseBody);
 
-            BroadPhaseQuery();
-            NarrowPhaseQuery();
+            base.FixedUpdate();
+
+            BroadPhaseQuery(
+                origin: new float3(2f, 3f, -2f),
+                vector: new float3(-5f, 0f, 0f)
+            );
+
+            NarrowPhaseQuery(
+                origin: new float3(2f, 3f, +2f),
+                vector: new float3(-5f, 0f, 0f)
+            );
         }
 
-        private void BroadPhaseQuery()
+        private void BroadPhaseQuery(float3 origin, float3 vector)
         {
             var query = PhysicsSystem.GetBroadPhaseQuery();
-            var origin = new float3(-2, 2, 2 - math.sin(PhysicsTime) * 2f);
-            var vector = new float3(4, 0, 0);
 
             BroadPhaseCastResult hit = default;
 
             // TODO joltc has no simple out result for this like NarrowPhaseQuery_CastRay
             if (query.CastRay(origin, vector, (ref BroadPhaseCastResult result) => { hit = result; }, default, default))
             {
-                Debug.DrawRay(origin, vector * hit.Fraction, UnityEngine.Color.magenta);
+                var point = origin + vector * hit.Fraction;
+                var normal = -vector; // TODO derive AABB normal from vector orientation
+
+                BroadPhasePoint.SetActive(true);
+                BroadPhasePoint.transform.position = point;
+                BroadPhasePoint.transform.rotation = quaternion.LookRotation(-normal, math.up());
             }
             else
             {
-                Debug.DrawRay(origin, vector, UnityEngine.Color.yellow);
+                BroadPhasePoint.SetActive(false);
             }
         }
 
-        private void NarrowPhaseQuery()
+        private void NarrowPhaseQuery(float3 origin, float3 vector)
         {
             var query = PhysicsSystem.GetNarrowPhaseQuery();
-            var origin = new float3(-2, 2, -2 + math.sin(PhysicsTime) * 2f);
-            var vector = new float3(4, 0, 0);
 
             RayCastResult hit = default;
 
             // TODO generate bindings with default parameters
             if (query.CastRay(origin, vector, out hit, default, default, default))
             {
-                Debug.DrawRay(origin, vector * hit.Fraction, UnityEngine.Color.red);
+                var point = origin + vector * hit.Fraction;
+                var normal = NarrowPhaseBody.NativeBody!.Value.GetWorldSpaceSurfaceNormal(hit.SubShapeID, point);
+
+                NarrowPhasePoint.SetActive(true);
+                NarrowPhasePoint.transform.position = point;
+                NarrowPhasePoint.transform.rotation = quaternion.LookRotation(-normal, math.up());
             }
             else
             {
-                Debug.DrawRay(origin, vector, UnityEngine.Color.green);
+                NarrowPhasePoint.SetActive(false);
             }
         }
     }
