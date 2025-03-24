@@ -9,6 +9,6 @@ namespace Jolt
 
         public float Fraction;
 
-        public uint SubShapeID;
+        public SubShapeID SubShapeID;
     }
 }
