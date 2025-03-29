@@ -16,7 +16,7 @@ namespace Jolt
             InitializeContactListeners();
         }
 
-        #if JOLT_DISABLE_SAFETY_CHECkS
+        #if JOLT_DISABLE_SAFETY_CHECKS
         [Conditional("FALSE")]
         #endif
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

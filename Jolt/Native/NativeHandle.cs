@@ -14,7 +14,7 @@ namespace Jolt
         
         public NativeHandle(T* ptr)
         {
-            #if !JOLT_DISABLE_SAFETY_CHECkS
+            #if !JOLT_DISABLE_SAFETY_CHECKS
             safety = NativeSafetyHandle.Create();
             #endif
 
@@ -26,7 +26,7 @@ namespace Jolt
         /// </summary>
         public NativeHandle<U> CreateOwnedHandle<U>(U* ptr) where U : unmanaged
         {
-            #if !JOLT_DISABLE_SAFETY_CHECkS
+            #if !JOLT_DISABLE_SAFETY_CHECKS
             return new NativeHandle<U> { ptr = ptr, safety = safety };
             #else
             return new NativeHandle<U> { ptr = ptr };
@@ -36,7 +36,7 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly NativeHandle<U> Reinterpret<U>() where U : unmanaged
         {
-            #if !JOLT_DISABLE_SAFETY_CHECkS
+            #if !JOLT_DISABLE_SAFETY_CHECKS
             return new NativeHandle<U> { ptr = (U*) ptr, safety = safety };
             #else
             return new NativeHandle<U> { ptr = (U*) ptr };
@@ -46,7 +46,7 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly T* IntoPointer()
         {
-            #if !JOLT_DISABLE_SAFETY_CHECkS
+            #if !JOLT_DISABLE_SAFETY_CHECKS
             NativeSafetyHandle.AssertExists(in safety);
             #endif
 
@@ -63,7 +63,7 @@ namespace Jolt
 
         public void Dispose()
         {
-            #if !JOLT_DISABLE_SAFETY_CHECkS
+            #if !JOLT_DISABLE_SAFETY_CHECKS
             NativeSafetyHandle.Release(safety);
             #endif
 

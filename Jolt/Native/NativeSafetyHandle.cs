@@ -1,4 +1,4 @@
-﻿#if !JOLT_DISABLE_SAFETY_CHECkS
+﻿#if !JOLT_DISABLE_SAFETY_CHECKS
 
 using System;
 using System.Runtime.CompilerServices;
