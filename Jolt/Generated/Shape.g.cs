@@ -47,6 +47,8 @@ namespace Jolt
         
         public MassProperties GetMassProperties() => Bindings.JPH_Shape_GetMassProperties(Handle);
         
+        public PhysicsMaterial GetMaterial(SubShapeID subShapeID) => new PhysicsMaterial { Handle = Bindings.JPH_Shape_GetMaterial(Handle, subShapeID) };
+        
         public float3 GetSurfaceNormal(SubShapeID subShapeID, float3 localPosition) => Bindings.JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPosition);
         
         public float GetVolume() => Bindings.JPH_Shape_GetVolume(Handle);

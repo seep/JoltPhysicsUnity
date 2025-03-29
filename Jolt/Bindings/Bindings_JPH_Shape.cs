@@ -77,7 +77,10 @@ namespace Jolt
 
         // TODO JPH_Shape_GetLeafShape
 
-        // TODO JPH_Shape_GetMaterial
+        public static NativeHandle<JPH_PhysicsMaterial> JPH_Shape_GetMaterial(NativeHandle<JPH_Shape> shape, SubShapeID subShapeID)
+        {
+            return CreateHandle(UnsafeBindings.JPH_Shape_GetMaterial(shape, subShapeID.Value));
+        }
 
         public static float3 JPH_Shape_GetSurfaceNormal(NativeHandle<JPH_Shape> shape, SubShapeID subShapeID, float3 localPosition)
         {
