@@ -4,6 +4,8 @@
     {
         public static void JPH_JobSystem_Destroy(NativeHandle<JPH_JobSystem> system)
         {
+            AssertInitialized();
+
             UnsafeBindings.JPH_JobSystem_Destroy(system);
         }
     }

@@ -23,6 +23,8 @@ namespace Jolt
     {
         public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay(
                 query, &origin, &direction,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
@@ -33,6 +35,8 @@ namespace Jolt
 
         public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_BroadPhaseQuery_CastRay2(
                 query, &origin, &direction, collisionCollectorType,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
@@ -47,6 +51,8 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter
         )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_BroadPhaseQuery_CollideAABox(
                 query, (JPH_AABox*)&box,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
@@ -57,6 +63,8 @@ namespace Jolt
 
         public static bool JPH_BroadPhaseQuery_CollideSphere(NativeHandle<JPH_BroadPhaseQuery> query, float3 center, float radius, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_BroadPhaseQuery_CollideSphere(
                 query, &center, radius,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
@@ -67,6 +75,8 @@ namespace Jolt
 
         public static bool JPH_BroadPhaseQuery_CollidePoint(NativeHandle<JPH_BroadPhaseQuery> query, float3 point, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_BroadPhaseQuery_CollidePoint(
                 query, &point,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,

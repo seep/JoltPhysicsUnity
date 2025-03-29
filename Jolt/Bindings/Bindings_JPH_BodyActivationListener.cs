@@ -8,6 +8,8 @@ namespace Jolt
     {
         public static NativeHandle<JPH_BodyActivationListener> JPH_BodyActivationListener_Create(IBodyActivationListener listener)
         {
+            AssertInitialized();
+
             // See Bindings_JPH_ContactListener for comments.
 
             var gch = GCHandle.Alloc(listener);
@@ -21,6 +23,8 @@ namespace Jolt
 
         public static void JPH_BodyActivationListener_Destroy(NativeHandle<JPH_BodyActivationListener> listener)
         {
+            AssertInitialized();
+
             if (ManagedReference.Remove(listener, out var gch))
             {
                 gch.Free();
@@ -37,6 +41,8 @@ namespace Jolt
 
         private static void InitializeBodyActivationListeners()
         {
+            AssertInitialized();
+
             fixed (JPH_BodyActivationListener_Procs* ptr = &UnsafeBodyActivationListenerProcs)
             {
                 UnsafeBindings.JPH_BodyActivationListener_SetProcs(ptr);

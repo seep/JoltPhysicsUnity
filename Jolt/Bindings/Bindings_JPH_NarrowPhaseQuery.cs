@@ -12,18 +12,18 @@ namespace Jolt
         /// Callback signature for CastRay.
         /// </summary>
         public delegate void CastRayCallback(ref RayCastResult result);
-        
+
         /// <summary>
         /// Callback signature for ...
         /// </summary>
         public delegate void CollidePointCallback(ref CollidePointResult result);
-        
+
         /// <summary>
         /// Callback signature for ...
         /// </summary>
         public delegate void CollideShapeCallback(ref CollideShapeResult result);
     }
-    
+
     internal static unsafe partial class Bindings
     {
         public static bool JPH_NarrowPhaseQuery_CastRay(
@@ -38,11 +38,13 @@ namespace Jolt
             NativeHandle<JPH_BodyFilter> bodyFilter = default
         )
         {
+            AssertInitialized();
+
             fixed (RayCastResult* ptr = &hit)
             {
                 return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay(
                     query, &origin, &direction, (JPH_RayCastResult*)ptr, broadPhaseLayerFilter, objectLayerFilter, bodyFilter
-                );   
+                );
             }
         }
 
@@ -59,6 +61,8 @@ namespace Jolt
             NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay2(
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings),
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
@@ -78,8 +82,10 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
-        ) 
+        )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay3(
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings), collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
@@ -99,8 +105,10 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
-        ) 
+        )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollidePoint(
                 query, &point,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -120,8 +128,10 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
-        ) 
+        )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollidePoint2(
                 query, &point, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -141,8 +151,10 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
-        ) 
+        )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollideShape(
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -164,6 +176,8 @@ namespace Jolt
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
         )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollideShape2(
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -183,8 +197,10 @@ namespace Jolt
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
-        ) 
+        )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastShape(
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -206,6 +222,8 @@ namespace Jolt
             NativeHandle<JPH_ShapeFilter> shapeFilter  = default
         )
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastShape2(
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
@@ -227,15 +245,15 @@ namespace Jolt
         public static nint UnsafeCastRayCallbackPointer = Marshal.GetFunctionPointerForDelegate(
             (UnsafeCastRayDelegate)UnsafeCastRayCallback
         );
-        
+
         public static nint UnsafeCollideShapeCallbackPointer = Marshal.GetFunctionPointerForDelegate(
             (UnsafeCollideShapeDelegate)UnsafeCollideShapeCallback
         );
-        
+
         public static nint UnsafeCollidePointCallbackPointer = Marshal.GetFunctionPointerForDelegate(
             (UnsafeCollidePointDelegate)UnsafeCollidePointCallback
         );
-        
+
         private static void UnsafeCastRayCallback(nint udata, RayCastResult* result)
         {
             try
@@ -259,7 +277,7 @@ namespace Jolt
                 Debug.LogException(e);
             }
         }
-        
+
         private static void UnsafeCollidePointCallback(nint udata, CollidePointResult* result)
         {
             try

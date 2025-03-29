@@ -9,7 +9,9 @@ namespace Jolt
     {
         public static NativeHandle<JPH_ContactListener> JPH_ContactListener_Create(IContactListener listener)
         {
-            // Getting the listeners to work requires a lot of indirection, because the listeners are represented as 
+            AssertInitialized();
+
+            // Getting the listeners to work requires a lot of indirection, because the listeners are represented as
             // heap objects in the native plugin with their own lifetimes. The joltc constructor for the listener takes
             // a "user data" parameter that lets us provide context to the callbacks when they are invoked.
             //
@@ -17,12 +19,12 @@ namespace Jolt
             // also create a GCHandle for the associated managed listener. These are tracked in the ManagedReference
             // static class. When Jolt invokes the native listener, it invokes the joltc static listener, which invokes
             // our own static listeners with the GCHandle parameter, which we dereference to obtain the user listener.
-            
+
             var gch = GCHandle.Alloc(listener);
             var ptr = GCHandle.ToIntPtr(gch);
-            
+
             var handle = CreateHandle(UnsafeBindings.JPH_ContactListener_Create(ptr));
-            
+
             ManagedReference.Add(handle, gch);
 
             return handle;
@@ -30,6 +32,8 @@ namespace Jolt
 
         public static void JPH_ContactListener_Destroy(NativeHandle<JPH_ContactListener> listener)
         {
+            AssertInitialized();
+
             if (ManagedReference.Remove(listener, out var gch))
             {
                 gch.Free();
@@ -38,12 +42,12 @@ namespace Jolt
             {
                 Debug.LogError("Missing GCHandle for managed contact listener!");
             }
-            
+
             UnsafeBindings.JPH_ContactListener_Destroy(listener);
-            
+
             listener.Dispose();
         }
-        
+
         /// <summary>
         /// Set the static callback pointers for JPH_ContactListener.
         /// </summary>
@@ -54,7 +58,7 @@ namespace Jolt
                 UnsafeBindings.JPH_ContactListener_SetProcs(ptr);
             }
         }
-        
+
         /// <summary>
         /// Static procs for marshalling; the lookup from static to instance listener happens in each method.
         /// </summary>
@@ -64,7 +68,7 @@ namespace Jolt
             OnContactRemoved   = GetDelegatePointer((UnsafeContactRemoved) UnsafeContactRemovedCallback),
             OnContactPersisted = GetDelegatePointer((UnsafeContactPersisted) UnsafeContactPersistedCallback),
         };
-        
+
         /// <summary>
         /// Unsafe static delegate for OnContactValidate.
         /// </summary>
@@ -88,7 +92,7 @@ namespace Jolt
         /// </summary>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         private delegate void UnsafeContactPersisted(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB);
-        
+
         /// <summary>
         /// Unsafe static implementation for OnContactValidate.
         /// </summary>

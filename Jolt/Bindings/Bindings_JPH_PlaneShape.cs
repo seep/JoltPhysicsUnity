@@ -8,8 +8,10 @@
         /// </summary>
         public static NativeHandle<JPH_PlaneShape> JPH_PlaneShape_Create(Plane plane, float halfExtent)
         {
+            AssertInitialized();
+
             // TODO include JPH_PhysicsMaterial argument
-            
+
             return CreateHandle(UnsafeBindings.JPH_PlaneShape_Create((JPH_Plane*)&plane, default, halfExtent));
         }
 
@@ -18,6 +20,8 @@
         /// </summary>
         public static Plane JPH_PlaneShape_GetPlane(NativeHandle<JPH_PlaneShape> shape)
         {
+            AssertInitialized();
+
             Plane result = default;
             UnsafeBindings.JPH_PlaneShape_GetPlane(shape, (JPH_Plane*)&result);
             return result;
@@ -28,6 +32,8 @@
         /// </summary>
         public static float JPH_PlaneShape_GetHalfExtent(NativeHandle<JPH_PlaneShape> shape)
         {
+            AssertInitialized();
+
             return UnsafeBindings.JPH_PlaneShape_GetHalfExtent(shape);
         }
     }

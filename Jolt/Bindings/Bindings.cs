@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Jolt.Tests")]
@@ -12,6 +14,18 @@ namespace Jolt
         {
             InitializeBodyActivationListeners();
             InitializeContactListeners();
+        }
+
+        #if JOLT_DISABLE_SAFETY_CHECkS
+        [Conditional("FALSE")]
+        #endif
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AssertInitialized()
+        {
+            if (!Jolt.Initialized)
+            {
+                throw new InvalidOperationException("The Jolt native plugin has not been initialized. You must call Jolt.Initialize() before using Jolt.");
+            }
         }
     }
 }
