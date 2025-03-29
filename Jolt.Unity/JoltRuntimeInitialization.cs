@@ -4,19 +4,25 @@ namespace Jolt.Unity
 {
     internal static class JoltRuntimeInitialization
     {
-        [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void Initialize()
         {
             Jolt.SetAssertFailureHandler(OnAssertFailure);
 
             if (Jolt.Initialize())
             {
-                Application.quitting += static () => Jolt.Shutdown();
+                Application.quitting -= OnApplicationQuit;
+                Application.quitting += OnApplicationQuit;
             }
             else
             {
                 Debug.LogError("Jolt initialization failed.");
             }
+        }
+
+        private static void OnApplicationQuit()
+        {
+            Jolt.Shutdown();
         }
 
         private static bool OnAssertFailure(string expr, string message, string file, uint line)
