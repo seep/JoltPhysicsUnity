@@ -12,7 +12,12 @@ namespace Jolt
         {
             Value = value;
         }
-        
+
+        public static implicit operator SubShapeID(uint value)
+        {
+            return new SubShapeID(value);
+        }
+
         #region IEquatable
 
         public bool Equals(SubShapeID other)
