@@ -3,11 +3,21 @@
 
 namespace Unity.Mathematics
 {
-    public struct double3 { }
+    public struct double3
+    {
+        public double x;
+        public double y;
+        public double z;
+    }
 
     public struct float2 { }
 
-    public struct float3 { }
+    public struct float3
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
 
     public struct float4 { }
 
