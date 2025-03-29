@@ -2,7 +2,8 @@
     "name": "Jolt.Tests",
     "references": [
         "Jolt",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Mathematics"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
