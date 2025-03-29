@@ -5,7 +5,7 @@ namespace Jolt
 {
     internal static unsafe partial class Bindings
     {
-        public static NativeHandle<JPH_PhysicsMaterial> JPH_PhysicsMaterial_Create(string name, Color color)
+        public static NativeHandle<JPH_PhysicsMaterial> JPH_PhysicsMaterial_Create(string name, uint color)
         {
             AssertInitialized();
 
@@ -14,7 +14,7 @@ namespace Jolt
             try
             {
                 nameptr = Marshal.StringToHGlobalAnsi(name); // TODO look for a way to generate unsafe binding with marshalling attributes
-                return CreateHandle(UnsafeBindings.JPH_PhysicsMaterial_Create((sbyte*)nameptr, color.Value));
+                return CreateHandle(UnsafeBindings.JPH_PhysicsMaterial_Create((sbyte*)nameptr, color));
             }
             finally
             {
@@ -37,11 +37,11 @@ namespace Jolt
             throw new NotImplementedException(); // TODO marshal sbyte* pointer into string
         }
 
-        public static Color JPH_PhysicsMaterial_GetDebugColor(NativeHandle<JPH_PhysicsMaterial> material)
+        public static uint JPH_PhysicsMaterial_GetDebugColor(NativeHandle<JPH_PhysicsMaterial> material)
         {
             AssertInitialized();
 
-            return new Color(UnsafeBindings.JPH_PhysicsMaterial_GetDebugColor(material));
+            return UnsafeBindings.JPH_PhysicsMaterial_GetDebugColor(material);
         }
     }
 }

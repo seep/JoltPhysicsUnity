@@ -27,7 +27,7 @@ namespace Jolt
         
         public string GetDebugName() => Bindings.JPH_PhysicsMaterial_GetDebugName(Handle);
         
-        public Color GetDebugColor() => Bindings.JPH_PhysicsMaterial_GetDebugColor(Handle);
+        public uint GetDebugColor() => Bindings.JPH_PhysicsMaterial_GetDebugColor(Handle);
         
         #endregion
         
