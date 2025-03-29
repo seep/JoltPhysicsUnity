@@ -39,5 +39,7 @@ namespace Unity.Collections
         public bool Contains(T _) => true;
 
         public void Dispose() { }
+
+        public void Clear() { }
     }
 }

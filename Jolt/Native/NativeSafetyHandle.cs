@@ -27,20 +27,22 @@ namespace Jolt
 
         private static NativeHashSet<uint> disposed;
 
-        [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         internal static void Initialize()
         {
-            disposed = new NativeHashSet<uint>(1024, Allocator.Persistent);
+            if (disposed.IsCreated)
+            {
+                disposed.Clear();
+            }
+            else
+            {
+                disposed = new NativeHashSet<uint>(1024, Allocator.Persistent);
+            }
         }
 
-        /// <summary>
-        /// Dispose the internal safety handle state.
-        /// </summary>
-        internal static void Dispose()
+        internal static void TrackHandleLeaks()
         {
-            // TODO check for unreleased safety handles?
-
-            if (disposed.IsCreated) disposed.Dispose();
+            // TODO log about unreleased handles
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -52,6 +54,11 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Release(in NativeSafetyHandle handle)
         {
+            if (!disposed.IsCreated)
+            {
+                Initialize();
+            }
+
             if (disposed.Contains(handle.Index))
             {
                 Debug.LogWarning("A NativeSafetyHandle is being released for a handle index that was already released.");
@@ -63,6 +70,11 @@ namespace Jolt
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AssertExists(in NativeSafetyHandle handle)
         {
+            if (!disposed.IsCreated)
+            {
+                Initialize();
+            }
+
             if (disposed.Contains(handle.Index))
             {
                 throw new ObjectDisposedException("The native resource has been disposed.");
