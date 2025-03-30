@@ -41,8 +41,6 @@ namespace Jolt
 
         private static void InitializeBodyActivationListeners()
         {
-            AssertInitialized();
-
             fixed (JPH_BodyActivationListener_Procs* ptr = &UnsafeBodyActivationListenerProcs)
             {
                 UnsafeBindings.JPH_BodyActivationListener_SetProcs(ptr);

@@ -2,6 +2,16 @@
 
 namespace Jolt
 {
+    /// <summary>
+    /// A delegate for receiving Jolt traces.
+    /// </summary>
+    public delegate void TraceHandler(string message);
+
+    /// <summary>
+    /// A delegate for receiving Jolt assertion failures.
+    /// </summary>
+    public delegate bool AssertFailureHandler(string expr, string message, string file, uint line);
+
     internal static partial class Bindings
     {
         public static bool JPH_Init()
@@ -18,20 +28,10 @@ namespace Jolt
         {
             UnsafeBindings.JPH_SetTraceHandler(Marshal.GetFunctionPointerForDelegate(handler));
         }
-        
+
         public static void JPH_SetAssertFailureHandler(AssertFailureHandler handler)
         {
             UnsafeBindings.JPH_SetAssertFailureHandler(Marshal.GetFunctionPointerForDelegate(handler));
         }
     }
-
-    /// <summary>
-    /// A delegate for receiving Jolt traces.
-    /// </summary>
-    public delegate void TraceHandler(string message);
-    
-    /// <summary>
-    /// A delegate for receiving Jolt assertion failures.
-    /// </summary>
-    public delegate bool AssertFailureHandler(string expr, string message, string file, uint line);
 }

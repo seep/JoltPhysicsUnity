@@ -20,13 +20,13 @@ namespace Jolt
         }
 
         public static bool operator false(NativeBool value) => value.Value == 0;
-        
+
         public static bool operator true(NativeBool value) => value.Value != 0;
 
         public static bool operator ==(NativeBool lhs, NativeBool rhs) => lhs.Value == rhs.Value;
 
         public static bool operator !=(NativeBool lhs, NativeBool rhs) => lhs.Value != rhs.Value;
-        
+
         #region IEquatable
 
         public bool Equals(NativeBool other) => Value == other.Value;
