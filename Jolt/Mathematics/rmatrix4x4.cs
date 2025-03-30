@@ -6,7 +6,7 @@ namespace Jolt
     /// <summary>
     /// A 4x4 matrix with optional double precision on the last column.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct rmatrix4x4
     {
         public float4 c0;

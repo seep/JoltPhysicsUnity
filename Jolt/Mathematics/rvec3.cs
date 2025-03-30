@@ -6,7 +6,7 @@ namespace Jolt
     /// <summary>
     /// A 3 vector with optional double precision.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct rvec3
     {
         public static rvec3 zero => new rvec3();
@@ -66,7 +66,7 @@ namespace Jolt
         }
 
         /// <summary>
-        /// Perform an implicit cast from a float3 to an rvec3.
+        /// Perform an implicit cast from a float3 to an rvec3. Safe because we are gaining precision.
         /// </summary>
         public static implicit operator rvec3(float3 vec)
         {
