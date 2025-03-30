@@ -13,6 +13,12 @@ namespace Jolt.Native
 {
     public static class NativeLibrary
     {
+        #if JOLT_DOUBLE_PRECISION
+        public const string JOLT_LIB = "joltc_double";
+        #else
+        public const string JOLT_LIB = "joltc";
+        #endif
+
         [DllImport("kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "LoadLibrary")]
         private static extern IntPtr LoadLibraryWindows(string path);
 
@@ -48,15 +54,15 @@ namespace Jolt.Native
 
             if (IsWindows())
             {
-                libname = "windows-x64\\joltc.dll";
+                libname = $"windows-x64\\{JOLT_LIB}.dll";
             }
             else if (IsLinux())
             {
-                libname = "linux-x64\\libjoltc.so";
+                libname = $"linux-x64\\lib{JOLT_LIB}.so";
             }
             else if (IsMacOS())
             {
-                libname = "macos-x64\\libjoltc.dylib";
+                libname = $"macos-x64\\lib{JOLT_LIB}.dylib";
             }
             else
             {

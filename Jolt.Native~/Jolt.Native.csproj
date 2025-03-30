@@ -15,19 +15,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Vezel.Zig.Toolsets.win-x64" Version="0.11.0.1" Condition="'$(UseWindowsToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.win-x64" Version="0.14.0.1" Condition="'$(UseWindowsToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Vezel.Zig.Toolsets.osx-x64" Version="0.11.0.1" Condition="'$(UseMacOSToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.osx-x64" Version="0.14.0.1" Condition="'$(UseMacOSToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Vezel.Zig.Toolsets.linux-x64" Version="0.11.0.1" Condition="'$(UseLinuxToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.linux-x64" Version="0.14.0.1" Condition="'$(UseLinuxToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
+
+    <PropertyGroup>
+        <OutputRoot>out\$(Configuration)</OutputRoot>
+        <ExportRoot>..\Jolt.Native\$(Configuration)</ExportRoot>
+    </PropertyGroup>
 
     <PropertyGroup>
         <NativeOptimize>Debug</NativeOptimize>
@@ -37,30 +42,40 @@
         <NativeOptimize>ReleaseFast</NativeOptimize>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Content Include="out\$(Configuration)\**\*.dll" />
-        <Content Include="out\$(Configuration)\**\*.dylib" />
-        <Content Include="out\$(Configuration)\**\*.so" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <UnityExports Include="out\$(Configuration)\**\*.dll"/>
-        <UnityExports Include="out\$(Configuration)\**\*.dylib"/>
-        <UnityExports Include="out\$(Configuration)\**\*.so"/>
-    </ItemGroup>
-
     <Target Name="Compile Jolt" AfterTargets="Build" Condition="'$(ZigExePath)' != ''">
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --prefix out/$(Configuration) --prefix-lib-dir linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
+        <!-- clean prior outputs -->
+        <RemoveDir Directories="out/$(Configuration)" />
+        <!-- windows -->
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
+        <!-- macos -->
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
+        <!-- linux -->
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
     </Target>
 
     <Target Name="Export Jolt" AfterTargets="Compile Jolt">
-        <Copy SourceFiles="@(UnityExports)" DestinationFolder="..\Jolt.Native\$(Configuration)\%(RecursiveDir)" />
+        <!-- windows -->
+        <Copy SourceFiles="$(OutputRoot)\windows-x64\bin\joltc.dll"           DestinationFiles="$(ExportRoot)\windows-x64\joltc.dll"/>
+        <Copy SourceFiles="$(OutputRoot)\windows-x64\bin\joltc_double.dll"    DestinationFiles="$(ExportRoot)\windows-x64\joltc_double.dll"/>
+        <!-- macos -->
+        <Copy SourceFiles="$(OutputRoot)\macos-x64\lib\libjoltc.dylib"        DestinationFiles="$(ExportRoot)\macos-x64\libjoltc.dylib"/>
+        <Copy SourceFiles="$(OutputRoot)\macos-x64\lib\libjoltc_double.dylib" DestinationFiles="$(ExportRoot)\macos-x64\libjoltc_double.dylib"/>
+        <!-- linux -->
+        <Copy SourceFiles="$(OutputRoot)\linux-x64\lib\libjoltc.so"           DestinationFiles="$(ExportRoot)\linux-x64\libjoltc.so"/>
+        <Copy SourceFiles="$(OutputRoot)\linux-x64\lib\libjoltc_double.so"    DestinationFiles="$(ExportRoot)\linux-x64\libjoltc_double.so"/>
     </Target>
 
     <Target Name="Generate Jolt Bindings" AfterTargets="Build">
-        <Exec Command="clangsharppinvokegenerator --include-directory &quot;$(ZigToolsetPath)lib\include&quot; -f lib\joltc\joltc.h -n Jolt -m UnsafeBindings -l joltc -o ..\Jolt\Bindings\UnsafeBindings.g.cs @clangsharp.rsp"/>
+        <PropertyGroup>
+            <OutputFile>..\Jolt\Bindings\UnsafeBindings.g.cs</OutputFile>
+        </PropertyGroup>
+        <!-- generate unsafe bindings from clangsharppinvokegenerator -->
+        <Exec Command="clangsharppinvokegenerator --include-directory &quot;$(ZigToolsetPath)lib\include&quot; -f lib\joltc\joltc.h -n Jolt -m UnsafeBindings -l joltc -o $(OutputFile) @clangsharp.rsp"/>
+        <!-- replace inlined lib name with constant so we can substitute lib name for double precision -->
+        <WriteLinesToFile File="$(OutputFile)" Lines="$([System.IO.File]::ReadAllText($(OutputFile)).Replace('&quot;joltc&quot;','JOLT_LIB'))" Overwrite="true" />
     </Target>
 
 </Project>

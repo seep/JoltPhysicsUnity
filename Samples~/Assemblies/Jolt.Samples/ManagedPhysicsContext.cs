@@ -173,16 +173,13 @@ namespace Jolt.Samples
 
         private void UpdateManagedTransforms()
         {
-#if JOLT_DOUBLE_PRECISION
-            throw new NotImplementedException();
-#endif
             var bodies = PhysicsSystem.GetBodyInterface();
 
             foreach (var managedBody in managedBodyList)
             {
                 // assume no scaling and skip decomposition
 
-                var wt = (float4x4) bodies.GetWorldTransform(managedBody.NativeBodyID!.Value);
+                var wt = bodies.GetWorldTransform(managedBody.NativeBodyID!.Value).IntoFloat4x4();
 
                 var position = wt.c3.xyz;
                 var rotation = new quaternion(wt);

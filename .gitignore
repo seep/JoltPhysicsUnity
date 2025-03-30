@@ -4,8 +4,7 @@ obj/
 out/
 
 # Jolt.Native zig cache directories
-zig-out/
-zig-cache/
+.zig-cache/
 
 # JetBrains cache directory
 .idea/
