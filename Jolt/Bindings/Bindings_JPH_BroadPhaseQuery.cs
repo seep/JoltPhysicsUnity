@@ -21,7 +21,11 @@ namespace Jolt
 
     internal static unsafe partial class Bindings
     {
-        public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
+        public static bool JPH_BroadPhaseQuery_CastRay(
+            NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback,
+            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
+            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default
+        )
         {
             AssertInitialized();
 
@@ -29,11 +33,17 @@ namespace Jolt
                 query, &origin, &direction,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter)
             );
         }
 
-        public static bool JPH_BroadPhaseQuery_CastRay(NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default)
+        public static bool JPH_BroadPhaseQuery_CastRay(
+            NativeHandle<JPH_BroadPhaseQuery> query, float3 origin, float3 direction,
+            CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback,
+            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
+            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default
+        )
         {
             AssertInitialized();
 
@@ -41,14 +51,15 @@ namespace Jolt
                 query, &origin, &direction, collisionCollectorType,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter)
             );
         }
 
         public static bool JPH_BroadPhaseQuery_CollideAABox(
             NativeHandle<JPH_BroadPhaseQuery> query, AABox box, BroadPhaseQuery.CollideCallback callback,
-            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter,
-            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter
+            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
+            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default
         )
         {
             AssertInitialized();
@@ -57,11 +68,16 @@ namespace Jolt
                 query, (JPH_AABox*)&box,
                 callback: UnsafeBroadPhaseQueryCallbacks.UnsafeCollideCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter)
             );
         }
 
-        public static bool JPH_BroadPhaseQuery_CollideSphere(NativeHandle<JPH_BroadPhaseQuery> query, float3 center, float radius, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
+        public static bool JPH_BroadPhaseQuery_CollideSphere(
+            NativeHandle<JPH_BroadPhaseQuery> query, float3 center, float radius, BroadPhaseQuery.CollideCallback callback,
+            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
+            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default
+        )
         {
             AssertInitialized();
 
@@ -73,7 +89,11 @@ namespace Jolt
             );
         }
 
-        public static bool JPH_BroadPhaseQuery_CollidePoint(NativeHandle<JPH_BroadPhaseQuery> query, float3 point, BroadPhaseQuery.CollideCallback callback, NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter, NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter)
+        public static bool JPH_BroadPhaseQuery_CollidePoint(
+            NativeHandle<JPH_BroadPhaseQuery> query, float3 point, BroadPhaseQuery.CollideCallback callback,
+            NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
+            NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default
+        )
         {
             AssertInitialized();
 

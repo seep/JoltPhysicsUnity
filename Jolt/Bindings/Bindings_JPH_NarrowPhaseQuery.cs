@@ -43,7 +43,10 @@ namespace Jolt
             fixed (RayCastResult* ptr = &hit)
             {
                 return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay(
-                    query, &origin, &direction, (JPH_RayCastResult*)ptr, broadPhaseLayerFilter, objectLayerFilter, bodyFilter
+                    query, &origin, &direction, (JPH_RayCastResult*)ptr,
+                    GetOptionalPointer(broadPhaseLayerFilter),
+                    GetOptionalPointer(objectLayerFilter),
+                    GetOptionalPointer(bodyFilter)
                 );
             }
         }
@@ -67,7 +70,10 @@ namespace Jolt
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings),
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -81,7 +87,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -90,7 +96,10 @@ namespace Jolt
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings), collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -104,7 +113,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -113,7 +122,10 @@ namespace Jolt
                 query, &point,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -127,7 +139,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -136,7 +148,10 @@ namespace Jolt
                 query, &point, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -150,7 +165,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -159,7 +174,10 @@ namespace Jolt
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -173,7 +191,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -182,7 +200,10 @@ namespace Jolt
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -196,7 +217,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -205,7 +226,10 @@ namespace Jolt
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
 
@@ -219,7 +243,7 @@ namespace Jolt
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
             NativeHandle<JPH_BodyFilter> bodyFilter = default,
-            NativeHandle<JPH_ShapeFilter> shapeFilter  = default
+            NativeHandle<JPH_ShapeFilter> shapeFilter = default
         )
         {
             AssertInitialized();
@@ -228,7 +252,10 @@ namespace Jolt
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
                 userData: GetDelegatePointer(callback),
-                broadPhaseLayerFilter, objectLayerFilter, bodyFilter, shapeFilter
+                GetOptionalPointer(broadPhaseLayerFilter),
+                GetOptionalPointer(objectLayerFilter),
+                GetOptionalPointer(bodyFilter),
+                GetOptionalPointer(shapeFilter)
             );
         }
     }
