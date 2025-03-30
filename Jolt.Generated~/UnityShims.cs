@@ -28,18 +28,37 @@ namespace Unity.Mathematics
 
 namespace Unity.Collections
 {
-    public struct NativeHashSet<T> : System.IDisposable
+    public struct NativeList<T> : System.IDisposable
     {
-        public NativeHashSet(int _, Allocator __) { }
+        public NativeList(int _, Allocator __) { }
 
-        public bool IsCreated => true;
+        public int Length => 0;
+
+        public T this[int index]
+        {
+            get { return default; }
+            set { }
+        }
 
         public void Add(T _) { }
 
-        public bool Contains(T _) => true;
+        public void Dispose() { }
+    }
+
+    public struct NativeHashMap<T, U> : System.IDisposable
+    {
+        public NativeHashMap(int _, Allocator __) { }
+
+        public bool IsCreated => true;
+
+        public void Add(T _, U __) { }
+
+        public bool TryGetValue(T _, out U __)
+        {
+            __ = default;
+            return false;
+        }
 
         public void Dispose() { }
-
-        public void Clear() { }
     }
 }
