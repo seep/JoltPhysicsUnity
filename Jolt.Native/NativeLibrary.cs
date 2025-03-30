@@ -66,7 +66,7 @@ namespace Jolt.Native
             #if UNITY_EDITOR
             var paths = EditorLibraryPaths();
             #else
-            var paths = RuntimePackagePaths();
+            var paths = RuntimeLibraryPaths();
             #endif
 
             foreach (var path in paths)
