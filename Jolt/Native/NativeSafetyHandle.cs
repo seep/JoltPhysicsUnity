@@ -69,9 +69,12 @@ namespace Jolt
                     return new NativeSafetyHandle { index = index, version = versions[index] };
                 }
 
-                versions.Add(1); // add a new version for the handle
+                index = versions.Length;
 
-                return new NativeSafetyHandle { index = versions.Length - 1, version = 1 };
+                indexes.Add(ptr, index);
+                versions.Add(1);
+
+                return new NativeSafetyHandle { index = index, version = 1 };
             }
         }
 
