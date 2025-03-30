@@ -13,73 +13,140 @@ namespace Jolt
     /// <summary>
     /// A safety handle for detecting use-after-free access of native objects.
     /// </summary>
-    public struct NativeSafetyHandle
+    public struct NativeSafetyHandle : IEquatable<NativeSafetyHandle>
     {
-        // Initially I tried to reuse AtomicSafetyHandle to offload complexity out of the lib, but
-        // AtomicSafetyHandle is tightly coupled to the ENABLE_UNITY_COLLECTIONS_CHECKS scripting
-        // define, and ideally the Jolt safety checks can be enabled independently.
+        private static NativeHashMap<nint, int> indexes;
 
-        // TODO investigate more sophisticated use-after-free safety checks
+        private static NativeList<int> versions;
 
-        public uint Index;
+        private static readonly object @lock = new();
 
-        private static uint nextHandleIndex;
+        private static bool initialized;
 
-        private static NativeHashSet<uint> disposed;
+        private int index;
+        private int version;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         internal static void Initialize()
         {
-            if (disposed.IsCreated)
+            if (initialized)
             {
-                disposed.Clear();
+                return;
             }
-            else
+
+            lock (@lock)
             {
-                disposed = new NativeHashSet<uint>(1024, Allocator.Persistent);
+                indexes = new(1024, Allocator.Persistent);
+                versions = new(1024, Allocator.Persistent);
+                initialized = true;
             }
         }
 
-        internal static void TrackHandleLeaks()
+        internal static void Dispose()
         {
-            // TODO log about unreleased handles
+            lock (@lock)
+            {
+                indexes.Dispose();
+                versions.Dispose();
+                initialized = false;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NativeSafetyHandle Create()
+        /// <summary>
+        /// Create (or reuse) a safety handle for a <paramref name="ptr"/>.
+        /// </summary>
+        public static NativeSafetyHandle Create(nint ptr)
         {
-            return new NativeSafetyHandle { Index = nextHandleIndex++ };
+            Initialize();
+
+            lock (@lock)
+            {
+                if (indexes.TryGetValue(ptr, out var index))
+                {
+                    // Pointer is already registered. This pattern happens a lot; Body.GetMaterial is a good example.
+                    // The material is a single ref counted resource in Jolt, but the binding code can create a lot
+                    // of distinct handles to it from different bodies. They should all share the same safety
+                    // handle so that destroying the material invalidates all of the handles.
+                    return new NativeSafetyHandle { index = index, version = versions[index] };
+                }
+
+                versions.Add(1); // add a new version for the handle
+
+                return new NativeSafetyHandle { index = versions.Length - 1, version = 1 };
+            }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Release a safety handle. A future attempt to assert the handle will throw an exception.
+        /// </summary>
         public static void Release(in NativeSafetyHandle handle)
         {
-            if (!disposed.IsCreated)
-            {
-                Initialize();
-            }
+            Initialize();
 
-            if (disposed.Contains(handle.Index))
+            lock (@lock)
             {
-                Debug.LogWarning("A NativeSafetyHandle is being released for a handle index that was already released.");
-            }
+                if (versions.Length < handle.index)
+                {
+                    Debug.LogWarning("A NativeSafetyHandle is being released for a handle index that is out of range.");
+                    return;
+                }
 
-            disposed.Add(handle.Index);
+                if (versions[handle.index] != handle.version)
+                {
+                    Debug.LogWarning("A NativeSafetyHandle is being released for a handle index that was already released.");
+                    return;
+                }
+
+                versions[handle.index] += 1;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AssertExists(in NativeSafetyHandle handle)
+        public static void Assert(in NativeSafetyHandle handle)
         {
-            if (!disposed.IsCreated)
-            {
-                Initialize();
-            }
+            Initialize();
 
-            if (disposed.Contains(handle.Index))
+            lock (@lock)
             {
-                throw new ObjectDisposedException("The native resource has been disposed.");
+                if (versions.Length < handle.index)
+                {
+                    // very unexpected situation, this would be a safety handle that survived a domain reload
+                    throw new ObjectDisposedException("The native resource has been disposed.");
+                }
+
+                if (versions[handle.index] != handle.version)
+                {
+                    throw new ObjectDisposedException("The native resource has been disposed.");
+                }
             }
         }
+
+        #region IEquatable
+
+        public bool Equals(NativeSafetyHandle other)
+        {
+            return index == other.index && version == other.version;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NativeSafetyHandle other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(index, version);
+        }
+
+        public static bool operator ==(NativeSafetyHandle left, NativeSafetyHandle right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NativeSafetyHandle left, NativeSafetyHandle right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
     }
 }
 

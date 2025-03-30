@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Jolt
 {
+    /// <summary>
+    /// A pointer to a native resource with optional safety checks against use-after-free.
+    /// </summary>
     internal unsafe struct NativeHandle<T> : IDisposable, IEquatable<NativeHandle<T>> where T : unmanaged
     {
+        #if !JOLT_DISABLE_SAFETY_CHECKS
         private NativeSafetyHandle safety;
+        #endif
 
         private T* ptr;
 
         public nint RawValue => (nint)ptr;
-        
+
         public NativeHandle(T* ptr)
         {
             #if !JOLT_DISABLE_SAFETY_CHECKS
-            safety = NativeSafetyHandle.Create();
+            safety = NativeSafetyHandle.Create((nint)ptr);
             #endif
 
             this.ptr = ptr;
@@ -47,7 +51,7 @@ namespace Jolt
         public readonly T* IntoPointer()
         {
             #if !JOLT_DISABLE_SAFETY_CHECKS
-            NativeSafetyHandle.AssertExists(in safety);
+            NativeSafetyHandle.Assert(safety);
             #endif
 
             return ptr;
@@ -76,7 +80,11 @@ namespace Jolt
 
         public bool Equals(NativeHandle<T> other)
         {
+            #if !JOLT_DISABLE_SAFETY_CHECKS
+            return ptr == other.ptr && safety == other.safety;
+            #else
             return ptr == other.ptr;
+            #endif
         }
 
         public override bool Equals(object obj)
@@ -86,7 +94,11 @@ namespace Jolt
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((nint) ptr);
+            #if !JOLT_DISABLE_SAFETY_CHECKS
+            return HashCode.Combine((nint)ptr, safety);
+            #else
+            return ((nint)ptr).GetHashCode();
+            #endif
         }
 
         public static bool operator ==(NativeHandle<T> lhs, NativeHandle<T> rhs)
