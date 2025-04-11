@@ -120,6 +120,16 @@ namespace Jolt.Samples
                 throw new NotImplementedException();
             }
 
+            if (managedShapeComponent is PhysicsShapeMesh && managedBodyComponent.MotionType != MotionType.Static)
+            {
+                // Mesh shapes on dynamic/kinematic bodies have a lot of limitations and will fail jolt assertions if
+                // they contact any other dynamic mesh/heightfield shapes. Disabled in the sample code for simplicity.
+                // https://jrouwe.github.io/JoltPhysics/index.html#shapes
+                // https://github.com/seep/JoltPhysicsUnity/issues/7
+
+                throw new NotImplementedException("Using a mesh shape with a non-static body requires additional settings on the body and is not recommended.");
+            }
+
             var nativeShapeSettings = managedShapeComponent.CreateShapeSettings();
 
             var pos = (float3) gobj.transform.position;
@@ -139,19 +149,33 @@ namespace Jolt.Samples
 
             foreach (var managedBody in UnityEngine.Object.FindObjectsByType<PhysicsBody>(FindObjectsSortMode.None))
             {
-                var nativeBody = CreateNativeBodyFromGameObject(bodies, managedBody.gameObject);
+                try
+                {
+                    var nativeBody = CreateNativeBodyFromGameObject(bodies, managedBody.gameObject);
 
-                bodies.AddBody(nativeBody.GetID(), Activation.Activate);
+                    bodies.AddBody(nativeBody.GetID(), Activation.Activate);
 
-                managedBody.NativeBody = nativeBody;
-                managedBody.NativeBodyID = nativeBody.GetID();
+                    managedBody.NativeBody = nativeBody;
+                    managedBody.NativeBodyID = nativeBody.GetID();
 
-                managedBodyList.Add(managedBody);
+                    managedBodyList.Add(managedBody);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
 
             foreach (var managedConstraint in UnityEngine.Object.FindObjectsByType<PhysicsConstraintBase>(FindObjectsSortMode.None))
             {
-                PhysicsSystem.AddConstraint(managedConstraint.Initialize(this));
+                try
+                {
+                    PhysicsSystem.AddConstraint(managedConstraint.Initialize(this));
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
         }
 
