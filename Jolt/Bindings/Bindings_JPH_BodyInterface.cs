@@ -135,11 +135,11 @@ namespace Jolt
             return UnsafeBindings.JPH_BodyInterface_IsAdded(@interface, bodyID);
         }
 
-        public static bool JPH_BodyInterface_GetBodyType(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
+        public static BodyType JPH_BodyInterface_GetBodyType(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID)
         {
             AssertInitialized();
 
-            return UnsafeBindings.JPH_BodyInterface_IsAdded(@interface, bodyID);
+            return UnsafeBindings.JPH_BodyInterface_GetBodyType(@interface, bodyID);
         }
 
         public static void JPH_BodyInterface_SetLinearVelocity(NativeHandle<JPH_BodyInterface> @interface, BodyID bodyID, float3 velocity)

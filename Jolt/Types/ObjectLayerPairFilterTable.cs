@@ -6,6 +6,11 @@ namespace Jolt
     {
         internal NativeHandle<JPH_ObjectLayerPairFilter> Handle;
 
+        public ObjectLayerPairFilterTable(uint numObjectLayers)
+        {
+            Handle = JPH_ObjectLayerPairFilterTable_Create(numObjectLayers);
+        }
+
         public static ObjectLayerPairFilterTable Create(uint numObjectLayers)
         {
             return new ObjectLayerPairFilterTable { Handle = JPH_ObjectLayerPairFilterTable_Create(numObjectLayers) };

@@ -14,7 +14,7 @@ namespace Jolt
         /// <summary>
         /// The number of bits in a group.
         /// </summary>
-        private const uint NumBits = ObjectLayer.ObjectLayerBits / 2;
+        private const uint NumBits = ObjectLayer.Bits / 2;
 
         /// <summary>
         /// The mask bits.

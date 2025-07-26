@@ -6,6 +6,11 @@ namespace Jolt
     public partial struct PlaneShape
     {
         internal NativeHandle<JPH_PlaneShape> Handle;
+
+        public PlaneShape(in Plane plane, in float halfExtent)
+        {
+            Handle = JPH_PlaneShape_Create(plane, halfExtent);
+        }
         
         public static PlaneShape Create(Plane plane, float halfExtent)
         {

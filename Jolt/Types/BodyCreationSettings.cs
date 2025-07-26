@@ -13,6 +13,15 @@ namespace Jolt
         {
             return new BodyCreationSettings { Handle = JPH_BodyCreationSettings_Create() };
         }
+        public BodyCreationSettings (ShapeSettings settings, rvec3 position, quaternion rotation, MotionType motion, ObjectLayer layer)
+        {
+            Handle = JPH_BodyCreationSettings_Create(settings.Handle, position, rotation, motion, layer);
+        }
+
+        public BodyCreationSettings (Shape shape, rvec3 position, quaternion rotation, MotionType motion, ObjectLayer layer)
+        {
+            Handle = JPH_BodyCreationSettings_Create(shape.Handle, position, rotation, motion, layer);
+        }
 
         public static BodyCreationSettings Create(ShapeSettings settings, rvec3 position, quaternion rotation, MotionType motion, ObjectLayer layer)
         {

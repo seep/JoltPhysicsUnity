@@ -23,15 +23,16 @@ namespace Jolt
         
         #region JPH_PhysicsSystem
         
-        public void Destroy() => Bindings.JPH_PhysicsSystem_Destroy(Handle);
+        public readonly void Destroy() => Bindings.JPH_PhysicsSystem_Destroy(Handle);
         
         public void SetPhysicsSettings(ref PhysicsSettings settings) => Bindings.JPH_PhysicsSystem_SetPhysicsSettings(Handle, ref settings);
         
         public void GetPhysicsSettings(ref PhysicsSettings settings) => Bindings.JPH_PhysicsSystem_GetPhysicsSettings(Handle, ref settings);
         
         public void OptimizeBroadPhase() => Bindings.JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
-        
-        public BodyInterface GetBodyInterface() => new BodyInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyInterface(Handle) };
+
+        public BodyInterface BodyInterface => GetBodyInterface();
+        public readonly BodyInterface GetBodyInterface() => new BodyInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyInterface(Handle) };
         
         public BodyInterface GetBodyInterfaceNoLock() => new BodyInterface { Handle = Bindings.JPH_PhysicsSystem_GetBodyInterfaceNoLock(Handle) };
         
@@ -55,10 +56,22 @@ namespace Jolt
         
         public uint GetNumConstraints() => Bindings.JPH_PhysicsSystem_GetNumConstraints(Handle);
         
-        public void SetGravity(float3 gravity) => Bindings.JPH_PhysicsSystem_SetGravity(Handle, gravity);
+        public readonly void SetGravity(float3 gravity) => Bindings.JPH_PhysicsSystem_SetGravity(Handle, gravity);
         
         public float3 GetGravity() => Bindings.JPH_PhysicsSystem_GetGravity(Handle);
-        
+
+        public float3 gravity
+        {
+            get
+            {
+                return Bindings.JPH_PhysicsSystem_GetGravity(Handle);
+            }
+            set
+            {
+                Bindings.JPH_PhysicsSystem_SetGravity(Handle, gravity);
+            }
+        }
+
         public void AddConstraint(Constraint constraint) => Bindings.JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
         
         public void RemoveConstraint(Constraint constraint) => Bindings.JPH_PhysicsSystem_RemoveConstraint(Handle, constraint.Handle);

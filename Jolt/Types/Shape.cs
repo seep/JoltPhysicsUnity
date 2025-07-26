@@ -8,6 +8,11 @@
     {
         internal NativeHandle<JPH_Shape> Handle;
         
+        public static implicit operator Shape(PlaneShape shape)
+        {
+            return new Shape { Handle = shape.Handle.Reinterpret<JPH_Shape>() };
+        }
+        
         public static implicit operator Shape(BoxShape shape)
         {
             return new Shape { Handle = shape.Handle.Reinterpret<JPH_Shape>() };

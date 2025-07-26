@@ -11,6 +11,12 @@ namespace Jolt
         
         public float Distance;
 
+        public Plane(float3 normal, float distance)
+        {
+            this.Normal = normal;
+            this.Distance = distance;
+        }
+
         #region IEquatable
 
         public bool Equals(Plane other)

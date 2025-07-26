@@ -7,6 +7,11 @@ namespace Jolt
     {
         internal NativeHandle<JPH_SphereShape> Handle;
         
+        public SphereShape(float radius)
+        {
+            Handle = JPH_SphereShape_Create(radius);
+        }
+        
         public static SphereShape Create(float radius)
         {
             return new SphereShape { Handle = JPH_SphereShape_Create(radius) };

@@ -47,7 +47,7 @@ namespace Jolt
         /// <remarks>
         /// The out parameter will contain the error if any.
         /// </remarks>
-        public bool Update(float deltaTime, int collisionSteps, JobSystem jobSystem, out PhysicsUpdateError error)
+        public readonly bool Update(float deltaTime, int collisionSteps, JobSystem jobSystem, out PhysicsUpdateError error)
         {
             return (error = JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, jobSystem.Handle)) == PhysicsUpdateError.None;
         }

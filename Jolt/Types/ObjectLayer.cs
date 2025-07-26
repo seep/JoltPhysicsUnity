@@ -6,34 +6,40 @@ namespace Jolt
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct ObjectLayer : IEquatable<ObjectLayer>
     {
-        // A distinct type wrapper around ushort (or optionally uint, but unsupported). See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/ObjectLayer.h
+        // A distinct type wrapper around uint (or optionally uint, but unsupported). See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/ObjectLayer.h
 
         /// <summary>
         /// Number of bits in an object layer.
         /// </summary>
-        public const uint ObjectLayerBits = 16; // TODO can be 32 with compiler flag
+        public const int Bits = 32 /*0x20*/;
 
-        /// <summary>
-        /// The invalid ObjectLayer (0).
-        /// </summary>
-        public static readonly ObjectLayer Invalid = 0;
+        public const uint ObjectLayerInvalid = 4294967295 /*0xFFFFFFFF*/;
 
         /// <summary>
         /// The layer value.
         /// </summary>
-        public readonly ushort Value;
+        public readonly uint Value;
 
-        public ObjectLayer(ushort value)
+        public ObjectLayer(uint value)
         {
             Value = value;
         }
+        public bool IsValid => this.Value != uint.MaxValue;
 
+        public bool IsInvalid => this.Value == uint.MaxValue;
+
+        public static ObjectLayer Invalid => new ObjectLayer(uint.MaxValue);
         /// <summary>
-        /// Implicit cast from ushort. The inverse is not available to avoid confusion.
+        /// Implicit cast from uint. The inverse is not available to avoid confusion.
         /// </summary>
-        public static implicit operator ObjectLayer(ushort layer)
+        public static implicit operator ObjectLayer(uint layer)
         {
             return new ObjectLayer(layer);
+        }
+        
+        public static implicit operator uint(ObjectLayer layer)
+        {
+            return layer.Value;
         }
 
         #region IEquatable

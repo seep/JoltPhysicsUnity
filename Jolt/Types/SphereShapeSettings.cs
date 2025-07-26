@@ -6,7 +6,12 @@ namespace Jolt
     public partial struct SphereShapeSettings
     {
         internal NativeHandle<JPH_SphereShapeSettings> Handle;
-        
+
+        public SphereShapeSettings(float radius)
+        {
+            Handle = JPH_SphereShapeSettings_Create(radius);
+        }
+
         /// <summary>
         /// Allocate a new native SphereShapeSettings and return the handle.
         /// </summary>

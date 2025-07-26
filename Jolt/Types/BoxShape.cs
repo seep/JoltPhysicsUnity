@@ -7,6 +7,11 @@ namespace Jolt
     public partial struct BoxShape
     {
         internal NativeHandle<JPH_BoxShape> Handle;
+
+        public BoxShape(float3 halfExtent, float convexRadius = PhysicsSettings.DefaultConvexRadius)
+        {
+            Handle = JPH_BoxShape_Create(halfExtent, convexRadius);
+        }
         
         public static BoxShape Create(float3 halfExtent, float convexRadius = PhysicsSettings.DefaultConvexRadius)
         {

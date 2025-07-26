@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Jolt;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -27,6 +28,12 @@ namespace Jolt
         
         public ShapeType GetShapeType() => Bindings.JPH_Shape_GetType(Handle);
         
+        public ShapeSubType subType
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return Bindings.JPH_Shape_GetSubType(Handle); }
+        }
+
         public ShapeSubType GetSubType() => Bindings.JPH_Shape_GetSubType(Handle);
         
         public ulong GetUserData() => Bindings.JPH_Shape_GetUserData(Handle);

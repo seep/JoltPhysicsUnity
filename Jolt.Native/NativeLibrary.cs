@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -11,15 +12,19 @@ using UnityEngine.Scripting;
 
 namespace Jolt.Native
 {
+    // TODO 处理Android 和 IOS
     public static class NativeLibrary
     {
-        [DllImport("kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "LoadLibrary")]
+        [DllImport("kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi,
+            EntryPoint = "LoadLibrary")]
         private static extern IntPtr LoadLibraryWindows(string path);
 
-        [DllImport("libc", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "dlopen")]
+        [DllImport("libc", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi,
+            EntryPoint = "dlopen")]
         private static extern IntPtr LoadLibraryLinux(string path, int flags);
 
-        [DllImport("libdl", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "dlopen")]
+        [DllImport("libdl", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi,
+            EntryPoint = "dlopen")]
         private static extern IntPtr LoadLibraryMacOS(string path, int flags);
 
         private static IntPtr libptr;
@@ -44,40 +49,58 @@ namespace Jolt.Native
                 return;
             }
 
-            string libname;
+            List<string> libnames = new List<string>();
 
             if (IsWindows())
             {
-                libname = "windows-x64\\joltc.dll";
+                libnames.Add("win-x64/native/joltc.dll");
+                libnames.Add("win-arm64/native/joltc.dll");
+                libnames.Add("win-x86/native/joltc.dll");
             }
             else if (IsLinux())
             {
-                libname = "linux-x64\\libjoltc.so";
+                libnames.Add("linux-x64/native/libjoltc.so");
+                libnames.Add("linux-arm64/native/libjoltc.so");
             }
             else if (IsMacOS())
             {
-                libname = "macos-x64\\libjoltc.dylib";
+                libnames.Add("osx/native/libjoltc.dylib");
+                libnames.Add("osx-x64/native/libjoltc.dylib");
+                libnames.Add("osx-arm64/native/libjoltc.dylib");
             }
+            // else if (IsAndroid())
+            // {
+            //     libnames.Add("android-arm/native/libjoltc.so");
+            //     libnames.Add("android-arm64/native/libjoltc.so");
+            //     libnames.Add("android-x64/native/libjoltc.so");
+            // }
+            // else if (IsIOS())
+            // {
+            // }
             else
             {
                 throw new Exception("Unrecognized platform, unable to load native lib.");
             }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             var paths = EditorLibraryPaths();
-            #else
+#else
             var paths = RuntimeLibraryPaths();
-            #endif
+#endif
 
             foreach (var path in paths)
             {
-                if (TryLoadLibrary(Path.Combine(path, libname), out libptr))
+                foreach (var libname in libnames)
                 {
-                    Debug.Log($"Loaded Jolt library at {path}/{libname}");
-                    break;
+                    if (TryLoadLibrary(Path.Combine(path, libname), out libptr))
+                    {
+                        Debug.Log($"Loaded Jolt library at {path}/{libname}");
+                        goto ok;
+                    }
                 }
             }
 
+            ok:
             if (libptr == IntPtr.Zero)
             {
                 throw new Exception("Failed to load native lib.");
@@ -122,12 +145,7 @@ namespace Jolt.Native
         private static string[] EditorLibraryPaths()
         {
             const string package = "com.seep.jolt";
-
-            #if JOLT_RELEASE
             const string config = "Release";
-            #else
-            const string config = "Debug";
-            #endif
 
             return new[]
             {

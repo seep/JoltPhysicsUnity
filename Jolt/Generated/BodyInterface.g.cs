@@ -59,7 +59,7 @@ namespace Jolt
         
         public bool IsAdded(BodyID bodyID) => Bindings.JPH_BodyInterface_IsAdded(Handle, bodyID);
         
-        public bool GetBodyType(BodyID bodyID) => Bindings.JPH_BodyInterface_GetBodyType(Handle, bodyID);
+        public BodyType GetBodyType(BodyID bodyID) => Bindings.JPH_BodyInterface_GetBodyType(Handle, bodyID);
         
         public void SetLinearVelocity(BodyID bodyID, float3 velocity) => Bindings.JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, velocity);
         
@@ -81,7 +81,7 @@ namespace Jolt
         
         public void SetPosition(BodyID bodyID, rvec3 position, Activation activation) => Bindings.JPH_BodyInterface_SetPosition(Handle, bodyID, position, activation);
         
-        public rvec3 GetPosition(BodyID bodyID) => Bindings.JPH_BodyInterface_GetPosition(Handle, bodyID);
+        public readonly rvec3 GetPosition(BodyID bodyID) => Bindings.JPH_BodyInterface_GetPosition(Handle, bodyID);
         
         public void SetRotation(BodyID bodyID, quaternion rotation, Activation activation) => Bindings.JPH_BodyInterface_SetRotation(Handle, bodyID, rotation, activation);
         

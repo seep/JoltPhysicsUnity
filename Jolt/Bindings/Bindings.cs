@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Jolt.Native;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Jolt.Tests")]
+
+[assembly: InternalsVisibleTo("JoltWrapper")]
 
 namespace Jolt
 {

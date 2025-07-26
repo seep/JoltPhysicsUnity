@@ -6,7 +6,29 @@ namespace Jolt
     [StructLayout(LayoutKind.Sequential), ExpectedStructSize(typeof(uint))]
     public struct BodyID : IEquatable<BodyID>
     {
+        /// <summary>
+        /// The value for an invalid body ID
+        /// </summary>
+        public const uint InvalidBodyID = 0xffffffff;
+        
         public uint Value;
+
+        public uint ID => Value;
+
+        public BodyID(uint value)
+        {
+            Value = value;
+        }
+        
+        public static implicit operator uint(BodyID id)
+        {
+            return id.Value;
+        }
+
+        public static implicit operator BodyID(uint id)
+        {
+            return new BodyID { Value = id };
+        }
 
         #region IEquatable
 

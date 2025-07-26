@@ -6,6 +6,11 @@ namespace Jolt
     public partial struct BroadPhaseLayerInterfaceTable
     {
         internal NativeHandle<JPH_BroadPhaseLayerInterface> Handle;
+
+        public BroadPhaseLayerInterfaceTable(uint numObjectLayers, uint numBroadPhaseLayers)
+        {
+            Handle = JPH_BroadPhaseLayerInterfaceTable_Create(numObjectLayers, numBroadPhaseLayers);
+        }
         
         public static BroadPhaseLayerInterfaceTable Create(uint numObjectLayers, uint numBroadPhaseLayers)
         {
