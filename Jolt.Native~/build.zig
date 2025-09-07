@@ -159,6 +159,10 @@ fn defineCMacro(lib: *Build.Step.Compile, name: []const u8) void {
   lib.root_module.addCMacro(name, "1");
 }
 
+fn defineCMacroValue(lib: *Build.Step.Compile, name: []const u8, value: []const u8) void {
+  lib.root_module.addCMacro(name, value);
+}
+
 pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
     defineCMacro(lib, "JPH_SHARED_LIBRARY_BUILD");
 
@@ -177,6 +181,8 @@ pub fn compile(options: Options, b: *Build, lib: *Build.Step.Compile) void {
     if (options.enable_debug_renderer) {
         defineCMacro(lib, "JPH_DEBUG_RENDERER");
     }
+    
+    defineCMacroValue(lib, "JPH_OBJECT_LAYER_BITS", "32");
 
     lib.addIncludePath(b.path("lib/jolt"));
     lib.addIncludePath(b.path("lib/joltc"));
