@@ -15,15 +15,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Vezel.Zig.Toolsets.win-x64" Version="0.14.0.1" Condition="'$(UseWindowsToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.win-x64" Version="0.15.1.1" Condition="'$(UseWindowsToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Vezel.Zig.Toolsets.osx-x64" Version="0.14.0.1" Condition="'$(UseMacOSToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.osx-x64" Version="0.15.1.1" Condition="'$(UseMacOSToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Vezel.Zig.Toolsets.linux-x64" Version="0.14.0.1" Condition="'$(UseLinuxToolset)' == 'true'">
+        <PackageReference Include="Vezel.Zig.Toolsets.linux-x64" Version="0.15.1.1" Condition="'$(UseLinuxToolset)' == 'true'">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
