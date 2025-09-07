@@ -6,12 +6,12 @@ namespace Jolt
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct ObjectLayer : IEquatable<ObjectLayer>
     {
-        // A distinct type wrapper around ushort (or optionally uint, but unsupported). See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/ObjectLayer.h
+        // A distinct type wrapper around uint. See https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Collision/ObjectLayer.h
 
         /// <summary>
         /// Number of bits in an object layer.
         /// </summary>
-        public const uint ObjectLayerBits = 16; // TODO can be 32 with compiler flag
+        public const uint ObjectLayerBits = 32;
 
         /// <summary>
         /// The invalid ObjectLayer (0).
