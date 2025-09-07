@@ -8,3 +8,9 @@ out/
 
 # JetBrains cache directory
 .idea/
+
+# JetBrains settings files
+*.DotSettings.user
+
+# macOS
+.DS_Store
