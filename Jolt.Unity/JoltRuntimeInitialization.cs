@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.Scripting;
+
+[assembly: AlwaysLinkAssembly] // prevent IL2CPP stripping
 
 namespace Jolt.Unity
 {
