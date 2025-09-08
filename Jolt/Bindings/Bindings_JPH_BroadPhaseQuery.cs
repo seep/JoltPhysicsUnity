@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AOT;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
@@ -122,6 +123,7 @@ namespace Jolt
             (UnsafeCollideDelegate)UnsafeCollideCallback
         );
 
+        [MonoPInvokeCallback(typeof(UnsafeCastRayDelegate))]
         private static void UnsafeCastRayCallback(nint udata, BroadPhaseCastResult* result)
         {
             try
@@ -134,6 +136,7 @@ namespace Jolt
             }
         }
 
+        [MonoPInvokeCallback(typeof(UnsafeCollideDelegate))]
         private static void UnsafeCollideCallback(nint udata, BodyID result)
         {
             try
