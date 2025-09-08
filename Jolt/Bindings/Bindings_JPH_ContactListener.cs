@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AOT;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -96,6 +97,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnContactValidate.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeContactValidate))]
         private static ValidateResult UnsafeContactValidateCallback(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB, double3* offset, CollideShapeResult* result)
         {
             try
@@ -113,6 +115,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnContactAdded.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeContactAdded))]
         private static void UnsafeContactAddedCallback(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB)
         {
             try
@@ -128,6 +131,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnContactRemoved.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeContactRemoved))]
         private static void UnsafeContactRemovedCallback(IntPtr udata, SubShapeIDPair* pair)
         {
             try
@@ -143,6 +147,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnContactPersisted.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeContactPersisted))]
         private static void UnsafeContactPersistedCallback(IntPtr udata, JPH_Body* bodyA, JPH_Body* bodyB) // TODO forward args
         {
             try

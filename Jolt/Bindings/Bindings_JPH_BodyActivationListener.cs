@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AOT;
 using UnityEngine;
 
 namespace Jolt
@@ -68,6 +69,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnBodyActivated.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeBodyActivated))]
         private static void UnsafeBodyActivatedCallback(IntPtr udata, BodyID bodyID, ulong bodyUserData)
         {
             try
@@ -83,6 +85,7 @@ namespace Jolt
         /// <summary>
         /// Unsafe static implementation for OnBodyDeactivated.
         /// </summary>
+        [MonoPInvokeCallback(typeof(UnsafeBodyDeactivated))]
         private static void UnsafeBodyDeactivatedCallback(IntPtr udata, BodyID bodyID, ulong bodyUserData)
         {
             try
