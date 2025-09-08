@@ -11,6 +11,9 @@ namespace Jolt
         /// <summary>
         /// Number of bits in an object layer.
         /// </summary>
+        /// <remarks>
+        /// Jolt itself supports 16 bit object layers with a compiler option, but joltc hardcodes the width to 32 bits.
+        /// </remarks>
         public const uint ObjectLayerBits = 32;
 
         /// <summary>
@@ -21,17 +24,17 @@ namespace Jolt
         /// <summary>
         /// The layer value.
         /// </summary>
-        public readonly ushort Value;
+        public readonly uint Value;
 
-        public ObjectLayer(ushort value)
+        public ObjectLayer(uint value)
         {
             Value = value;
         }
 
         /// <summary>
-        /// Implicit cast from ushort. The inverse is not available to avoid confusion.
+        /// Implicit cast from uint. The inverse is not available to avoid confusion.
         /// </summary>
-        public static implicit operator ObjectLayer(ushort layer)
+        public static implicit operator ObjectLayer(uint layer)
         {
             return new ObjectLayer(layer);
         }
