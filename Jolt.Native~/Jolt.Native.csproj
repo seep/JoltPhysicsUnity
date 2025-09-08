@@ -42,30 +42,30 @@
         <NativeOptimize>ReleaseFast</NativeOptimize>
     </PropertyGroup>
 
+    <ItemGroup>
+        <!-- x86 -->
+        <NativePlatform Include="x86_64-windows"  CopySourceFiles="bin\*.dll"/>
+        <NativePlatform Include="x86_64-macos"    CopySourceFiles="lib\*.dylib"/>
+        <NativePlatform Include="x86_64-linux"    CopySourceFiles="lib\*.so"/>
+        <!-- aarch64 -->
+        <NativePlatform Include="aarch64-windows" CopySourceFiles="bin\*.dll"/>
+        <NativePlatform Include="aarch64-macos"   CopySourceFiles="lib\*.dylib"/>
+        <!-- aarch64-linux is only available to unity enterprise clients, no way to verify -->
+    </ItemGroup>
+
     <Target Name="Compile Jolt" AfterTargets="Build" Condition="'$(ZigExePath)' != ''">
         <!-- clean prior outputs -->
         <RemoveDir Directories="out/$(Configuration)" />
-        <!-- windows -->
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\windows-x64 -Dtarget=x86_64-windows -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
-        <!-- macos -->
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\macos-x64   -Dtarget=x86_64-macos   -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
-        <!-- linux -->
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize)"/>
-        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\linux-x64   -Dtarget=x86_64-linux   -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
+        <!-- produce single and double precision outputs for each platform -->
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\%(NativePlatform.Identity) -Dtarget=%(NativePlatform.Identity) -Doptimize=$(NativeOptimize)"/>
+        <Exec Command="$(ZigExePath) build --summary all --prefix $(OutputRoot)\%(NativePlatform.Identity) -Dtarget=%(NativePlatform.Identity) -Doptimize=$(NativeOptimize) -Duse_double_precision=true"/>
     </Target>
 
-    <Target Name="Export Jolt" AfterTargets="Compile Jolt">
-        <!-- windows -->
-        <Copy SourceFiles="$(OutputRoot)\windows-x64\bin\joltc.dll"           DestinationFiles="$(ExportRoot)\windows-x64\joltc.dll"/>
-        <Copy SourceFiles="$(OutputRoot)\windows-x64\bin\joltc_double.dll"    DestinationFiles="$(ExportRoot)\windows-x64\joltc_double.dll"/>
-        <!-- macos -->
-        <Copy SourceFiles="$(OutputRoot)\macos-x64\lib\libjoltc.dylib"        DestinationFiles="$(ExportRoot)\macos-x64\libjoltc.dylib"/>
-        <Copy SourceFiles="$(OutputRoot)\macos-x64\lib\libjoltc_double.dylib" DestinationFiles="$(ExportRoot)\macos-x64\libjoltc_double.dylib"/>
-        <!-- linux -->
-        <Copy SourceFiles="$(OutputRoot)\linux-x64\lib\libjoltc.so"           DestinationFiles="$(ExportRoot)\linux-x64\libjoltc.so"/>
-        <Copy SourceFiles="$(OutputRoot)\linux-x64\lib\libjoltc_double.so"    DestinationFiles="$(ExportRoot)\linux-x64\libjoltc_double.so"/>
+    <Target Name="Export Jolt" AfterTargets="Compile Jolt" Outputs="%(NativePlatform.Identity)">
+        <ItemGroup>
+            <NativePlatformFiles Include="$(OutputRoot)\%(NativePlatform.Identity)\%(NativePlatform.CopySourceFiles)"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(NativePlatformFiles)" DestinationFolder="$(ExportRoot)\%(NativePlatform.Identity)"/>
     </Target>
 
     <Target Name="Generate Jolt Bindings" AfterTargets="Build">

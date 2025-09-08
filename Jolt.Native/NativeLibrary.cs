@@ -30,6 +30,8 @@ namespace Jolt.Native
 
         private static IntPtr libptr;
 
+        public static bool IsLoaded => libptr != IntPtr.Zero;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void LoadLibrary()
         {
@@ -50,24 +52,7 @@ namespace Jolt.Native
                 return;
             }
 
-            string libname;
-
-            if (IsWindows())
-            {
-                libname = $"windows-x64\\{JOLT_LIB}.dll";
-            }
-            else if (IsLinux())
-            {
-                libname = $"linux-x64\\lib{JOLT_LIB}.so";
-            }
-            else if (IsMacOS())
-            {
-                libname = $"macos-x64\\lib{JOLT_LIB}.dylib";
-            }
-            else
-            {
-                throw new Exception("Unrecognized platform, unable to load native lib.");
-            }
+            var libpath = GetLibraryRelativePath();
 
             #if UNITY_EDITOR
             var paths = EditorLibraryPaths();
@@ -77,9 +62,11 @@ namespace Jolt.Native
 
             foreach (var path in paths)
             {
-                if (TryLoadLibrary(Path.Combine(path, libname), out libptr))
+                var combined = Path.Combine(path, libpath);
+
+                if (TryLoadLibrary(combined, out libptr))
                 {
-                    Debug.Log($"Loaded Jolt library at {path}/{libname}");
+                    Debug.Log($"Loaded Jolt library at {path}{Path.DirectorySeparatorChar}{libpath}");
                     break;
                 }
             }
@@ -108,6 +95,42 @@ namespace Jolt.Native
             }
 
             return handle != IntPtr.Zero;
+        }
+
+        private static string GetLibraryRelativePath()
+        {
+            var arch = RuntimeInformation.ProcessArchitecture;
+            var archFolderPrefix = string.Empty;
+
+            if (arch == Architecture.X64)
+            {
+                archFolderPrefix = "x86_64";
+            }
+            else if (arch == Architecture.Arm64)
+            {
+                archFolderPrefix = "aarch64";
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unsupported architecture {arch}, unable to load native lib.");
+            }
+
+            if (IsWindows())
+            {
+                return $"{archFolderPrefix}-windows\\{JOLT_LIB}.dll";
+            }
+
+            if (IsMacOS())
+            {
+                return $"{archFolderPrefix}-macos\\{JOLT_LIB}.dll";
+            }
+
+            if (IsLinux())
+            {
+                return $"{archFolderPrefix}-linux\\{JOLT_LIB}.dll";
+            }
+
+            throw new InvalidOperationException("Unsupported platform, unable to load native lib.");
         }
 
         private static bool IsWindows()
@@ -145,6 +168,7 @@ namespace Jolt.Native
         {
             return new[]
             {
+                $"{Application.dataPath}/Plugins/aarch64",
                 $"{Application.dataPath}/Plugins/x86_64",
                 $"{Application.dataPath}/Plugins"
             };
