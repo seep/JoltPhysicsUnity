@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -32,6 +33,12 @@ namespace Jolt.Native
 
         public static bool IsLoaded => libptr != IntPtr.Zero;
 
+        #if UNITY_EDITOR
+        private const bool IsEditor = true;
+        #else
+        private const bool IsEditor = false;
+        #endif
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void LoadLibrary()
         {
@@ -47,33 +54,24 @@ namespace Jolt.Native
 
         private static void MaybeLoadLibrary()
         {
-            if (libptr != IntPtr.Zero)
+            if (IsLoaded)
             {
                 return;
             }
 
-            var libpath = GetLibraryRelativePath();
+            var dir = IsEditor ? GetEditorLibraryFolder() : GetRuntimeLibraryFolder();
+            var ext = GetLibraryExtension();
 
-            #if UNITY_EDITOR
-            var paths = EditorLibraryPaths();
-            #else
-            var paths = RuntimeLibraryPaths();
-            #endif
+            var libname = $"{JOLT_LIB}.{ext}";
+            var libpath = Path.Combine(dir, libname);
 
-            foreach (var path in paths)
+            if (TryLoadLibrary(libpath, out libptr))
             {
-                var combined = Path.Combine(path, libpath);
-
-                if (TryLoadLibrary(combined, out libptr))
-                {
-                    Debug.Log($"Loaded Jolt library at {path}{Path.DirectorySeparatorChar}{libpath}");
-                    break;
-                }
+                Debug.Log($"Loaded Jolt library at {libpath}");
             }
-
-            if (libptr == IntPtr.Zero)
+            else
             {
-                throw new Exception("Failed to load native lib.");
+                throw new Exception($"Failed to load native lib from {libpath}");
             }
         }
 
@@ -97,37 +95,83 @@ namespace Jolt.Native
             return handle != IntPtr.Zero;
         }
 
-        private static string GetLibraryRelativePath()
+        private static string GetEditorLibraryFolder()
         {
-            var arch = RuntimeInformation.ProcessArchitecture;
-            var archFolderPrefix = string.Empty;
+            string arch;
 
-            if (arch == Architecture.X64)
+            if (RuntimeInformation.ProcessArchitecture == Architecture.X64)
             {
-                archFolderPrefix = "x86_64";
+                arch = "x86_64";
             }
-            else if (arch == Architecture.Arm64)
+            else if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
             {
-                archFolderPrefix = "aarch64";
+                arch = "aarch64";
             }
             else
             {
-                throw new InvalidOperationException($"Unsupported architecture {arch}, unable to load native lib.");
+                throw new InvalidOperationException("Unsupported architecture, unable to load native lib.");
             }
+
+            string relpath;
 
             if (IsWindows())
             {
-                return $"{archFolderPrefix}-windows\\{JOLT_LIB}.dll";
+                relpath = $"{arch}-windows";
+            }
+            else if (IsMacOS())
+            {
+                relpath = $"{arch}-macos";
+            }
+            else if (IsLinux())
+            {
+                relpath = $"{arch}-linux";
+            }
+            else
+            {
+                throw new InvalidOperationException("Unsupported platform, unable to load native lib.");
+            }
+
+            const string package = "com.seep.jolt";
+
+            #if JOLT_RELEASE
+            const string config = "Release";
+            #else
+            const string config = "Debug";
+            #endif
+
+            return Path.GetFullPath($"Packages\\{package}\\Jolt.Native\\{config}\\{relpath}");
+        }
+
+        private static string GetRuntimeLibraryFolder()
+        {
+            if (RuntimeInformation.ProcessArchitecture == Architecture.X64)
+            {
+                return $"{Application.dataPath}/Plugins/x86_64";
+            }
+
+            if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+            {
+                return $"{Application.dataPath}/Plugins/ARM64";
+            }
+
+            throw new InvalidOperationException("Unsupported architecture, unable to load native lib.");
+        }
+
+        private static string GetLibraryExtension()
+        {
+            if (IsWindows())
+            {
+                return "dll";
             }
 
             if (IsMacOS())
             {
-                return $"{archFolderPrefix}-macos\\{JOLT_LIB}.dll";
+                return "dylib";
             }
 
             if (IsLinux())
             {
-                return $"{archFolderPrefix}-linux\\{JOLT_LIB}.dll";
+                return "so";
             }
 
             throw new InvalidOperationException("Unsupported platform, unable to load native lib.");
@@ -146,32 +190,6 @@ namespace Jolt.Native
         private static bool IsMacOS()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        }
-
-        private static string[] EditorLibraryPaths()
-        {
-            const string package = "com.seep.jolt";
-
-            #if JOLT_RELEASE
-            const string config = "Release";
-            #else
-            const string config = "Debug";
-            #endif
-
-            return new[]
-            {
-                Path.GetFullPath($"Packages/{package}/Jolt.Native/{config}")
-            };
-        }
-
-        private static string[] RuntimeLibraryPaths()
-        {
-            return new[]
-            {
-                $"{Application.dataPath}/Plugins/aarch64",
-                $"{Application.dataPath}/Plugins/x86_64",
-                $"{Application.dataPath}/Plugins"
-            };
         }
     }
 }
