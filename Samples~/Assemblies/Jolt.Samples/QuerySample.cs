@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using AOT;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Jolt.Samples
@@ -36,12 +37,12 @@ namespace Jolt.Samples
         {
             var query = PhysicsSystem.GetBroadPhaseQuery();
 
-            BroadPhaseCastResult hit = default;
-
+            // TODO IL2CPP requires a static delegate annotated with MonoPInvokeCallback hence weird indirection
             // TODO joltc has no simple out result for this like NarrowPhaseQuery_CastRay
-            if (query.CastRay(origin, vector, (ref BroadPhaseCastResult result) => { hit = result; }, default, default))
+
+            if (query.CastRay(origin, vector, BroadphaseRayCastQuery.OnQueryResult, default, default))
             {
-                var point = origin + vector * hit.Fraction;
+                var point = origin + vector * BroadphaseRayCastQuery.LatestResult.Fraction;
                 var normal = -vector; // TODO derive AABB normal from vector orientation
 
                 BroadPhasePoint.SetActive(true);
@@ -74,6 +75,17 @@ namespace Jolt.Samples
             {
                 NarrowPhasePoint.SetActive(false);
             }
+        }
+    }
+
+    public static class BroadphaseRayCastQuery
+    {
+        public static BroadPhaseCastResult LatestResult;
+
+        [MonoPInvokeCallback(typeof(BroadPhaseQuery.CastRayCallback))]
+        public static void OnQueryResult(ref BroadPhaseCastResult result)
+        {
+            LatestResult = result;
         }
     }
 }
