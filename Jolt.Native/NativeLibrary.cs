@@ -20,6 +20,18 @@ namespace Jolt.Native
         public const string JOLT_LIB = "joltc";
         #endif
 
+        #if JOLT_DOUBLE_PRECISION
+        private const bool IsDoublePrecision = true;
+        #else
+        private const bool IsDoublePrecision = false;
+        #endif
+        
+        #if UNITY_EDITOR
+        private const bool IsEditor = true;
+        #else
+        private const bool IsEditor = false;
+        #endif
+
         [DllImport("kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "LoadLibrary")]
         private static extern IntPtr LoadLibraryWindows(string path);
 
@@ -32,12 +44,6 @@ namespace Jolt.Native
         private static IntPtr libptr;
 
         public static bool IsLoaded => libptr != IntPtr.Zero;
-
-        #if UNITY_EDITOR
-        private const bool IsEditor = true;
-        #else
-        private const bool IsEditor = false;
-        #endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void LoadLibrary()
@@ -60,9 +66,7 @@ namespace Jolt.Native
             }
 
             var dir = IsEditor ? GetEditorLibraryFolder() : GetRuntimeLibraryFolder();
-            var ext = GetLibraryExtension();
-
-            var libname = $"{JOLT_LIB}.{ext}";
+            var libname = GetLibraryFilename();
             var libpath = Path.Combine(dir, libname);
 
             if (TryLoadLibrary(libpath, out libptr))
@@ -157,21 +161,21 @@ namespace Jolt.Native
             throw new InvalidOperationException("Unsupported architecture, unable to load native lib.");
         }
 
-        private static string GetLibraryExtension()
+        private static string GetLibraryFilename()
         {
             if (IsWindows())
             {
-                return "dll";
+                return $"{JOLT_LIB}.dll";
             }
 
             if (IsMacOS())
             {
-                return "dylib";
+                return $"lib{JOLT_LIB}.dylib";
             }
 
             if (IsLinux())
             {
-                return "so";
+                return $"lib{JOLT_LIB}.so";
             }
 
             throw new InvalidOperationException("Unsupported platform, unable to load native lib.");
