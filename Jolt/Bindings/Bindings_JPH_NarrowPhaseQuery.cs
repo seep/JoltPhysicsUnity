@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
@@ -55,8 +56,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             rvec3 origin, float3 direction, RayCastSettings settings,
-            // callback
-            NarrowPhaseQuery.CastRayCallback callback,
+            // query results container
+            NativeList<RayCastResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -69,7 +70,7 @@ namespace Jolt
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay2(
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings),
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -81,8 +82,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             rvec3 origin, float3 direction, RayCastSettings settings, CollisionCollectorType collector,
-            // callback
-            NarrowPhaseQuery.CastRayCallback callback,
+            // query results container
+            NativeList<RayCastResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -95,7 +96,7 @@ namespace Jolt
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastRay3(
                 query, &origin, &direction, (JPH_RayCastSettings*)(&settings), collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCastRayCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -107,8 +108,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             rvec3 point,
-            // callback
-            NarrowPhaseQuery.CollidePointCallback callback,
+            // query results container
+            NativeList<CollidePointResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -121,7 +122,7 @@ namespace Jolt
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollidePoint(
                 query, &point,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -133,8 +134,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             rvec3 point, CollisionCollectorType collector,
-            // callback
-            NarrowPhaseQuery.CollidePointCallback callback,
+            // query results container
+            NativeList<CollidePointResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -147,7 +148,7 @@ namespace Jolt
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollidePoint2(
                 query, &point, collector,
                 callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -159,8 +160,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             NativeHandle<JPH_Shape> shape, float3 scale, rmatrix4x4 com, CollideShapeSettings settings, rvec3 offset,
-            // callback
-            NarrowPhaseQuery.CollideShapeCallback callback,
+            // query results container
+            NativeList<CollideShapeResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -172,8 +173,8 @@ namespace Jolt
 
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollideShape(
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset,
-                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollideShapeCallbackPointer,
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -185,8 +186,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             NativeHandle<JPH_Shape> shape, float3 scale, rmatrix4x4 com, CollideShapeSettings settings, rvec3 offset, CollisionCollectorType collector,
-            // callback
-            NarrowPhaseQuery.CollideShapeCallback callback,
+            // query results container
+            NativeList<CollideShapeResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -198,8 +199,8 @@ namespace Jolt
 
             return UnsafeBindings.JPH_NarrowPhaseQuery_CollideShape2(
                 query, shape, &scale, &com, (JPH_CollideShapeSettings*)&settings, &offset, collector,
-                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollideShapeCallbackPointer,
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -211,8 +212,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query,
             // query parameters
             NativeHandle<JPH_Shape> shape, rmatrix4x4 worldTransform, float3 direction, ShapeCastSettings settings, rvec3 baseOffset,
-            // callback
-            NarrowPhaseQuery.CollideShapeCallback callback,
+            // query results container
+            NativeList<CollideShapeResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -224,8 +225,8 @@ namespace Jolt
 
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastShape(
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset,
-                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollideShapeCallbackPointer,
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -237,8 +238,8 @@ namespace Jolt
             NativeHandle<JPH_NarrowPhaseQuery> query, NativeHandle<JPH_Shape> shape,
             // query parameters
             rmatrix4x4 worldTransform, float3 direction, ShapeCastSettings settings, rvec3 baseOffset, CollisionCollectorType collector,
-            // callback
-            NarrowPhaseQuery.CollideShapeCallback callback,
+            // query results container
+            NativeList<CollideShapeResult> results,
             // optional filters
             NativeHandle<JPH_BroadPhaseLayerFilter> broadPhaseLayerFilter = default,
             NativeHandle<JPH_ObjectLayerFilter> objectLayerFilter = default,
@@ -250,8 +251,8 @@ namespace Jolt
 
             return UnsafeBindings.JPH_NarrowPhaseQuery_CastShape2(
                 query, shape, &worldTransform, &direction, (JPH_ShapeCastSettings*)&settings, &baseOffset, collector,
-                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollidePointCallbackPointer,
-                userData: GetDelegatePointer(callback),
+                callback: UnsafeNarrowPhaseQueryCallbacks.UnsafeCollideShapeCallbackPointer,
+                userData: (nint)results.GetUnsafeList(),
                 GetOptionalPointer(broadPhaseLayerFilter),
                 GetOptionalPointer(objectLayerFilter),
                 GetOptionalPointer(bodyFilter),
@@ -261,7 +262,7 @@ namespace Jolt
     }
 
     /// <summary>
-    /// Static function pointers for JPH_NarrowPhaseQuery queries; the individual callback pointers are passed via the user data.
+    /// Static function pointers for JPH_NarrowPhaseQuery queries.
     /// </summary>
     internal static unsafe class UnsafeNarrowPhaseQueryCallbacks
     {
@@ -281,40 +282,25 @@ namespace Jolt
             (UnsafeCollidePointDelegate)UnsafeCollidePointCallback
         );
 
+        private static void TryAddNoResize<T>(UnsafeList<T>* list, T value) where T : unmanaged
+        {
+            // TODO add conditionally compiled error log about too small list
+            if (list->Length < list->Capacity) list->AddNoResize(value);
+        }
+
         private static void UnsafeCastRayCallback(nint udata, RayCastResult* result)
         {
-            try
-            {
-                Marshal.GetDelegateForFunctionPointer<NarrowPhaseQuery.CastRayCallback>(udata).Invoke(ref UnsafeUtility.AsRef<RayCastResult>(result));
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            TryAddNoResize((UnsafeList<RayCastResult>*)udata, *result);
         }
 
         private static void UnsafeCollideShapeCallback(nint udata, CollideShapeResult* result)
         {
-            try
-            {
-                Marshal.GetDelegateForFunctionPointer<NarrowPhaseQuery.CollideShapeCallback>(udata).Invoke(ref UnsafeUtility.AsRef<CollideShapeResult>(result));
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            TryAddNoResize((UnsafeList<CollideShapeResult>*)udata, *result);
         }
 
         private static void UnsafeCollidePointCallback(nint udata, CollidePointResult* result)
         {
-            try
-            {
-                Marshal.GetDelegateForFunctionPointer<NarrowPhaseQuery.CollidePointCallback>(udata).Invoke(ref UnsafeUtility.AsRef<CollidePointResult>(result));
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            TryAddNoResize((UnsafeList<CollidePointResult>*)udata, *result);
         }
     }
 }

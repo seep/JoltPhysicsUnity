@@ -23,15 +23,15 @@ namespace Jolt
         
         #region JPH_BroadPhaseQuery
         
-        public bool CastRay(float3 origin, float3 direction, BroadPhaseQuery.CastRayCallback callback, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CastRay(Handle, origin, direction, callback, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
+        public bool CastRay(float3 origin, float3 direction, NativeList<BroadPhaseCastResult> results, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CastRay(Handle, origin, direction, results, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
         
-        public bool CastRay(float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, BroadPhaseQuery.CastRayCallback callback, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CastRay(Handle, origin, direction, collisionCollectorType, callback, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
+        public bool CastRay(float3 origin, float3 direction, CollisionCollectorType collisionCollectorType, NativeList<BroadPhaseCastResult> results, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CastRay(Handle, origin, direction, collisionCollectorType, results, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
         
-        public bool CollideAABox(AABox box, BroadPhaseQuery.CollideCallback callback, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollideAABox(Handle, box, callback, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
+        public bool CollideAABox(AABox box, NativeList<BodyID> results, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollideAABox(Handle, box, results, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
         
-        public bool CollideSphere(float3 center, float radius, BroadPhaseQuery.CollideCallback callback, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollideSphere(Handle, center, radius, callback, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
+        public bool CollideSphere(float3 center, float radius, NativeList<BodyID> results, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollideSphere(Handle, center, radius, results, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
         
-        public bool CollidePoint(float3 point, BroadPhaseQuery.CollideCallback callback, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollidePoint(Handle, point, callback, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
+        public bool CollidePoint(float3 point, NativeList<BodyID> results, BroadPhaseLayerFilter broadPhaseLayerFilter, ObjectLayerFilter objectLayerFilter) => Bindings.JPH_BroadPhaseQuery_CollidePoint(Handle, point, results, broadPhaseLayerFilter.Handle, objectLayerFilter.Handle);
         
         #endregion
         

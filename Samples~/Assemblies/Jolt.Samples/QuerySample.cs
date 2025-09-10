@@ -1,4 +1,5 @@
 ﻿using AOT;
+using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -36,13 +37,12 @@ namespace Jolt.Samples
         private void BroadPhaseQuery(float3 origin, float3 vector)
         {
             var query = PhysicsSystem.GetBroadPhaseQuery();
+            var results = new NativeList<BroadPhaseCastResult>(8, Allocator.Temp);
 
-            // TODO IL2CPP requires a static delegate annotated with MonoPInvokeCallback hence weird indirection
-            // TODO joltc has no simple out result for this like NarrowPhaseQuery_CastRay
-
-            if (query.CastRay(origin, vector, BroadphaseRayCastQuery.OnQueryResult, default, default))
+            if (query.CastRay(origin, vector, results, default, default))
             {
-                var point = origin + vector * BroadphaseRayCastQuery.LatestResult.Fraction;
+                var hit = results[0];
+                var point = origin + vector * hit.Fraction;
                 var normal = -vector; // TODO derive AABB normal from vector orientation
 
                 BroadPhasePoint.SetActive(true);
@@ -58,12 +58,12 @@ namespace Jolt.Samples
         private void NarrowPhaseQuery(float3 origin, float3 vector)
         {
             var query = PhysicsSystem.GetNarrowPhaseQuery();
-
-            RayCastResult hit = default;
+            var results = new NativeList<RayCastResult>(8, Allocator.Temp);
 
             // TODO generate bindings with default parameters
-            if (query.CastRay(origin, vector, out hit, default, default, default))
+            if (query.CastRay(origin, vector, default, CollisionCollectorType.ClosestHit, results, default, default, default, default))
             {
+                var hit = results[0];
                 var point = origin + vector * hit.Fraction;
                 var normal = NarrowPhaseBody.NativeBody!.Value.GetWorldSpaceSurfaceNormal(hit.SubShapeID, point);
 
@@ -75,17 +75,6 @@ namespace Jolt.Samples
             {
                 NarrowPhasePoint.SetActive(false);
             }
-        }
-    }
-
-    public static class BroadphaseRayCastQuery
-    {
-        public static BroadPhaseCastResult LatestResult;
-
-        [MonoPInvokeCallback(typeof(BroadPhaseQuery.CastRayCallback))]
-        public static void OnQueryResult(ref BroadPhaseCastResult result)
-        {
-            LatestResult = result;
         }
     }
 }
