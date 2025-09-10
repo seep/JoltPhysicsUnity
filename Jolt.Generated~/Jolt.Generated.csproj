@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <UnityVersion>2022.3.60f1</UnityVersion>
+    <UnityVersion>6000.0.57f1</UnityVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Jolt.SourceGenerator~\Jolt.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    <PackageReference Include="Unity3D" Version="3.0.0"/>
+    <PackageReference Include="Unity3D" Version="3.0.1"/>
   </ItemGroup>
 
   <ItemGroup>

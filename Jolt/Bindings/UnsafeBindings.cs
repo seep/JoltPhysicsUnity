@@ -1,9 +1,12 @@
-﻿using Jolt.Native;
-
-namespace Jolt
+﻿namespace Jolt
 {
     internal partial class UnsafeBindings
     {
-        private const string JOLT_LIB = NativeLibrary.JOLT_LIB;
+        #if JOLT_DOUBLE_PRECISION
+        private const string JOLT_LIB = "joltc_double";
+        #else
+        private const string JOLT_LIB = "joltc";
+        #endif
+
     }
 }
